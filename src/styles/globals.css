@@ -19,7 +19,9 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -28,6 +30,7 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 a {
@@ -38,5 +41,893 @@ a {
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
+  }
+}
+
+/* Theme-specific body classes */
+body.light-mode {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+body.dark-mode {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Dark mode scrollbar */
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Focus styles for accessibility */
+*:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* Utility classes */
+.fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.scale-in {
+  animation: scaleIn 0.4s ease-out forwards;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+.bounce {
+  animation: bounce 1s ease-in-out;
+}
+
+/* Animaciones de entrada escalonadas */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+
+/* Microinteracciones */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow {
+  transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Animaciones de botones */
+.button-ripple {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.button-ripple:active {
+  transform: scale(0.95);
+}
+
+/* Animaciones de tabla */
+.table-row-hover {
+  transition: all 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(102, 126, 234, 0.08);
+  transform: translateX(4px);
+}
+
+/* Animaciones de skeleton */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Animaciones de scroll */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Animaciones de carga */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animaciones de notificación */
+.notification-slide {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.notification-slide-out {
+  animation: slideOutRight 0.4s ease-in forwards;
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Animaciones de modal */
+.modal-backdrop {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Animaciones de transición de página */
+.page-transition {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Animaciones de formulario */
+.form-field-focus {
+  transition: all 0.3s ease;
+}
+
+.form-field-focus:focus-within {
+  transform: translateY(-2px);
+}
+
+/* Animaciones de chip */
+.chip-hover {
+  transition: all 0.2s ease;
+}
+
+.chip-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Animaciones de iconos */
+.icon-spin {
+  animation: spin 2s linear infinite;
+}
+
+.icon-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* Animaciones de progreso */
+.progress-bar {
+  animation: progressFill 2s ease-out forwards;
+}
+
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Animaciones de error */
+.error-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Animaciones de éxito */
+.success-checkmark {
+  animation: checkmark 0.5s ease-out forwards;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Animaciones de tema */
+.theme-transition {
+  transition: all 0.3s ease;
+}
+
+/* Animaciones de sidebar */
+.sidebar-slide {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* Animaciones de tooltip */
+.tooltip-fade {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Animaciones de dropdown */
+.dropdown-slide {
+  animation: slideInRight 0.2s ease-out;
+}
+
+/* Animaciones de badge */
+.badge-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Animaciones de avatar */
+.avatar-hover {
+  transition: all 0.3s ease;
+}
+
+.avatar-hover:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Animaciones de card */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Animaciones de input */
+.input-focus {
+  transition: all 0.3s ease;
+}
+
+.input-focus:focus-within {
+  transform: scale(1.02);
+}
+
+/* Animaciones de select */
+.select-dropdown {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de checkbox */
+.checkbox-check {
+  animation: checkmark 0.3s ease-out;
+}
+
+/* Animaciones de radio */
+.radio-select {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de switch */
+.switch-toggle {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de slider */
+.slider-thumb {
+  transition: all 0.2s ease;
+}
+
+.slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Animaciones de pagination */
+.pagination-hover {
+  transition: all 0.2s ease;
+}
+
+.pagination-hover:hover {
+  transform: scale(1.1);
+}
+
+/* Animaciones de breadcrumb */
+.breadcrumb-hover {
+  transition: all 0.2s ease;
+}
+
+.breadcrumb-hover:hover {
+  transform: translateX(2px);
+}
+
+/* Animaciones de tab */
+.tab-active {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de accordion */
+.accordion-expand {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* Animaciones de stepper */
+.stepper-complete {
+  animation: checkmark 0.5s ease-out;
+}
+
+/* Animaciones de rating */
+.rating-star {
+  transition: all 0.2s ease;
+}
+
+.rating-star:hover {
+  transform: scale(1.2);
+}
+
+/* Animaciones de progress circular */
+.progress-circular {
+  animation: spin 2s linear infinite;
+}
+
+/* Animaciones de skeleton avanzado */
+.skeleton-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Animaciones de loading avanzado */
+.loading-dots {
+  animation: pulse 1.4s ease-in-out infinite both;
+}
+
+.loading-dots:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots:nth-child(2) { animation-delay: -0.16s; }
+
+/* Animaciones de notificación toast */
+.toast-slide {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.toast-slide-out {
+  animation: slideOutRight 0.4s ease-in forwards;
+}
+
+/* Animaciones de drawer */
+.drawer-slide {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* Animaciones de snackbar */
+.snackbar-slide {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Animaciones de dialog */
+.dialog-backdrop {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.dialog-content {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Animaciones de popover */
+.popover-fade {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Animaciones de menu */
+.menu-slide {
+  animation: slideInRight 0.2s ease-out;
+}
+
+/* Animaciones de autocomplete */
+.autocomplete-dropdown {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de datepicker */
+.datepicker-calendar {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de timepicker */
+.timepicker-clock {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de colorpicker */
+.colorpicker-palette {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Animaciones de file upload */
+.file-upload-drag {
+  transition: all 0.3s ease;
+}
+
+.file-upload-drag.dragover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Animaciones de drag and drop */
+.drag-item {
+  transition: all 0.2s ease;
+}
+
+.drag-item.dragging {
+  transform: rotate(5deg) scale(1.05);
+  opacity: 0.8;
+}
+
+/* Animaciones de sortable */
+.sortable-item {
+  transition: all 0.3s ease;
+}
+
+.sortable-item.sorting {
+  transform: translateY(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Animaciones de virtual scroll */
+.virtual-item {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Animaciones de infinite scroll */
+.infinite-loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Animaciones de lazy load */
+.lazy-image {
+  transition: opacity 0.3s ease;
+}
+
+.lazy-image.loaded {
+  opacity: 1;
+}
+
+/* Animaciones de responsive */
+@media (max-width: 768px) {
+  .mobile-slide {
+    animation: slideInLeft 0.4s ease-out;
+  }
+  
+  .mobile-fade {
+    animation: fadeIn 0.4s ease-out;
+  }
+}
+
+/* Animaciones de print */
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+  
+  .print-show {
+    display: block !important;
+  }
+}
+
+/* Animaciones de high contrast */
+@media (prefers-contrast: high) {
+  .high-contrast {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Animaciones de reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Animaciones para el sistema de alertas */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* Animaciones para alertas específicas */
+.alert-success {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.alert-error {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.alert-warning {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.alert-info {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Efectos hover para alertas */
+.alert-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* Animación de progreso para alertas con duración */
+.alert-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  animation: progressBar 6s linear;
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Animaciones para lazy loading */
+@keyframes lazyLoadIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lazyLoadOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+@keyframes componentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes componentSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Clases para lazy loading */
+.lazy-load-in {
+  animation: lazyLoadIn 0.4s ease-out;
+}
+
+.lazy-load-out {
+  animation: lazyLoadOut 0.3s ease-in;
+}
+
+.component-fade-in {
+  animation: componentFadeIn 0.5s ease-out;
+}
+
+.component-slide-up {
+  animation: componentSlideUp 0.5s ease-out;
+}
+
+/* Efectos para componentes lazy */
+.lazy-component {
+  transition: all 0.3s ease;
+}
+
+.lazy-component:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading states para lazy loading */
+.lazy-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.lazy-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Optimizaciones para lazy loading */
+.lazy-optimized {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Efectos de carga progresiva */
+.progressive-load {
+  opacity: 0;
+  animation: progressiveLoad 0.6s ease-out forwards;
+}
+
+@keyframes progressiveLoad {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Stagger para múltiples elementos lazy */
+.lazy-stagger > * {
+  opacity: 0;
+  animation: staggerLoad 0.4s ease-out forwards;
+}
+
+.lazy-stagger > *:nth-child(1) { animation-delay: 0.1s; }
+.lazy-stagger > *:nth-child(2) { animation-delay: 0.2s; }
+.lazy-stagger > *:nth-child(3) { animation-delay: 0.3s; }
+.lazy-stagger > *:nth-child(4) { animation-delay: 0.4s; }
+.lazy-stagger > *:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes staggerLoad {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
