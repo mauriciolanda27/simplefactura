@@ -7,8 +7,14 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
-  if (!session) {
+  if (!session || !session.user?.email) {
     return res.status(401).json({ error: "No autenticado" });
+  }
+
+  const userEmail = session.user.email;
+  const user = await prisma.user.findUnique({ where: { email: userEmail } });
+  if (!user) {
+    return res.status(500).json({ error: "Usuario inválido" });
   }
 
   if (req.method !== 'GET') {
@@ -16,15 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const userEmail = session.user?.email;
-    if (!userEmail) {
-      return res.status(400).json({ error: "Email de usuario no disponible" });
-    }
-    const user = await prisma.user.findUnique({ where: { email: userEmail } });
-    if (!user) {
-      return res.status(500).json({ error: "Usuario inválido" });
-    }
-
     // Parse query parameters
     const {
       dateFrom,
@@ -63,202 +60,144 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const invoices = await prisma.invoice.findMany({
       where: whereClause,
       include: { category: true },
-      orderBy: { purchase_date: 'asc' }
+      orderBy: { purchase_date: 'desc' }
     });
 
+    if (invoices.length === 0) {
+      return res.status(404).json({ error: "No se encontraron facturas en el rango especificado" });
+    }
+
+    // Calculate statistics
+    const totalAmount = invoices.reduce((sum, inv) => sum + inv.total_amount, 0);
+    const totalInvoices = invoices.length;
+    const averageAmount = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
+    const totalTax = totalAmount * 0.13;
+
+    // Group by category
+    const categoryStats = invoices.reduce((acc: Record<string, { count: number; amount: number }>, invoice) => {
+      const categoryName = invoice.category?.name || 'Sin categoría';
+      if (!acc[categoryName]) {
+        acc[categoryName] = { count: 0, amount: 0 };
+      }
+      acc[categoryName].count += 1;
+      acc[categoryName].amount += invoice.total_amount;
+      return acc;
+    }, {});
+
+    // Group by vendor
+    const vendorStats = invoices.reduce((acc: Record<string, { count: number; amount: number }>, invoice) => {
+      const vendorName = invoice.vendor || 'Sin proveedor';
+      if (!acc[vendorName]) {
+        acc[vendorName] = { count: 0, amount: 0 };
+      }
+      acc[vendorName].count += 1;
+      acc[vendorName].amount += invoice.total_amount;
+      return acc;
+    }, {});
+
     if (format === 'csv') {
-      return generateCSVReport(res, invoices, reportType as string, {
-        dateFrom: dateFrom as string,
-        dateTo: dateTo as string
-      });
+      // Generate CSV content
+      let csvContent = '';
+      
+      if (reportType === 'summary') {
+        csvContent = `Reporte Resumen de Facturas\n`;
+        csvContent += `Período: ${dateFrom ? new Date(dateFrom as string).toLocaleDateString() : 'Todo'} - ${dateTo ? new Date(dateTo as string).toLocaleDateString() : 'Hoy'}\n`;
+        csvContent += `Generado: ${new Date().toLocaleString()}\n\n`;
+        
+        csvContent += `Métrica,Valor\n`;
+        csvContent += `Total Facturas,${totalInvoices}\n`;
+        csvContent += `Monto Total,${totalAmount.toFixed(2)}\n`;
+        csvContent += `IVA Total (13%),${totalTax.toFixed(2)}\n`;
+        csvContent += `Promedio por Factura,${averageAmount.toFixed(2)}\n\n`;
+
+        // Top categories
+        csvContent += `Top Categorías\n`;
+        csvContent += `Categoría,Monto,Cantidad\n`;
+        Object.entries(categoryStats)
+          .sort((a, b) => b[1].amount - a[1].amount)
+          .slice(0, 5)
+          .forEach(([category, stats]) => {
+            csvContent += `${category},${stats.amount.toFixed(2)},${stats.count}\n`;
+          });
+
+        csvContent += `\nTop Proveedores\n`;
+        csvContent += `Proveedor,Monto,Cantidad\n`;
+        Object.entries(vendorStats)
+          .sort((a, b) => b[1].amount - a[1].amount)
+          .slice(0, 5)
+          .forEach(([vendor, stats]) => {
+            csvContent += `${vendor},${stats.amount.toFixed(2)},${stats.count}\n`;
+          });
+
+      } else if (reportType === 'detailed') {
+        csvContent = `Reporte Detallado de Facturas\n`;
+        csvContent += `Período: ${dateFrom ? new Date(dateFrom as string).toLocaleDateString() : 'Todo'} - ${dateTo ? new Date(dateTo as string).toLocaleDateString() : 'Hoy'}\n`;
+        csvContent += `Generado: ${new Date().toLocaleString()}\n\n`;
+        
+        csvContent += `Número,Proveedor,Categoría,Rubro,Monto,Fecha,Descripción\n`;
+        invoices.forEach(inv => {
+          csvContent += `"${inv.number_receipt || ''}","${(inv.vendor || 'Sin proveedor').replace(/"/g, '""')}","${(inv.category?.name || 'Sin categoría').replace(/"/g, '""')}","${(inv.rubro || 'Sin rubro').replace(/"/g, '""')}",${inv.total_amount.toFixed(2)},"${new Date(inv.purchase_date).toLocaleDateString()}","${(inv.name || '').replace(/"/g, '""')}"\n`;
+        });
+      }
+
+      // Add BOM for proper UTF-8 encoding in Excel
+      const csvBuffer = Buffer.from('\uFEFF' + csvContent, 'utf8');
+      
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename=reporte_${reportType}_${new Date().toISOString().split('T')[0]}.csv`);
+      res.send(csvBuffer);
+
+    } else if (format === 'pdf') {
+      // For PDF, return the data and let the frontend handle PDF generation
+      const pdfData = {
+        invoices: invoices.map(inv => ({
+          id: inv.id,
+          number_receipt: inv.number_receipt,
+          vendor: inv.vendor,
+          category: inv.category?.name || 'Sin categoría',
+          rubro: inv.rubro,
+          total_amount: inv.total_amount,
+          purchase_date: inv.purchase_date,
+          name: inv.name
+        })),
+        summary: {
+          totalInvoices,
+          totalAmount: totalAmount.toFixed(2),
+          averageAmount: averageAmount.toFixed(2),
+          totalTax: totalTax.toFixed(2),
+          periodStart: dateFrom || '',
+          periodEnd: dateTo || ''
+        },
+        topPerformers: {
+          categories: Object.entries(categoryStats)
+            .map(([name, stats]) => ({ name, amount: stats.amount, count: stats.count }))
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 5),
+          vendors: Object.entries(vendorStats)
+            .map(([name, stats]) => ({ name, amount: stats.amount, count: stats.count }))
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 5)
+        },
+        filters: {
+          dateFrom,
+          dateTo,
+          category,
+          vendor,
+          rubro,
+          minAmount,
+          maxAmount,
+          reportType
+        },
+        exportDate: new Date().toLocaleDateString('es-BO')
+      };
+
+      res.status(200).json(pdfData);
     } else {
-      return generatePDFReport(res, invoices, reportType as string, {
-        dateFrom: dateFrom as string,
-        dateTo: dateTo as string
-      });
+      res.status(400).json({ error: "Formato no soportado. Use 'csv' o 'pdf'" });
     }
 
   } catch (error) {
     console.error('Error exporting report:', error);
     return res.status(500).json({ error: "Error interno del servidor" });
-  }
-}
-
-function generateCSVReport(res: NextApiResponse, invoices: any[], reportType: string, filters: any) {
-  try {
-    const totalAmount = invoices.reduce((sum, inv) => sum + parseFloat(String(inv.total_amount || '0')), 0);
-    const totalTax = totalAmount * 0.13;
-
-    let csvContent = '';
-
-    if (reportType === 'summary') {
-      csvContent = `Reporte Resumen de Facturas\n`;
-      csvContent += `Período: ${filters.dateFrom ? new Date(filters.dateFrom).toLocaleDateString() : 'Todo'} - ${filters.dateTo ? new Date(filters.dateTo).toLocaleDateString() : 'Hoy'}\n`;
-      csvContent += `Generado: ${new Date().toLocaleString()}\n\n`;
-      
-      csvContent += `Métrica,Valor\n`;
-      csvContent += `Total Facturas,${invoices.length}\n`;
-      csvContent += `Monto Total,${totalAmount.toFixed(2)}\n`;
-      csvContent += `IVA Total (13%),${totalTax.toFixed(2)}\n`;
-      csvContent += `Promedio por Factura,${invoices.length > 0 ? (totalAmount / invoices.length).toFixed(2) : '0.00'}\n\n`;
-
-      // Top categories
-      const categoryMap = new Map<string, number>();
-      invoices.forEach(inv => {
-        const categoryName = inv.category?.name || 'Sin categoría';
-        categoryMap.set(categoryName, (categoryMap.get(categoryName) || 0) + parseFloat(String(inv.total_amount || '0')));
-      });
-
-      csvContent += `Top Categorías\n`;
-      csvContent += `Categoría,Monto\n`;
-      Array.from(categoryMap.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .forEach(([category, amount]) => {
-          csvContent += `${category},${amount.toFixed(2)}\n`;
-        });
-
-    } else if (reportType === 'detailed') {
-      csvContent = `Reporte Detallado de Facturas\n`;
-      csvContent += `Período: ${filters.dateFrom ? new Date(filters.dateFrom).toLocaleDateString() : 'Todo'} - ${filters.dateTo ? new Date(filters.dateTo).toLocaleDateString() : 'Hoy'}\n`;
-      csvContent += `Generado: ${new Date().toLocaleString()}\n\n`;
-      
-      csvContent += `Número,Proveedor,Categoría,Rubro,Monto,Fecha,Descripción\n`;
-      invoices.forEach(inv => {
-        csvContent += `"${inv.number_receipt || ''}","${inv.vendor || 'Sin proveedor'}","${inv.category?.name || 'Sin categoría'}","${inv.rubro || 'Sin rubro'}",${parseFloat(String(inv.total_amount || '0')).toFixed(2)},"${new Date(inv.purchase_date).toLocaleDateString()}","${inv.name || ''}"\n`;
-      });
-    }
-
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename=reporte_${reportType}_${new Date().toISOString().split('T')[0]}.csv`);
-    res.status(200).send(csvContent);
-  } catch (error) {
-    console.error('Error generating CSV:', error);
-    res.status(500).json({ error: "Error generando CSV" });
-  }
-}
-
-async function generatePDFReport(res: NextApiResponse, invoices: any[], reportType: string, filters: any) {
-  try {
-    // Dynamic import to avoid issues in serverless environment
-    const { default: jsPDF } = await import('jspdf');
-    await import('jspdf-autotable');
-    
-    const doc = new jsPDF();
-    const totalAmount = invoices.reduce((sum, inv) => sum + parseFloat(String(inv.total_amount || '0')), 0);
-    const totalTax = totalAmount * 0.13;
-
-    // Header
-    doc.setFontSize(20);
-    doc.text('SimpleFactura - Reporte de Negocio', 20, 20);
-    
-    doc.setFontSize(12);
-    doc.text(`Tipo: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`, 20, 35);
-    doc.text(`Período: ${filters.dateFrom ? new Date(filters.dateFrom).toLocaleDateString() : 'Todo'} - ${filters.dateTo ? new Date(filters.dateTo).toLocaleDateString() : 'Hoy'}`, 20, 45);
-    doc.text(`Generado: ${new Date().toLocaleString()}`, 20, 55);
-
-    let yPosition = 75;
-
-    if (reportType === 'summary') {
-      // Summary section
-      doc.setFontSize(16);
-      doc.text('Resumen Ejecutivo', 20, yPosition);
-      yPosition += 15;
-
-      doc.setFontSize(12);
-      const summaryData = [
-        ['Métrica', 'Valor'],
-        ['Total Facturas', invoices.length.toString()],
-        ['Monto Total', `$${totalAmount.toFixed(2)}`],
-        ['IVA Total (13%)', `$${totalTax.toFixed(2)}`],
-        ['Promedio por Factura', `$${invoices.length > 0 ? (totalAmount / invoices.length).toFixed(2) : '0.00'}`]
-      ];
-
-      (doc as any).autoTable({
-        startY: yPosition,
-        head: [summaryData[0]],
-        body: summaryData.slice(1),
-        theme: 'grid',
-        headStyles: { fillColor: [66, 139, 202] }
-      });
-
-      yPosition = (doc as any).lastAutoTable.finalY + 20;
-
-      // Top categories
-      const categoryMap = new Map<string, number>();
-      invoices.forEach(inv => {
-        const categoryName = inv.category?.name || 'Sin categoría';
-        categoryMap.set(categoryName, (categoryMap.get(categoryName) || 0) + parseFloat(String(inv.total_amount || '0')));
-      });
-
-      doc.setFontSize(16);
-      doc.text('Top Categorías', 20, yPosition);
-      yPosition += 15;
-
-      const categoryData = [['Categoría', 'Monto']];
-      Array.from(categoryMap.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .forEach(([category, amount]) => {
-          categoryData.push([category, `$${amount.toFixed(2)}`]);
-        });
-
-      (doc as any).autoTable({
-        startY: yPosition,
-        head: [categoryData[0]],
-        body: categoryData.slice(1),
-        theme: 'grid',
-        headStyles: { fillColor: [66, 139, 202] }
-      });
-
-    } else if (reportType === 'detailed') {
-      // Detailed invoices table
-      doc.setFontSize(16);
-      doc.text('Detalle de Facturas', 20, yPosition);
-      yPosition += 15;
-
-      const tableData = invoices.map(inv => [
-        inv.number_receipt || '',
-        inv.vendor || 'Sin proveedor',
-        inv.category?.name || 'Sin categoría',
-        inv.rubro || 'Sin rubro',
-        `$${parseFloat(String(inv.total_amount || '0')).toFixed(2)}`,
-        new Date(inv.purchase_date).toLocaleDateString()
-      ]);
-
-      (doc as any).autoTable({
-        startY: yPosition,
-        head: [['Número', 'Proveedor', 'Categoría', 'Rubro', 'Monto', 'Fecha']],
-        body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [66, 139, 202] },
-        styles: { fontSize: 8 },
-        columnStyles: {
-          0: { cellWidth: 25 },
-          1: { cellWidth: 35 },
-          2: { cellWidth: 30 },
-          3: { cellWidth: 25 },
-          4: { cellWidth: 25 },
-          5: { cellWidth: 25 }
-        }
-      });
-    }
-
-    // Footer
-    const pageCount = (doc as any).internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(`Página ${i} de ${pageCount}`, 20, doc.internal.pageSize.height - 10);
-    }
-
-    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-    
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=reporte_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`);
-    res.status(200).send(pdfBuffer);
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    res.status(500).json({ error: "Error generando PDF" });
   }
 } 

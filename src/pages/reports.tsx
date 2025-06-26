@@ -34,6 +34,8 @@ import {
 import Layout from '../components/Layout';
 import SkeletonLoader from '../components/SkeletonLoader';
 import AnimatedContainer from '../components/AnimatedContainer';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface ReportData {
   summary: {
@@ -153,18 +155,155 @@ export default function Reports() {
       const res = await fetch(`/api/reports/export?${params}`);
       if (!res.ok) throw new Error('Error al exportar reporte');
       
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}.${format}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      if (format === 'csv') {
+        // Download CSV file
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else if (format === 'pdf') {
+        // Generate PDF on frontend
+        const pdfData = await res.json();
+        generatePDF(pdfData, filters.reportType);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al exportar');
     }
+  };
+
+  const generatePDF = (data: any, reportType: string) => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(20);
+    doc.text('SimpleFactura - Reporte de Negocio', 20, 20);
+    
+    // Subtitle with period
+    doc.setFontSize(12);
+    const periodText = data.summary.periodStart && data.summary.periodEnd 
+      ? `${data.summary.periodStart} - ${data.summary.periodEnd}`
+      : 'Todo el período';
+    doc.text(`Período: ${periodText}`, 20, 30);
+    doc.text(`Fecha de exportación: ${data.exportDate}`, 20, 37);
+    doc.text(`Tipo de reporte: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`, 20, 44);
+    
+    let yPosition = 55;
+
+    if (reportType === 'summary') {
+      // Summary section
+      doc.setFontSize(16);
+      doc.text('Resumen Ejecutivo', 20, yPosition);
+      yPosition += 15;
+
+      doc.setFontSize(12);
+      const summaryData = [
+        ['Métrica', 'Valor'],
+        ['Total Facturas', data.summary.totalInvoices.toString()],
+        ['Monto Total', `$${data.summary.totalAmount}`],
+        ['IVA Total (13%)', `$${data.summary.totalTax}`],
+        ['Promedio por Factura', `$${data.summary.averageAmount}`]
+      ];
+
+      autoTable(doc, {
+        startY: yPosition,
+        head: [summaryData[0]],
+        body: summaryData.slice(1),
+        theme: 'grid',
+        headStyles: { fillColor: [66, 139, 202] }
+      });
+
+      yPosition = (doc as any).lastAutoTable.finalY + 20;
+
+      // Top categories
+      if (data.topPerformers.categories.length > 0) {
+        doc.setFontSize(16);
+        doc.text('Top Categorías', 20, yPosition);
+        yPosition += 15;
+
+        const categoryData = [['Categoría', 'Monto', 'Cantidad']];
+        data.topPerformers.categories.forEach((cat: any) => {
+          categoryData.push([cat.name, `$${cat.amount.toFixed(2)}`, cat.count.toString()]);
+        });
+
+        autoTable(doc, {
+          startY: yPosition,
+          head: [categoryData[0]],
+          body: categoryData.slice(1),
+          theme: 'grid',
+          headStyles: { fillColor: [66, 139, 202] }
+        });
+
+        yPosition = (doc as any).lastAutoTable.finalY + 20;
+      }
+
+      // Top vendors
+      if (data.topPerformers.vendors.length > 0) {
+        doc.setFontSize(16);
+        doc.text('Top Proveedores', 20, yPosition);
+        yPosition += 15;
+
+        const vendorData = [['Proveedor', 'Monto', 'Cantidad']];
+        data.topPerformers.vendors.forEach((vendor: any) => {
+          vendorData.push([vendor.name, `$${vendor.amount.toFixed(2)}`, vendor.count.toString()]);
+        });
+
+        autoTable(doc, {
+          startY: yPosition,
+          head: [vendorData[0]],
+          body: vendorData.slice(1),
+          theme: 'grid',
+          headStyles: { fillColor: [66, 139, 202] }
+        });
+      }
+
+    } else if (reportType === 'detailed') {
+      // Detailed invoices table
+      doc.setFontSize(16);
+      doc.text('Detalle de Facturas', 20, yPosition);
+      yPosition += 15;
+
+      const tableData = data.invoices.map((inv: any) => [
+        inv.number_receipt || '',
+        inv.vendor || 'Sin proveedor',
+        inv.category || 'Sin categoría',
+        inv.rubro || 'Sin rubro',
+        `$${inv.total_amount.toFixed(2)}`,
+        new Date(inv.purchase_date).toLocaleDateString()
+      ]);
+
+      autoTable(doc, {
+        startY: yPosition,
+        head: [['Número', 'Proveedor', 'Categoría', 'Rubro', 'Monto', 'Fecha']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [66, 139, 202] },
+        styles: { fontSize: 8 },
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 35 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 25 },
+          4: { cellWidth: 25 },
+          5: { cellWidth: 25 }
+        }
+      });
+    }
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(`Página ${i} de ${pageCount}`, 20, doc.internal.pageSize.height - 10);
+    }
+
+    // Save PDF
+    doc.save(`reporte_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   // Show loading while checking authentication
