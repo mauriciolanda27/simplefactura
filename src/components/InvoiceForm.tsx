@@ -153,16 +153,18 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
+    // Validaciones obligatorias
+    if (!formData.number_receipt?.trim()) newErrors.number_receipt = 'El número de recibo es obligatorio';
     if (!formData.purchase_date) newErrors.purchase_date = 'La fecha de compra es obligatoria';
-    if (!formData.vendor || formData.vendor.length < 2) newErrors.vendor = 'El vendedor es obligatorio y debe tener al menos 2 caracteres';
-    if (!formData.total_amount || parseFloat(formData.total_amount) <= 0) newErrors.total_amount = 'El monto total es obligatorio y debe ser mayor a 0';
-    if (!formData.rubro || formData.rubro.length < 2) newErrors.rubro = 'El rubro es obligatorio y debe tener al menos 2 caracteres';
+    if (!formData.total_amount?.trim()) newErrors.total_amount = 'El monto total es obligatorio';
+    if (!formData.vendor?.trim()) newErrors.vendor = 'El vendedor es obligatorio';
+    if (!formData.rubro?.trim()) newErrors.rubro = 'El rubro es obligatorio';
     if (!formData.categoryId) newErrors.categoryId = 'La categoría es obligatoria';
     
-    // Validaciones opcionales
-    if (formData.nit && !/^\d{7,11}$/.test(formData.nit)) newErrors.nit = 'NIT debe tener 7-11 dígitos';
-    if (formData.nit_ci_cex && !/^\d{7,11}$/.test(formData.nit_ci_cex)) newErrors.nit_ci_cex = 'NIT/CI/CEX debe tener 7-11 dígitos';
-    if (formData.authorization_code && formData.authorization_code.length < 3) newErrors.authorization_code = 'El código de autorización debe tener al menos 3 caracteres';
+    // Validaciones opcionales - solo verificar que no estén vacíos si se proporcionan
+    if (formData.nit && !formData.nit.trim()) newErrors.nit = 'NIT no puede estar vacío';
+    if (formData.nit_ci_cex && !formData.nit_ci_cex.trim()) newErrors.nit_ci_cex = 'NIT/CI/CEX no puede estar vacío';
+    if (formData.authorization_code && !formData.authorization_code.trim()) newErrors.authorization_code = 'El código de autorización no puede estar vacío';
     if (formData.name && formData.name.length < 2) newErrors.name = 'El nombre debe tener al menos 2 caracteres';
     
     setErrors(newErrors);

@@ -7,8 +7,8 @@ export const validationSchemas = {
   invoice: z.object({
     authorization_code: z.string().optional(),
     name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').optional(),
-    nit: z.string().regex(/^\d{7,11}$/, 'NIT debe tener 7-11 dígitos').optional(),
-    nit_ci_cex: z.string().regex(/^\d{7,11}$/, 'NIT/CI/CEX debe tener 7-11 dígitos').optional(),
+    nit: z.string().optional(),
+    nit_ci_cex: z.string().optional(),
     number_receipt: z.string().min(1, 'El número de recibo es obligatorio'),
     purchase_date: z.string().refine((date: string) => {
       const parsed = new Date(date);
@@ -106,8 +106,7 @@ export function isValidEmail(email: string): boolean {
 
 // Función para validar NIT
 export function isValidNIT(nit: string): boolean {
-  const nitRegex = /^\d{7,11}$/;
-  return nitRegex.test(nit);
+  return nit.trim().length > 0;
 }
 
 // Función para validar monto
