@@ -11,19 +11,27 @@ import {
 import { formatCurrency } from '../../theme';
 
 interface LineChartProps {
-  data: Array<{ week?: string; month?: string; amount: number; count: number }>;
+  data: Array<{
+    date: string;
+    amount: number;
+    count: number;
+  }>;
 }
 
 export default function LineChart({ data }: LineChartProps) {
   const formatData = (data: LineChartProps['data']) => {
     return data.map(item => ({
-      period: item.week || item.month || '',
+      period: item.date,
       amount: item.amount,
       count: item.count
     }));
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: {
+    active?: boolean;
+    payload?: Array<{ value: number; dataKey: string }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div style={{

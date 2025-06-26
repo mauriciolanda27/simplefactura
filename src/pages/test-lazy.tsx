@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, Stack, Typography, Paper, Grid } from '@mui/material';
+import { Box, Button, Stack, Typography, Paper } from '@mui/material';
 import { 
   CameraAlt, 
   BarChart, 
@@ -41,12 +41,26 @@ export default function TestLazyPage() {
     { week: 'Sem 4', amount: 2200, count: 10 }
   ];
 
+  // Transform data to match LineChart expected format
+  const transformedSampleData = sampleData.map(item => ({
+    date: item.week,
+    amount: item.amount,
+    count: item.count
+  }));
+
   const sampleCategories = [
     { name: 'Alimentación', amount: 2500, count: 12 },
     { name: 'Transporte', amount: 1800, count: 8 },
     { name: 'Servicios', amount: 1200, count: 6 },
     { name: 'Entretenimiento', amount: 800, count: 4 }
   ];
+
+  // Transform category data to match PieChart expected format
+  const transformedSampleCategories = sampleCategories.map(item => ({
+    name: item.name,
+    value: item.amount,
+    color: undefined
+  }));
 
   return (
     <Layout title="Prueba de Lazy Loading">
@@ -61,9 +75,9 @@ export default function TestLazyPage() {
             cargando componentes solo cuando son necesarios.
           </Typography>
 
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {/* Componentes de UI */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
                 Componentes de UI
               </Typography>
@@ -96,10 +110,10 @@ export default function TestLazyPage() {
                   Cargar Formulario (Lazy)
                 </Button>
               </Stack>
-            </Grid>
+            </Box>
 
             {/* Gráficos */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
                 Componentes de Gráficos
               </Typography>
@@ -112,8 +126,8 @@ export default function TestLazyPage() {
               >
                 {showCharts ? 'Ocultar' : 'Mostrar'} Gráficos (Lazy)
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
 
           {/* Área de demostración de gráficos */}
           {showCharts && (
@@ -122,19 +136,19 @@ export default function TestLazyPage() {
                 Gráficos Cargados con Lazy Loading
               </Typography>
               
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
                   <Paper sx={{ p: 3, borderRadius: 0, height: 300 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       Gráfico de Líneas
                     </Typography>
                     <Suspense fallback={<LazyLoadingFallback message="Cargando gráfico de líneas..." />}>
-                      <LazyLineChart data={sampleData} />
+                      <LazyLineChart data={transformedSampleData} />
                     </Suspense>
                   </Paper>
-                </Grid>
+                </Box>
                 
-                <Grid item xs={12} md={6}>
+                <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
                   <Paper sx={{ p: 3, borderRadius: 0, height: 300 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       Gráfico de Barras
@@ -143,19 +157,19 @@ export default function TestLazyPage() {
                       <LazyBarChart data={sampleCategories} />
                     </Suspense>
                   </Paper>
-                </Grid>
+                </Box>
                 
-                <Grid item xs={12} md={6}>
+                <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
                   <Paper sx={{ p: 3, borderRadius: 0, height: 300 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       Gráfico Circular
                     </Typography>
                     <Suspense fallback={<LazyLoadingFallback message="Cargando gráfico circular..." />}>
-                      <LazyPieChart data={sampleCategories} />
+                      <LazyPieChart data={transformedSampleCategories} />
                     </Suspense>
                   </Paper>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
           )}
 
@@ -164,8 +178,8 @@ export default function TestLazyPage() {
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
               Beneficios del Lazy Loading
             </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+              <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
                 <Typography variant="body2" color="text.secondary">
                   <strong>• Tiempo de carga inicial más rápido:</strong> Solo se cargan los componentes necesarios
                 </Typography>
@@ -175,8 +189,8 @@ export default function TestLazyPage() {
                 <Typography variant="body2" color="text.secondary">
                   <strong>• Optimización de recursos:</strong> Menor uso de memoria y ancho de banda
                 </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
+              </Box>
+              <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
                 <Typography variant="body2" color="text.secondary">
                   <strong>• Carga bajo demanda:</strong> Los componentes se cargan cuando se necesitan
                 </Typography>
@@ -186,8 +200,8 @@ export default function TestLazyPage() {
                 <Typography variant="body2" color="text.secondary">
                   <strong>• Escalabilidad:</strong> Fácil agregar nuevos componentes sin afectar el rendimiento
                 </Typography>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Box>
         </Paper>
 

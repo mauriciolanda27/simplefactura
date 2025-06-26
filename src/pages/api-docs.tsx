@@ -20,7 +20,6 @@ import {
   Button,
   IconButton,
   Alert,
-  Grid,
   Link as MuiLink
 } from '@mui/material';
 import { 
@@ -31,6 +30,7 @@ import {
   Security,
   RequestPage
 } from '@mui/icons-material';
+import React from 'react';
 
 interface SwaggerSpec {
   info: Record<string, unknown>;
@@ -264,9 +264,9 @@ export default function ApiDocs() {
                 <RequestPage sx={{ mr: 1 }} />
                 Responses
               </Typography>
-              <Grid container spacing={2}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                 {Object.entries(details.responses).map(([code, response]: [string, any]) => (
-                  <Grid item xs={12} sm={6} key={code}>
+                  <Box sx={{ flex: '1 1 300px', minWidth: 0 }} key={code}>
                     <Paper sx={{ p: 2, border: '1px solid #e0e0e0' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                         <Chip 
@@ -289,14 +289,97 @@ export default function ApiDocs() {
                         </Typography>
                       )}
                     </Paper>
-                  </Grid>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </Box>
           </Box>
         </CardContent>
       </Card>
     ));
+  };
+
+  const renderTagsSection = () => {
+    if (!swaggerSpec?.tags || !Array.isArray(swaggerSpec.tags) || swaggerSpec.tags.length === 0) {
+      return null;
+    }
+
+    return (
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+          Endpoints de la API
+        </Typography>
+        
+        {(swaggerSpec.tags as any[]).map((tag: any) => (
+          <Accordion 
+            key={tag.name}
+            expanded={expandedTags.includes(tag.name)}
+            onChange={() => handleTagToggle(tag.name)}
+            sx={{ mb: 2, border: '1px solid #e0e0e0' }}
+          >
+            <AccordionSummary expandIcon={<ExpandMore />}>
+              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', flexGrow: 1 }}>
+                  {String(tag.name || '')}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  {String(tag.description || '')}
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 0 }}>
+              <Box sx={{ p: 2 }}>
+                {Object.entries(swaggerSpec.paths)
+                  .filter(([path, methods]: [string, any]) => 
+                    Object.values(methods).some((method: any) => 
+                      method.tags?.includes(tag.name)
+                    )
+                  )
+                  .map(([path, methods]: [string, any]) => 
+                    renderEndpoint(path, methods)
+                  )}
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Box>
+    );
+  };
+
+  const renderDataModelsSection = () => {
+    if (!swaggerSpec?.components?.schemas) {
+      return null;
+    }
+
+    return (
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+            Data Models
+          </Typography>
+          
+          {Object.entries(swaggerSpec.components.schemas)
+            .filter(([name, schema]: [string, any]) => 
+              !['Error', 'InvoiceFilters', 'ExportRequest', 'UserRegistration', 'UserLogin'].includes(name)
+            )
+            .map(([name, schema]: [string, any]) => (
+              <Accordion key={name} sx={{ mb: 2 }}>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                    {String(name || '')}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                    {String(schema.description || '')}
+                  </Typography>
+                  {renderSchema(schema, name)}
+                </AccordionDetails>
+              </Accordion>
+            ))}
+        </CardContent>
+      </Card>
+    );
   };
 
   if (loading) {
@@ -349,95 +432,28 @@ export default function ApiDocs() {
               <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
                 Información de la API
               </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
                   <Typography variant="h6" sx={{ mb: 1 }}>URL Base</Typography>
                   <Paper sx={{ p: 2, backgroundColor: '#f8f9fa', fontFamily: 'monospace' }}>
-                    {swaggerSpec?.servers?.[0]?.url || 'http://localhost:3000/api'}
+                    {String(swaggerSpec?.servers?.[0]?.url || 'http://localhost:3000/api')}
                   </Paper>
-                </Grid>
-                <Grid item xs={12} md={6}>
+                </Box>
+                <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
                   <Typography variant="h6" sx={{ mb: 1 }}>Autenticación</Typography>
                   <Alert severity="info">
                     Autenticación basada en sesiones usando cookies de NextAuth.js
                   </Alert>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </CardContent>
           </Card>
 
           {/* Endpoints by Tag */}
-          {swaggerSpec?.tags && (
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-                Endpoints de la API
-              </Typography>
-              
-              {swaggerSpec.tags.map((tag: any) => (
-                <Accordion 
-                  key={tag.name}
-                  expanded={expandedTags.includes(tag.name)}
-                  onChange={() => handleTagToggle(tag.name)}
-                  sx={{ mb: 2, border: '1px solid #e0e0e0' }}
-                >
-                  <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', flexGrow: 1 }}>
-                        {tag.name}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        {tag.description}
-                      </Typography>
-                    </Box>
-                  </AccordionSummary>
-                  <AccordionDetails sx={{ p: 0 }}>
-                    <Box sx={{ p: 2 }}>
-                      {Object.entries(swaggerSpec.paths)
-                        .filter(([path, methods]: [string, any]) => 
-                          Object.values(methods).some((method: any) => 
-                            method.tags?.includes(tag.name)
-                          )
-                        )
-                        .map(([path, methods]: [string, any]) => 
-                          renderEndpoint(path, methods)
-                        )}
-                    </Box>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </Box>
-          )}
+          {renderTagsSection()}
 
           {/* Data Models */}
-          {swaggerSpec?.components?.schemas && (
-            <Card sx={{ mb: 4 }}>
-              <CardContent>
-                <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-                  Data Models
-                </Typography>
-                
-                {Object.entries(swaggerSpec.components.schemas)
-                  .filter(([name, schema]: [string, any]) => 
-                    !['Error', 'InvoiceFilters', 'ExportRequest', 'UserRegistration', 'UserLogin'].includes(name)
-                  )
-                  .map(([name, schema]: [string, any]) => (
-                    <Accordion key={name} sx={{ mb: 2 }}>
-                      <AccordionSummary expandIcon={<ExpandMore />}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                          {name}
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-                          {schema.description}
-                        </Typography>
-                        {renderSchema(schema, name)}
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-              </CardContent>
-            </Card>
-          )}
+          {renderDataModelsSection()}
 
           {/* Try it out section */}
           <Card sx={{ mb: 4 }}>

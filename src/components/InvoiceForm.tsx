@@ -103,7 +103,7 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
       }
     };
     loadData();
-  }, []);
+  }, [showError]);
 
   // Handle webcam image capture
   const handleWebcamCapture = (capturedFile: File) => {
@@ -147,7 +147,7 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
         }
       })();
     }
-  }, [file]);
+  }, [file, showInfo, showSuccess, showError]);
 
   // Validación simple
   const validateForm = () => {

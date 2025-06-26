@@ -7,7 +7,6 @@ import {
   IconButton,
   Chip,
   Avatar,
-  Grid,
   Button,
   Dialog,
   DialogTitle,
@@ -31,7 +30,17 @@ import {
   Delete,
   Visibility
 } from '@mui/icons-material';
-import { Vendor } from '@prisma/client';
+
+interface Vendor {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  nit: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface VendorListProps {
   vendors: Vendor[];
@@ -89,9 +98,9 @@ export default function VendorList({ vendors, onEdit, onDelete }: VendorListProp
   return (
     <>
       {/* Vendors Grid */}
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
         {currentVendors.map((vendor) => (
-          <Grid item xs={12} sm={6} md={4} key={vendor.id}>
+          <Box sx={{ flex: '1 1 300px', minWidth: 0, maxWidth: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(33.333% - 16px)' } }} key={vendor.id}>
             <Card 
               elevation={2}
               sx={{
@@ -193,9 +202,9 @@ export default function VendorList({ vendors, onEdit, onDelete }: VendorListProp
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {/* Pagination Controls */}
       {vendors.length > itemsPerPage && (
@@ -251,8 +260,8 @@ export default function VendorList({ vendors, onEdit, onDelete }: VendorListProp
         <DialogContent>
           {selectedVendor && (
             <Box sx={{ pt: 1 }}>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box>
                   <Box display="flex" alignItems="center" mb={2}>
                     <Avatar sx={{ width: 60, height: 60, mr: 2, bgcolor: 'primary.main' }}>
                       <Business sx={{ fontSize: 30 }} />
@@ -268,9 +277,9 @@ export default function VendorList({ vendors, onEdit, onDelete }: VendorListProp
                       />
                     </Box>
                   </Box>
-                </Grid>
+                </Box>
 
-                <Grid item xs={12}>
+                <Box>
                   <Divider sx={{ my: 2 }} />
                   
                   {selectedVendor.email && (
@@ -314,8 +323,8 @@ export default function VendorList({ vendors, onEdit, onDelete }: VendorListProp
                       </Box>
                     </Box>
                   )}
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
           )}
         </DialogContent>

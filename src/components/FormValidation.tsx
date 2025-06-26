@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, TextFieldProps, FormControl, InputLabel, Select, MenuItem, Box, Typography } from '@mui/material';
+import { TextField, TextFieldProps, FormControl, InputLabel, Select, MenuItem, Box, Typography, SelectChangeEvent } from '@mui/material';
 import { CheckCircle, Error } from '@mui/icons-material';
 
 // Tipos de validación
@@ -344,8 +344,8 @@ export const ValidatedSelectField: React.FC<ValidatedSelectFieldProps> = ({
     }
   }, [value, rules, touched]);
 
-  const handleChange = (event: any) => {
-    onChange(event.target.value as string);
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    onChange(event.target.value);
   };
 
   const handleBlur = () => {

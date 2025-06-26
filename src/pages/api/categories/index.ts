@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         });
         
-        console.log('Categorías encontradas:', categories.map(c => ({ id: c.id, name: c.name, invoiceCount: c._count.invoices })));
+        console.log('Categorías encontradas:', categories.map((c: { id: string; name: string; _count: { invoices: number } }) => ({ id: c.id, name: c.name, invoiceCount: c._count.invoices })));
         
         return res.status(200).json(categories);
       } catch (e) {

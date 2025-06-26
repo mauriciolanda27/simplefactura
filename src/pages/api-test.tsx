@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useState } from 'react';
 import Head from 'next/head';
 import Layout from '../components/Layout';
@@ -271,7 +272,7 @@ export default function ApiTest() {
                 </Box>
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  Select an endpoint and click "Test Endpoint" to see the response here.
+                  Select an endpoint and click &quot;Test Endpoint&quot; to see the response here. If you&apos;re not authenticated, you may get a 401 error.
                 </Typography>
               )}
             </CardContent>

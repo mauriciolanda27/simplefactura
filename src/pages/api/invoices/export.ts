@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { startDate, endDate, format, vendor, nit, categoryId, minAmount, maxAmount, includeIVA = true } = req.body;
     
     // Build query filters
-    const where: Prisma.InvoiceWhereInput = {
+    const where: any = {
       userId: user.id, // Solo facturas del usuario actual
     };
     
@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     if (maxAmount) {
       if (where.total_amount && typeof where.total_amount === 'object' && 'gte' in where.total_amount) {
-        (where.total_amount as Prisma.FloatFilter).lte = parseFloat(maxAmount);
+        (where.total_amount as any).lte = parseFloat(maxAmount);
       } else {
         where.total_amount = { lte: parseFloat(maxAmount) };
       }

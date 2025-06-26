@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { Alert, Snackbar, AlertColor, Box } from '@mui/material';
-import { CheckCircle, Error, Warning, Info } from '@mui/icons-material';
+import { CheckCircle, Error as ErrorIcon, Warning, Info } from '@mui/icons-material';
 
 // Tipos de alerta
 export type AlertType = 'success' | 'error' | 'warning' | 'info';
@@ -47,6 +47,11 @@ interface AlertProviderProps {
 export function AlertProvider({ children, maxAlerts = 3 }: AlertProviderProps) {
   const [alerts, setAlerts] = useState<AlertMessage[]>([]);
 
+  // Función para limpiar una alerta específica
+  const clearAlert = useCallback((id: string) => {
+    setAlerts(prev => prev.filter(alert => alert.id !== id));
+  }, []);
+
   // Función para mostrar una alerta
   const showAlert = useCallback((
     type: AlertType, 
@@ -73,14 +78,14 @@ export function AlertProvider({ children, maxAlerts = 3 }: AlertProviderProps) {
       }
       return updated;
     });
-
+    
     // Auto-remover después del tiempo especificado
     if (duration > 0) {
       setTimeout(() => {
         clearAlert(id);
       }, duration);
     }
-  }, [maxAlerts]);
+  }, [maxAlerts, clearAlert]);
 
   // Funciones de conveniencia para cada tipo de alerta
   const showSuccess = useCallback((message: string, title?: string) => {
@@ -99,11 +104,6 @@ export function AlertProvider({ children, maxAlerts = 3 }: AlertProviderProps) {
     showAlert('info', message, title, 5000);
   }, [showAlert]);
 
-  // Función para limpiar una alerta específica
-  const clearAlert = useCallback((id: string) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== id));
-  }, []);
-
   // Función para limpiar todas las alertas
   const clearAllAlerts = useCallback(() => {
     setAlerts([]);
@@ -115,7 +115,7 @@ export function AlertProvider({ children, maxAlerts = 3 }: AlertProviderProps) {
       case 'success':
         return <CheckCircle />;
       case 'error':
-        return <Error />;
+        return <ErrorIcon />;
       case 'warning':
         return <Warning />;
       case 'info':
@@ -169,7 +169,7 @@ export function AlertProvider({ children, maxAlerts = 3 }: AlertProviderProps) {
           width: '100%'
         }}
       >
-        {alerts.map((alert, index) => (
+        {alerts.map((alert) => (
           <Snackbar
             key={alert.id}
             open={true}
@@ -229,7 +229,7 @@ export function AppAlert({ type, title, message, onClose, action, className }: A
       case 'success':
         return <CheckCircle />;
       case 'error':
-        return <Error />;
+        return <ErrorIcon />;
       case 'warning':
         return <Warning />;
       case 'info':

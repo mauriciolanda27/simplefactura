@@ -122,7 +122,7 @@ export async function withOwnership(
       name: user.name
     };
     
-    (req as any).resource = resource;
+    (req as AuthenticatedRequest & { resource: unknown }).resource = resource;
     next();
   } catch (error) {
     console.error('Ownership middleware error:', error);
@@ -192,24 +192,10 @@ export async function withRole(
 export function withRateLimit(
   req: NextApiRequest,
   res: NextApiResponse,
-  limit: number = 100, // requests por minuto
-  windowMs: number = 60 * 1000, // 1 minuto
   next: () => void
 ) {
-  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const key = `rate_limit:${clientIp}`;
-  
-  // En una implementación real, esto usaría Redis o similar
-  // Por ahora, es un placeholder para la estructura
-  console.log(`Rate limiting check for IP: ${clientIp}`);
-  
-  // Simular rate limiting (en producción usar Redis)
-  const currentTime = Date.now();
-  const windowStart = currentTime - windowMs;
-  
-  // Aquí se implementaría la lógica real de rate limiting
-  // Por ahora, permitimos todas las requests
-  
+  // TODO: Implement rate limiting logic
+  // For now, just call next()
   next();
 }
 
@@ -241,7 +227,7 @@ export async function withApiProtection(
   try {
     // Rate limiting
     if (rateLimit) {
-      withRateLimit(req, res, rateLimit.limit, rateLimit.windowMs, () => {});
+      withRateLimit(req, res, () => {});
     }
 
     // Autenticación

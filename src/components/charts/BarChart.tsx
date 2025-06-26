@@ -11,7 +11,13 @@ import {
 import { formatCurrency } from '../../theme';
 
 interface BarChartProps {
-  data: Array<{ category?: string; vendor?: string; rubro?: string; amount: number; count: number }>;
+  data: Array<{ 
+    category?: string; 
+    vendor?: string; 
+    rubro?: string; 
+    amount: number; 
+    count: number 
+  }>;
 }
 
 export default function BarChart({ data }: BarChartProps) {
@@ -25,7 +31,11 @@ export default function BarChart({ data }: BarChartProps) {
     }));
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: {
+    active?: boolean;
+    payload?: Array<{ value: number; dataKey: string }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div style={{

@@ -146,6 +146,39 @@ export default function Stats() {
 
   const { summary, weeklyData, monthlyData, categoryData, vendorData, rubroData, comparisons } = statsData;
 
+  // Transform data to match LineChart expected format
+  const transformedWeeklyData: Array<{ date: string; amount: number; count: number }> = weeklyData.map(item => ({
+    date: item.week,
+    amount: item.amount,
+    count: item.count
+  }));
+
+  const transformedMonthlyData: Array<{ date: string; amount: number; count: number }> = monthlyData.map(item => ({
+    date: item.month,
+    amount: item.amount,
+    count: item.count
+  }));
+
+  // Transform category data to match PieChart expected format
+  const transformedCategoryData: Array<{ name: string; value: number; color?: string }> = categoryData.map(item => ({
+    name: item.category,
+    value: item.amount,
+    color: undefined
+  }));
+
+  // Transform vendor and rubro data to match BarChart expected format
+  const transformedVendorData: Array<{ vendor: string; amount: number; count: number }> = vendorData.map(item => ({
+    vendor: item.vendor,
+    amount: item.amount,
+    count: item.count
+  }));
+
+  const transformedRubroData: Array<{ rubro: string; amount: number; count: number }> = rubroData.map(item => ({
+    rubro: item.rubro,
+    amount: item.amount,
+    count: item.count
+  }));
+
   // Calcular cambios porcentuales desde el array de comparisons
   const amountComparison = comparisons.find(c => c.metric === 'Total Monto');
   const countComparison = comparisons.find(c => c.metric === 'Total Facturas');
@@ -227,7 +260,7 @@ export default function Stats() {
                 Tendencia de Gastos
               </Typography>
               <Suspense fallback={<LazyLoadingFallback message="Cargando gráfico..." />}>
-                <LazyLineChart data={timeRange === 'week' ? weeklyData : monthlyData} />
+                <LazyLineChart data={timeRange === 'week' ? transformedWeeklyData : transformedMonthlyData} />
               </Suspense>
             </Paper>
           </AnimatedContainer>
@@ -239,7 +272,7 @@ export default function Stats() {
                 Gastos por Categoría
               </Typography>
               <Suspense fallback={<LazyLoadingFallback message="Cargando gráfico..." />}>
-                <LazyPieChart data={categoryData} />
+                <LazyPieChart data={transformedCategoryData} />
               </Suspense>
             </Paper>
           </AnimatedContainer>
@@ -253,7 +286,7 @@ export default function Stats() {
                 Gastos por Rubro
               </Typography>
               <Suspense fallback={<LazyLoadingFallback message="Cargando gráfico..." />}>
-                <LazyBarChart data={rubroData} />
+                <LazyBarChart data={transformedRubroData} />
               </Suspense>
             </Paper>
           </AnimatedContainer>
@@ -265,7 +298,7 @@ export default function Stats() {
                 Gastos por Proveedor
               </Typography>
               <Suspense fallback={<LazyLoadingFallback message="Cargando gráfico..." />}>
-                <LazyBarChart data={vendorData} />
+                <LazyBarChart data={transformedVendorData} />
               </Suspense>
             </Paper>
           </AnimatedContainer>

@@ -1,6 +1,9 @@
 import React, { lazy, Suspense } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import Image from 'next/image';
 import SkeletonLoader from './SkeletonLoader';
+
+/* eslint-disable react-hooks/exhaustive-deps */
 
 // Componente de carga para lazy loading
 export function LazyLoadingFallback({ message = "Cargando..." }: { message?: string }) {
@@ -105,7 +108,7 @@ export function useLazyData<T>(
 
   React.useEffect(() => {
     loadData();
-  }, deps);
+  }, [loadData, ...deps]);
 
   return { data, loading, error, refetch: loadData };
 }
@@ -166,15 +169,15 @@ export function LazyImage({
         observer.unobserve(imageRef);
       }
     };
-  }, [src, imageSrc, imageRef]);
+  }, [src, imageSrc, imageRef, placeholder]);
 
   return (
-    <img
+    <Image
       ref={setImageRef}
       src={imageSrc}
       alt={alt}
-      width={width}
-      height={height}
+      width={width || 400}
+      height={height || 300}
       className={className}
       style={{
         opacity: imageSrc === placeholder ? 0.5 : 1,

@@ -6,7 +6,6 @@ import {
   Typography,
   TextField,
   Button,
-  Grid,
   Divider,
   InputAdornment
 } from '@mui/material';
@@ -19,7 +18,17 @@ import {
   Cancel,
   Clear
 } from '@mui/icons-material';
-import { Vendor } from '@prisma/client';
+
+interface Vendor {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  nit: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface VendorFormData {
   name: string;
@@ -123,9 +132,9 @@ export default function VendorForm({ vendor, onSubmit, onCancel }: VendorFormPro
         <Divider sx={{ mb: 3 }} />
 
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {/* Nombre */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
               <TextField
                 fullWidth
                 label="Nombre del Proveedor *"
@@ -143,10 +152,10 @@ export default function VendorForm({ vendor, onSubmit, onCancel }: VendorFormPro
                   ),
                 }}
               />
-            </Grid>
+            </Box>
 
             {/* NIT */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
               <TextField
                 fullWidth
                 label="NIT *"
@@ -158,10 +167,10 @@ export default function VendorForm({ vendor, onSubmit, onCancel }: VendorFormPro
                 required
                 placeholder="1234567890"
               />
-            </Grid>
+            </Box>
 
             {/* Email */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
               <TextField
                 fullWidth
                 label="Email"
@@ -180,10 +189,10 @@ export default function VendorForm({ vendor, onSubmit, onCancel }: VendorFormPro
                   ),
                 }}
               />
-            </Grid>
+            </Box>
 
             {/* Teléfono */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
               <TextField
                 fullWidth
                 label="Teléfono"
@@ -199,10 +208,10 @@ export default function VendorForm({ vendor, onSubmit, onCancel }: VendorFormPro
                   ),
                 }}
               />
-            </Grid>
+            </Box>
 
             {/* Dirección */}
-            <Grid item xs={12}>
+            <Box sx={{ flex: '1 1 100%', minWidth: 0 }}>
               <TextField
                 fullWidth
                 label="Dirección"
@@ -220,8 +229,8 @@ export default function VendorForm({ vendor, onSubmit, onCancel }: VendorFormPro
                   ),
                 }}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
 
           {/* Actions */}
           <Box display="flex" justifyContent="space-between" alignItems="center" mt={4}>

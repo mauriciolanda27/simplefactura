@@ -37,7 +37,7 @@ export default function MetricCard({
       setDisplayValue(0);
       return;
     }
-    let start = ref.current;
+    const start = ref.current;
     let startTime: number | null = null;
     const duration = 800;
     const animate = (timestamp: number) => {
@@ -53,7 +53,6 @@ export default function MetricCard({
       }
     };
     requestAnimationFrame(animate);
-    // eslint-disable-next-line
   }, [value, loading]);
 
   return (

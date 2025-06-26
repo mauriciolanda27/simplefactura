@@ -10,28 +10,27 @@ import {
 import { formatCurrency } from '../../theme';
 
 interface PieChartProps {
-  data: Array<{ category?: string; vendor?: string; rubro?: string; amount: number; count: number }>;
+  data: Array<{
+    name: string;
+    value: number;
+    color?: string;
+  }>;
 }
-
-const COLORS = [
-  '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#ff0000',
-  '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'
-];
 
 export default function PieChart({ data }: PieChartProps) {
   const formatData = (data: PieChartProps['data']) => {
-    return data.slice(0, 8).map(item => ({
-      name: (item.category || item.vendor || item.rubro || '').length > 15 
-        ? (item.category || item.vendor || item.rubro || '').substring(0, 15) + '...' 
-        : (item.category || item.vendor || item.rubro || ''),
-      value: item.amount,
-      count: item.count
+    return data.map((item, index) => ({
+      name: item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name,
+      value: item.value,
+      fill: item.color || `hsl(${(index * 137.508) % 360}, 70%, 50%)`
     }));
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: {
+    active?: boolean;
+    payload?: Array<{ name: string; value: number; payload: { name: string; value: number; fill: string } }>;
+  }) => {
     if (active && payload && payload.length) {
-      const data = payload[0];
       return (
         <div style={{
           backgroundColor: 'white',
@@ -40,17 +39,9 @@ export default function PieChart({ data }: PieChartProps) {
           padding: '10px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
         }}>
-          <p style={{ margin: 0, fontWeight: 'bold', color: data.color }}>
-            {data.name}
-          </p>
-          <p style={{ margin: '5px 0' }}>
-            {`Monto: ${formatCurrency(data.value)}`}
-          </p>
-          <p style={{ margin: '5px 0' }}>
-            {`Facturas: ${data.payload.count}`}
-          </p>
-          <p style={{ margin: '5px 0' }}>
-            {`Porcentaje: ${((data.payload.percent || 0) * 100).toFixed(1)}%`}
+          <p style={{ margin: 0, fontWeight: 'bold' }}>{payload[0].name}</p>
+          <p style={{ margin: '5px 0', color: payload[0].payload.fill }}>
+            {`Valor: ${formatCurrency(payload[0].value)}`}
           </p>
         </div>
       );
@@ -58,13 +49,22 @@ export default function PieChart({ data }: PieChartProps) {
     return null;
   };
 
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const CustomCell = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: {
+    cx?: number;
+    cy?: number;
+    midAngle?: number;
+    innerRadius?: number;
+    outerRadius?: number;
+    percent?: number;
+  }) => {
+    if (!cx || !cy || !midAngle || !innerRadius || !outerRadius || !percent) return null;
+    
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    return percent > 0.05 ? (
+    return (
       <text 
         x={x} 
         y={y} 
@@ -76,7 +76,7 @@ export default function PieChart({ data }: PieChartProps) {
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
-    ) : null;
+    );
   };
 
   return (
@@ -87,7 +87,7 @@ export default function PieChart({ data }: PieChartProps) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={renderCustomizedLabel}
+          label={CustomCell}
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
@@ -95,7 +95,7 @@ export default function PieChart({ data }: PieChartProps) {
           {formatData(data).map((entry, index) => (
             <Cell 
               key={`cell-${index}`} 
-              fill={COLORS[index % COLORS.length]} 
+              fill={entry.fill} 
             />
           ))}
         </Pie>
@@ -103,8 +103,8 @@ export default function PieChart({ data }: PieChartProps) {
         <Legend 
           verticalAlign="bottom" 
           height={36}
-          formatter={(value, entry: any) => (
-            <span style={{ color: entry.color, fontSize: '12px' }}>
+          formatter={(value, entry: { color?: string }) => (
+            <span style={{ color: entry.color || '#666', fontSize: '12px' }}>
               {value}
             </span>
           )}

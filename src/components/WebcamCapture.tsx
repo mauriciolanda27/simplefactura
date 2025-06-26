@@ -80,7 +80,7 @@ export default function WebcamCapture({ onImageCapture, onClose }: WebcamCapture
     return () => {
       stopCamera();
     };
-  }, []); // Empty dependency array to run only once
+  }, [startCamera, stopCamera]);
 
   // Capture image from webcam
   const captureImage = useCallback(() => {
@@ -290,6 +290,7 @@ export default function WebcamCapture({ onImageCapture, onClose }: WebcamCapture
             {capturedImage ? (
               <>
                 <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={capturedImage}
                     alt="Captura previa"

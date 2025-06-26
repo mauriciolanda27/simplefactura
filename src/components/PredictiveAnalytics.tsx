@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Chip,
   Alert,
   CircularProgress,
@@ -132,8 +131,8 @@ export default function StatisticalAnalytics() {
             </Typography>
           </Box>
           
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                 Factores de Riesgo:
               </Typography>
@@ -146,8 +145,8 @@ export default function StatisticalAnalytics() {
                   sx={{ mr: 1, mb: 1 }}
                 />
               ))}
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                 Recomendaciones:
               </Typography>
@@ -160,8 +159,8 @@ export default function StatisticalAnalytics() {
                   sx={{ mr: 1, mb: 1 }}
                 />
               ))}
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
 
@@ -177,8 +176,8 @@ export default function StatisticalAnalytics() {
 
       {/* Cash Flow Predictions */}
       <TabPanel value={tabValue} index={0}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box>
             <Typography variant="h6" gutterBottom>
               Proyección de Flujo de Caja (Próximos 30 días)
             </Typography>
@@ -203,9 +202,9 @@ export default function StatisticalAnalytics() {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </Grid>
+          </Box>
           
-          <Grid item xs={12}>
+          <Box>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -217,7 +216,7 @@ export default function StatisticalAnalytics() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data.cashFlowPredictions.slice(0, 10).map((prediction, index) => (
+                  {data.cashFlowPredictions.slice(0, 10).map((prediction: any, index: number) => (
                     <TableRow key={index}>
                       <TableCell>
                         {new Date(prediction.date).toLocaleDateString('es-BO')}
@@ -253,8 +252,8 @@ export default function StatisticalAnalytics() {
                 </TableBody>
               </Table>
             </TableContainer>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </TabPanel>
 
       {/* Payment Predictions */}
@@ -274,7 +273,7 @@ export default function StatisticalAnalytics() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.paymentPredictions.map((prediction, index) => (
+              {data.paymentPredictions.map((prediction: any, index: number) => (
                 <TableRow key={index}>
                   <TableCell>
                     <Typography variant="body2" fontWeight="bold">
@@ -319,8 +318,8 @@ export default function StatisticalAnalytics() {
 
       {/* Seasonal Analysis */}
       <TabPanel value={tabValue} index={2}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+          <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
             <Typography variant="h6" gutterBottom>
               Análisis de Gastos por Mes
             </Typography>
@@ -333,14 +332,14 @@ export default function StatisticalAnalytics() {
                 <Bar dataKey="averageSpending" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>
-          </Grid>
+          </Box>
           
-          <Grid item xs={12} md={6}>
+          <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
             <Typography variant="h6" gutterBottom>
               Recomendaciones por Mes
             </Typography>
             <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
-              {data.seasonalAnalysis.map((analysis, index) => (
+              {data.seasonalAnalysis.map((analysis: any, index: number) => (
                 <Card key={index} sx={{ mb: 2, p: 2 }}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                     <Typography variant="subtitle1" fontWeight="bold">
@@ -363,8 +362,8 @@ export default function StatisticalAnalytics() {
                 </Card>
               ))}
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </TabPanel>
 
       {/* Spending Insights */}
@@ -372,9 +371,9 @@ export default function StatisticalAnalytics() {
         <Typography variant="h6" gutterBottom>
           Insights de Gastos por Categoría
         </Typography>
-        <Grid container spacing={2}>
-          {data.spendingInsights.map((insight, index) => (
-            <Grid item xs={12} md={6} key={index}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          {data.spendingInsights.map((insight: any, index: number) => (
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }} key={index}>
               <Card>
                 <CardContent>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -389,24 +388,24 @@ export default function StatisticalAnalytics() {
                     </Box>
                   </Box>
                   
-                  <Grid container spacing={2} mb={2}>
-                    <Grid item xs={6}>
+                  <Box sx={{ display: 'flex', gap: 2 }} mb={2}>
+                    <Box sx={{ flex: 1 }}>
                       <Typography variant="body2" color="text.secondary">
                         Mes Actual
                       </Typography>
                       <Typography variant="h6">
                         {formatCurrency(insight.currentMonth)}
                       </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
                       <Typography variant="body2" color="text.secondary">
                         Mes Anterior
                       </Typography>
                       <Typography variant="h6">
                         {formatCurrency(insight.previousMonth)}
                       </Typography>
-                    </Grid>
-                  </Grid>
+                    </Box>
+                  </Box>
                   
                   <Divider sx={{ my: 1 }} />
                   
@@ -419,9 +418,9 @@ export default function StatisticalAnalytics() {
                   </Alert>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </TabPanel>
 
       {/* Data Info */}
