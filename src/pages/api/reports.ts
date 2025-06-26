@@ -31,24 +31,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function getReports(req: NextApiRequest, res: NextApiResponse, userId: string) {
   try {
-    const { type, startDate, endDate, categoryId, vendorId } = req.query;
+    const { 
+      dateFrom, 
+      dateTo, 
+      category, 
+      vendor, 
+      rubro, 
+      minAmount, 
+      maxAmount, 
+      reportType 
+    } = req.query;
 
     // Construir filtros de fecha
     const dateFilter: Record<string, unknown> = {};
-    if (startDate && endDate) {
+    if (dateFrom && dateTo) {
       dateFilter.purchase_date = {
-        gte: new Date(startDate as string),
-        lte: new Date(endDate as string)
+        gte: new Date(dateFrom as string),
+        lte: new Date(dateTo as string)
       };
     }
 
     // Construir filtros adicionales
     const additionalFilters: Record<string, unknown> = { userId };
-    if (categoryId) {
-      additionalFilters.categoryId = categoryId as string;
+    if (category) {
+      additionalFilters.category = { name: { contains: category as string, mode: 'insensitive' } };
     }
-    if (vendorId) {
-      additionalFilters.vendor = vendorId as string;
+    if (vendor) {
+      additionalFilters.vendor = { contains: vendor as string, mode: 'insensitive' };
+    }
+    if (rubro) {
+      additionalFilters.rubro = { contains: rubro as string, mode: 'insensitive' };
+    }
+    
+    // Construir filtro de monto
+    let amountFilter: Record<string, unknown> = {};
+    if (minAmount) {
+      amountFilter.gte = parseFloat(minAmount as string);
+    }
+    if (maxAmount) {
+      amountFilter.lte = parseFloat(maxAmount as string);
+    }
+    if (Object.keys(amountFilter).length > 0) {
+      additionalFilters.total_amount = amountFilter;
     }
 
     // Obtener facturas con filtros
@@ -67,6 +91,7 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
     const totalAmount = invoices.reduce((sum, invoice) => sum + invoice.total_amount, 0);
     const totalInvoices = invoices.length;
     const averageAmount = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
+    const totalTax = totalAmount * 0.13; // 13% IVA
 
     // Agrupar por categoría
     const categoryStats = invoices.reduce((acc: Record<string, { count: number; amount: number }>, invoice) => {
@@ -101,15 +126,95 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
       return acc;
     }, {});
 
+    // Calcular análisis adicional
+    const amounts = invoices.map(inv => inv.total_amount);
+    const mostExpensiveInvoice = amounts.length > 0 ? Math.max(...amounts) : 0;
+    const cheapestInvoice = amounts.length > 0 ? Math.min(...amounts) : 0;
+    
+    // Calcular día pico (día con mayor gasto)
+    const dailyStats = invoices.reduce((acc: Record<string, number>, invoice) => {
+      const day = invoice.purchase_date.toISOString().split('T')[0];
+      acc[day] = (acc[day] || 0) + invoice.total_amount;
+      return acc;
+    }, {});
+    
+    const peakDay = Object.entries(dailyStats).reduce((max, [day, amount]) => 
+      amount > max.amount ? { day, amount } : max, 
+      { day: '', amount: 0 }
+    );
+
     // Preparar respuesta según el tipo de reporte
     let reportData: Record<string, unknown> = {};
 
-    switch (type) {
+    switch (reportType) {
       case 'summary':
         reportData = {
-          totalInvoices,
-          totalAmount,
-          averageAmount,
+          summary: {
+            totalInvoices,
+            totalAmount,
+            averageAmount,
+            totalTax,
+            periodStart: dateFrom || '',
+            periodEnd: dateTo || ''
+          },
+          topPerformers: {
+            categories: Object.entries(categoryStats)
+              .map(([name, stats]) => ({ name, amount: stats.amount, count: stats.count }))
+              .sort((a, b) => b.amount - a.amount)
+              .slice(0, 5),
+            vendors: Object.entries(vendorStats)
+              .map(([name, stats]) => ({ name, amount: stats.amount, count: stats.count }))
+              .sort((a, b) => b.amount - a.amount)
+              .slice(0, 5)
+          },
+          analysis: {
+            growthRate: 0, // TODO: Implementar cálculo de crecimiento
+            peakDay: peakDay.day,
+            peakAmount: peakDay.amount,
+            averageDailySpending: Object.values(dailyStats).reduce((sum, amount) => sum + amount, 0) / Math.max(Object.keys(dailyStats).length, 1),
+            mostExpensiveInvoice,
+            cheapestInvoice
+          },
+          invoices: invoices.slice(0, 10).map(invoice => ({
+            id: invoice.id,
+            invoice_number: invoice.number_receipt,
+            vendor: invoice.vendor,
+            category: invoice.category?.name || 'Sin categoría',
+            rubro: invoice.rubro,
+            total_amount: invoice.total_amount,
+            purchase_date: invoice.purchase_date.toISOString().split('T')[0],
+            description: invoice.name || ''
+          }))
+        };
+        break;
+
+      case 'detailed':
+        reportData = {
+          invoices: invoices.map(invoice => ({
+            id: invoice.id,
+            invoice_number: invoice.number_receipt,
+            vendor: invoice.vendor,
+            category: invoice.category?.name || 'Sin categoría',
+            rubro: invoice.rubro,
+            total_amount: invoice.total_amount,
+            purchase_date: invoice.purchase_date.toISOString().split('T')[0],
+            description: invoice.name || ''
+          }))
+        };
+        break;
+
+      case 'trends':
+        reportData = {
+          monthlyStats: Object.entries(monthlyStats).map(([month, stats]) => ({
+            month,
+            count: stats.count,
+            amount: stats.amount
+          }))
+        };
+        break;
+
+      case 'breakdown':
+        reportData = {
           categoryStats: Object.entries(categoryStats).map(([name, stats]) => ({
             name,
             count: stats.count,
@@ -123,38 +228,16 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
         };
         break;
 
-      case 'monthly':
-        reportData = {
-          monthlyStats: Object.entries(monthlyStats).map(([month, stats]) => ({
-            month,
-            count: stats.count,
-            amount: stats.amount
-          }))
-        };
-        break;
-
-      case 'detailed':
-        reportData = {
-          invoices: invoices.map(invoice => ({
-            id: invoice.id,
-            authorization_code: invoice.authorization_code,
-            name: invoice.name,
-            nit: invoice.nit,
-            number_receipt: invoice.number_receipt,
-            purchase_date: invoice.purchase_date,
-            total_amount: invoice.total_amount,
-            vendor: invoice.vendor,
-            category: invoice.category?.name,
-            created_at: invoice.created_at
-          }))
-        };
-        break;
-
       default:
         reportData = {
-          totalInvoices,
-          totalAmount,
-          averageAmount
+          summary: {
+            totalInvoices,
+            totalAmount,
+            averageAmount,
+            totalTax,
+            periodStart: dateFrom || '',
+            periodEnd: dateTo || ''
+          }
         };
     }
 
