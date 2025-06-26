@@ -18,7 +18,9 @@ import {
   CircularProgress,
   Card,
   CardContent,
-  IconButton
+  IconButton,
+  FormControlLabel,
+  Checkbox
 } from '@mui/material';
 import {
   Download as DownloadIcon,
@@ -71,6 +73,7 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
   const [format, setFormat] = useState<'csv' | 'pdf'>('csv');
   const [vendor, setVendor] = useState('');
   const [nit, setNit] = useState('');
+  const [includeIVA, setIncludeIVA] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState('');
 
@@ -101,36 +104,59 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
     doc.setFontSize(10);
     doc.text(`Total de facturas: ${data.summary.totalInvoices}`, 20, 65);
     doc.text(`Monto total: Bs. ${data.summary.totalAmount}`, 20, 72);
-    doc.text(`Monto sin IVA: Bs. ${data.summary.totalWithoutIVA}`, 20, 79);
-    doc.text(`IVA (13%): Bs. ${data.summary.totalIVA}`, 20, 86);
+    
+    if (includeIVA) {
+      doc.text(`Monto sin IVA: Bs. ${data.summary.totalWithoutIVA}`, 20, 79);
+      doc.text(`IVA (13%): Bs. ${data.summary.totalIVA}`, 20, 86);
+    }
     
     // Table headers
-    const headers = [
-      'Fecha',
-      'Vendedor', 
-      'NIT',
-      'Número Recibo',
-      'Monto (Bs.)',
-      'Sin IVA (Bs.)',
-      'IVA (Bs.)'
-    ];
+    const headers = includeIVA 
+      ? [
+          'Fecha',
+          'Vendedor', 
+          'NIT',
+          'Número Recibo',
+          'Monto (Bs.)',
+          'Sin IVA (Bs.)',
+          'IVA (Bs.)'
+        ]
+      : [
+          'Fecha',
+          'Vendedor', 
+          'NIT',
+          'Número Recibo',
+          'Monto (Bs.)'
+        ];
     
     // Table data
-    const tableData = data.invoices.map(inv => [
-      new Date(inv.purchase_date).toLocaleDateString('es-BO'),
-      inv.vendor,
-      inv.nit || '-',
-      inv.number_receipt || '-',
-      inv.total_amount.toFixed(2),
-      (inv.total_amount / 1.13).toFixed(2),
-      (inv.total_amount - inv.total_amount / 1.13).toFixed(2)
-    ]);
+    const tableData = data.invoices.map(inv => {
+      if (includeIVA) {
+        return [
+          new Date(inv.purchase_date).toLocaleDateString('es-BO'),
+          inv.vendor,
+          inv.nit || '-',
+          inv.number_receipt || '-',
+          inv.total_amount.toFixed(2),
+          (inv.total_amount / 1.13).toFixed(2),
+          (inv.total_amount - inv.total_amount / 1.13).toFixed(2)
+        ];
+      } else {
+        return [
+          new Date(inv.purchase_date).toLocaleDateString('es-BO'),
+          inv.vendor,
+          inv.nit || '-',
+          inv.number_receipt || '-',
+          inv.total_amount.toFixed(2)
+        ];
+      }
+    });
     
     // Add table to PDF
     autoTable(doc, {
       head: [headers],
       body: tableData,
-      startY: 95,
+      startY: includeIVA ? 95 : 85,
       styles: {
         fontSize: 8,
         cellPadding: 2,
@@ -143,15 +169,23 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
       alternateRowStyles: {
         fillColor: [245, 245, 245],
       },
-      columnStyles: {
-        0: { cellWidth: 20 }, // Date
-        1: { cellWidth: 35 }, // Vendor
-        2: { cellWidth: 25 }, // NIT
-        3: { cellWidth: 25 }, // Receipt number
-        4: { cellWidth: 20 }, // Total amount
-        5: { cellWidth: 20 }, // Without IVA
-        6: { cellWidth: 20 }, // IVA
-      },
+      columnStyles: includeIVA 
+        ? {
+            0: { cellWidth: 20 }, // Date
+            1: { cellWidth: 35 }, // Vendor
+            2: { cellWidth: 25 }, // NIT
+            3: { cellWidth: 25 }, // Receipt number
+            4: { cellWidth: 20 }, // Total amount
+            5: { cellWidth: 20 }, // Without IVA
+            6: { cellWidth: 20 }, // IVA
+          }
+        : {
+            0: { cellWidth: 25 }, // Date
+            1: { cellWidth: 40 }, // Vendor
+            2: { cellWidth: 30 }, // NIT
+            3: { cellWidth: 30 }, // Receipt number
+            4: { cellWidth: 25 }, // Total amount
+          },
     });
     
     // Footer
@@ -195,6 +229,7 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
           format,
           vendor: vendor.trim() || undefined,
           nit: nit.trim() || undefined,
+          includeIVA,
         }),
       });
 
@@ -347,11 +382,23 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
               </FormControl>
               
               <Box sx={{ mt: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={includeIVA}
+                      onChange={(e) => setIncludeIVA(e.target.checked)}
+                    />
+                  }
+                  label="Incluir cálculos de IVA (13%) en el reporte"
+                />
+              </Box>
+              
+              <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>CSV:</strong> Incluye cálculos de IVA (13%), resumen y datos detallados para SIN.
+                  <strong>CSV:</strong> {includeIVA ? 'Incluye cálculos de IVA (13%), resumen y datos detallados para SIN.' : 'Incluye datos básicos sin cálculos de IVA.'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>PDF:</strong> Reporte profesional con tabla de datos, resumen ejecutivo y cálculos de IVA.
+                  <strong>PDF:</strong> {includeIVA ? 'Reporte profesional con tabla de datos, resumen ejecutivo y cálculos de IVA.' : 'Reporte simplificado con datos básicos sin cálculos de IVA.'}
                 </Typography>
               </Box>
             </CardContent>
@@ -377,6 +424,11 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
                   {vendor && <Chip label={`Vendedor: ${vendor}`} size="small" />}
                   {nit && <Chip label={`NIT: ${nit}`} size="small" />}
                   <Chip label={`Formato: ${format.toUpperCase()}`} size="small" color="primary" />
+                  <Chip 
+                    label={`IVA: ${includeIVA ? 'Incluido' : 'Excluido'}`} 
+                    size="small" 
+                    color={includeIVA ? 'success' : 'default'}
+                  />
                 </Stack>
               </CardContent>
             </Card>

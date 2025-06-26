@@ -1,66 +1,68 @@
-# SimpleFactura - Sistema de Gestión de Facturas
+# SimpleFactura - Sistema de Gestión de Facturas para Pymes
 
-Un sistema moderno y robusto para la gestión de facturas con cache inteligente, validación backend y protección de rutas.
+Sistema multiplataforma de gestión de facturas desarrollado para Pequeñas y Medianas Empresas (Pymes) en Cochabamba, Bolivia. Permite la digitalización, organización y análisis de facturas con funcionalidades avanzadas de OCR, análisis estadístico y gestión de proveedores.
 
-## 🚀 Características Principales
+## Características Principales
 
-### 📊 Gestión de Facturas
-- **CRUD Completo**: Crear, leer, actualizar y eliminar facturas
-- **Filtros Avanzados**: Por fecha, vendedor, NIT, categoría y monto
-- **Exportación**: PDF y Excel con datos filtrados
-- **OCR Integrado**: Extracción automática de datos de facturas escaneadas
+### Gestión de Facturas
+- **Registro de Facturas**: Formulario completo con validación automática
+- **OCR Inteligente**: Extracción automática de datos mediante reconocimiento óptico de caracteres
+- **Captura por Cámara**: Integración con cámara web para captura directa
+- **Items de Factura**: Gestión detallada de líneas de factura con cálculos automáticos
+- **Selección de Proveedores**: Dropdown con proveedores registrados del usuario
 
-### 📈 Dashboard y Estadísticas
-- **Métricas en Tiempo Real**: Total de facturas, montos, promedios
-- **Gráficos Interactivos**: Líneas, barras y circulares
-- **Tendencias**: Comparación mes a mes
-- **Análisis por Categorías**: Distribución de gastos
+### Gestión de Usuarios
+- **Autenticación Segura**: Sistema de login/registro con NextAuth.js
+- **Configuración Personalizada**: Tema, idioma, notificaciones y formato de exportación
+- **Perfiles de Usuario**: Gestión individual de preferencias
 
-### 🔐 Seguridad y Autenticación
-- **NextAuth.js**: Autenticación robusta con sesiones JWT
-- **Middleware de Protección**: Verificación de autenticación y autorización
-- **Validación Backend**: Sanitización y validación de todos los inputs
-- **Rate Limiting**: Protección contra ataques de fuerza bruta
+### Gestión de Proveedores
+- **CRUD Completo**: Crear, leer, actualizar y eliminar proveedores
+- **Información Detallada**: NIT, contacto, dirección y datos fiscales
+- **Integración con Facturas**: Selección automática en formularios de facturación
 
-### ⚡ Rendimiento Optimizado
-- **SWR Cache Inteligente**: Memoización automática de datos
-- **Configuraciones Específicas**: Diferentes estrategias por tipo de dato
-- **Revalidación Automática**: Datos siempre actualizados
-- **Loading States**: Transiciones suaves y skeleton loaders
+### Análisis y Reportes
+- **Análisis Estadístico Avanzado**: Tendencias, patrones de gasto y predicciones
+- **Gráficos Interactivos**: Visualizaciones con Chart.js
+- **Exportación de Datos**: Formatos CSV, Excel y PDF
+- **Dashboard Inteligente**: Métricas en tiempo real
 
-## 🛠️ Tecnologías Utilizadas
+### Organización
+- **Categorización**: Sistema de categorías personalizable
+- **Búsqueda Avanzada**: Filtros por fecha, proveedor, monto y categoría
+- **Ordenamiento**: Múltiples criterios de ordenamiento
+
+## Tecnologías Utilizadas
 
 ### Frontend
-- **Next.js 15**: Framework React con SSR/SSG
+- **Next.js 15.3.4**: Framework React con SSR
 - **TypeScript**: Tipado estático para mayor seguridad
-- **Material-UI (MUI)**: Componentes de UI modernos
-- **SWR**: Cache inteligente y sincronización de datos
-- **Chart.js**: Gráficos interactivos y responsivos
+- **Material-UI**: Componentes de interfaz modernos
+- **Tailwind CSS**: Utilidades CSS para diseño responsivo
+- **Chart.js**: Gráficos interactivos para análisis
 
 ### Backend
-- **Next.js API Routes**: APIs RESTful
-- **Prisma ORM**: Base de datos tipada y migraciones
-- **SQLite**: Base de datos ligera (desarrollo)
-- **Zod**: Validación de esquemas y sanitización
-- **bcrypt**: Hashing seguro de contraseñas
+- **Node.js**: Runtime de JavaScript
+- **Prisma**: ORM para gestión de base de datos
+- **PostgreSQL**: Base de datos relacional (Neon)
+- **NextAuth.js**: Autenticación y autorización
 
-### Herramientas
+### Herramientas de Desarrollo
 - **ESLint**: Linting de código
-- **Prettier**: Formateo automático
-- **TypeScript**: Compilador de tipos
-- **NextAuth.js**: Autenticación completa
+- **Jest**: Testing unitario
+- **Git**: Control de versiones
 
-## 📦 Instalación
+## Requisitos del Sistema
 
-### Prerrequisitos
 - Node.js 18+ 
 - npm o yarn
+- Base de datos PostgreSQL (Neon recomendado)
 
-### Pasos de Instalación
+## Instalación
 
 1. **Clonar el repositorio**
 ```bash
-git clone https://github.com/tu-usuario/simplefactura.git
+git clone <repository-url>
 cd simplefactura
 ```
 
@@ -71,22 +73,13 @@ npm install
 
 3. **Configurar variables de entorno**
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
-
-Editar `.env.local`:
+Editar `.env` con tus credenciales:
 ```env
-# Base de datos
-DATABASE_URL="file:./dev.db"
-
-# NextAuth
-NEXTAUTH_SECRET="tu-secret-key-aqui"
+DATABASE_URL="postgresql://..."
+NEXTAUTH_SECRET="tu-secreto-aqui"
 NEXTAUTH_URL="http://localhost:3000"
-
-# OCR (opcional)
-CRADL_CLIENT_ID="tu-client-id"
-CRADL_CLIENT_SECRET="tu-client-secret"
-CRADL_MODEL_ID="tu-model-id"
 ```
 
 4. **Configurar base de datos**
@@ -95,163 +88,167 @@ npx prisma generate
 npx prisma db push
 ```
 
-5. **Ejecutar en desarrollo**
+5. **Ejecutar el servidor de desarrollo**
 ```bash
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:3000`
+El sistema estará disponible en `http://localhost:3000`
 
-## 🔧 Configuración Avanzada
+## Documentación de la API
 
-### Variables de Entorno
+### Endpoints Principales
 
-```env
-# Base de datos
-DATABASE_URL="file:./dev.db"
+#### Autenticación
+- `POST /api/auth/signin` - Iniciar sesión
+- `POST /api/auth/signout` - Cerrar sesión
+- `POST /api/register` - Registro de usuarios
 
-# Autenticación
-NEXTAUTH_SECRET="tu-secret-key-aqui"
-NEXTAUTH_URL="http://localhost:3000"
+#### Facturas
+- `GET /api/invoices` - Listar facturas
+- `POST /api/invoices` - Crear factura
+- `GET /api/invoices/[id]` - Obtener factura específica
+- `PUT /api/invoices/[id]` - Actualizar factura
+- `DELETE /api/invoices/[id]` - Eliminar factura
+- `POST /api/invoices/ocr` - Extracción OCR de facturas
+- `GET /api/invoices/export` - Exportar facturas
 
-# OCR (Lucidtech)
-CRADL_CLIENT_ID="tu-client-id"
-CRADL_CLIENT_SECRET="tu-client-secret"
-CRADL_MODEL_ID="tu-model-id"
+#### Categorías
+- `GET /api/categories` - Listar categorías
+- `POST /api/categories` - Crear categoría
+- `GET /api/categories/[id]` - Obtener categoría específica
+- `PUT /api/categories/[id]` - Actualizar categoría
+- `DELETE /api/categories/[id]` - Eliminar categoría
 
-# SWR Configuration
-NEXT_PUBLIC_SWR_REVALIDATE_FOCUS=true
-NEXT_PUBLIC_SWR_REVALIDATE_RECONNECT=true
+#### Proveedores
+- `GET /api/vendors` - Listar proveedores
+- `POST /api/vendors` - Crear proveedor
+- `GET /api/vendors/[id]` - Obtener proveedor específico
+- `PUT /api/vendors/[id]` - Actualizar proveedor
+- `DELETE /api/vendors/[id]` - Eliminar proveedor
 
-# Validation Configuration
-NEXT_PUBLIC_MAX_FILE_SIZE=5242880
-NEXT_PUBLIC_ALLOWED_FILE_TYPES=image/jpeg,image/png,application/pdf
-```
+#### Configuración de Usuario
+- `GET /api/user-settings` - Obtener configuración
+- `PUT /api/user-settings` - Actualizar configuración
 
-### Configuración de SWR
+#### Análisis Estadístico
+- `GET /api/analytics/predictions` - Predicciones y análisis
+- `GET /api/stats` - Estadísticas generales
 
-El sistema incluye configuraciones optimizadas de cache:
+### Documentación Interactiva
+- **API Docs**: `http://localhost:3000/api-docs` - Documentación completa de la API
+- **API Testing**: `http://localhost:3000/api-test` - Consola de pruebas de API
 
-```typescript
-// Datos frecuentes (facturas, estadísticas)
-swrConfigs.frequent // 2 minutos de cache
+## Testing
 
-// Datos estáticos (categorías)
-swrConfigs.static // 30 minutos de cache
-
-// Datos críticos
-swrConfigs.critical // 30 segundos de cache
-```
-
-## 📁 Estructura del Proyecto
-
-```
-simplefactura/
-├── src/
-│   ├── components/          # Componentes reutilizables
-│   │   ├── api/            # Endpoints de la API
-│   │   ├── auth/           # Páginas de autenticación
-│   │   └── invoices/       # Páginas de facturas
-│   ├── utils/              # Utilidades y configuraciones
-│   │   ├── swrConfig.ts    # Configuración de SWR
-│   │   └── validation.ts   # Validación y sanitización
-│   ├── middleware/         # Middleware de autenticación
-│   ├── contexts/           # Contextos de React
-│   └── styles/             # Estilos globales
-├── prisma/                 # Esquema y migraciones de BD
-├── public/                 # Archivos estáticos
-└── docs/                   # Documentación
-```
-
-## 🔐 Seguridad
-
-### Autenticación
-- **NextAuth.js**: Manejo completo de sesiones
-- **JWT Tokens**: Tokens seguros con expiración
-- **Password Hashing**: bcrypt con salt rounds altos
-
-### Validación
-- **Zod Schemas**: Validación tipada de todos los inputs
-- **Sanitización**: Limpieza automática de datos
-- **SQL Injection Protection**: ORM con queries parametrizadas
-
-### Autorización
-- **Middleware de Protección**: Verificación de autenticación
-- **Resource Ownership**: Usuarios solo acceden a sus datos
-- **Rate Limiting**: Protección contra ataques
-
-## 📊 Rendimiento
-
-### Cache Inteligente
-- **SWR**: Cache automático con revalidación
-- **Deduplicación**: Evita requests duplicados
-- **Stale-While-Revalidate**: Datos frescos sin esperas
-
-### Optimizaciones
-- **Lazy Loading**: Carga diferida de componentes
-- **Code Splitting**: División automática de bundles
-- **Image Optimization**: Optimización automática de imágenes
-
-## 🚀 Despliegue
-
-### Vercel (Recomendado)
+### Ejecutar Tests
 ```bash
-npm run build
-vercel --prod
+# Todos los tests
+npm test
+
+# Tests con coverage
+npm run test:coverage
+
+# Tests en modo watch
+npm run test:watch
 ```
 
-### Docker
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
+### Tipos de Tests
+- **Tests Unitarios**: Validación, utilidades, componentes
+- **Tests de Integración**: Endpoints de API
+- **Tests de Componentes**: React components con Jest
 
-### Variables de Producción
-```env
-DATABASE_URL="postgresql://..."
-NEXTAUTH_SECRET="secret-produccion"
-NEXTAUTH_URL="https://tu-dominio.com"
-```
+## Estructura de la Base de Datos
 
-## 🤝 Contribución
+### Tablas Principales
+- **User**: Usuarios del sistema
+- **Category**: Categorías de facturas
+- **Vendor**: Proveedores registrados
+- **Invoice**: Facturas principales
+- **InvoiceItem**: Líneas de factura
+- **UserSettings**: Configuración de usuario
+- **AuditLog**: Registro de auditoría
+
+### Relaciones
+- Usuario → Categorías (1:N)
+- Usuario → Proveedores (1:N)
+- Usuario → Facturas (1:N)
+- Factura → Items (1:N)
+- Factura → Categoría (N:1)
+- Factura → Proveedor (N:1)
+
+## Características de la Interfaz
+
+### Diseño Responsivo
+- Compatible con dispositivos móviles
+- Interfaz adaptativa para diferentes tamaños de pantalla
+- Navegación optimizada para touch
+
+### Temas y Personalización
+- Modo claro/oscuro
+- Configuración de idioma (Español/Inglés)
+- Preferencias de exportación personalizables
+
+### Experiencia de Usuario
+- Carga lazy de componentes
+- Animaciones suaves
+- Feedback visual inmediato
+- Validación en tiempo real
+
+## Seguridad
+
+- Autenticación JWT con NextAuth.js
+- Validación de entrada en todos los endpoints
+- Sanitización de datos
+- Control de acceso basado en roles
+- Registro de auditoría de acciones
+
+## Funcionalidades Avanzadas
+
+### Análisis Predictivo
+- Análisis de tendencias de gasto
+- Predicciones basadas en datos históricos
+- Identificación de patrones estacionales
+- Alertas de riesgo financiero
+
+### OCR Inteligente
+- Extracción automática de datos de facturas
+- Soporte para múltiples formatos (JPG, PNG, PDF)
+- Validación automática de datos extraídos
+- Corrección manual cuando sea necesario
+
+### Exportación Avanzada
+- Múltiples formatos (CSV, Excel, PDF)
+- Filtros personalizables
+- Reportes detallados
+- Gráficos incluidos en exportaciones
+
+## Contribución
 
 1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
 3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+5. Abrir un Pull Request
 
-## 📝 Licencia
+## Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 🆘 Soporte
+## Soporte
 
-- **Documentación**: [MEJORAS_IMPLEMENTADAS.md](./MEJORAS_IMPLEMENTADAS.md)
-- **Issues**: [GitHub Issues](https://github.com/tu-usuario/simplefactura/issues)
-- **Discusiones**: [GitHub Discussions](https://github.com/tu-usuario/simplefactura/discussions)
+Para soporte técnico o consultas:
+- Crear un issue en GitHub
+- Contactar al equipo de desarrollo
+- Revisar la documentación en `/api-docs`
 
-## 🔄 Changelog
+## Roadmap
 
-### v2.0.0 (Diciembre 2024)
-- ✨ **Cache Inteligente**: Implementación de SWR con configuraciones optimizadas
-- 🔒 **Validación Backend**: Sistema completo de validación con Zod
-- 🛡️ **Middleware de Autenticación**: Protección robusta de rutas y APIs
-- ⚡ **Mejoras de Rendimiento**: Reducción del 60% en requests al servidor
-- 🎨 **UX Mejorada**: Loading states optimizados y transiciones suaves
-
-### v1.0.0 (Versión inicial)
-- 📊 Dashboard básico
-- 🔐 Autenticación con NextAuth
-- 📄 CRUD de facturas
-- 📈 Estadísticas básicas
+### Próximas Funcionalidades
+- [ ] Integración con sistemas contables
+- [ ] Notificaciones push
+- [ ] API móvil nativa
 
 ---
 
-**Desarrollado con ❤️ usando Next.js, TypeScript y Material-UI**
+**Desarrollado para Pymes en Cochabamba, Bolivia** 🇧🇴

@@ -34,7 +34,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(router.query.error ? "Credenciales inválidas" : "");
-  const [successMsg, setSuccessMsg] = useState(router.query.registro ? "Registro exitoso, ahora puede iniciar sesión" : "");
+  const [successMsg, setSuccessMsg] = useState(
+    router.query.verified ? "¡Cuenta verificada exitosamente! Ya puedes iniciar sesión." :
+    router.query.registered ? "¡Registro exitoso! Ya puedes iniciar sesión." : ""
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,6 +215,18 @@ export default function LoginPage() {
                 }}
               >
                 Regístrate aquí
+              </Link>
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              <Link 
+                href="/landing" 
+                style={{ 
+                  color: '#667eea', 
+                  textDecoration: 'none',
+                  fontWeight: 'bold'
+                }}
+              >
+                ← Volver al inicio
               </Link>
             </Typography>
           </Box>

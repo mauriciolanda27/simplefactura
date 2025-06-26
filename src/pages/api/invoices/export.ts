@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { startDate, endDate, format, vendor, nit, categoryId, minAmount, maxAmount } = req.body;
+    const { startDate, endDate, format, vendor, nit, categoryId, minAmount, maxAmount, includeIVA = true } = req.body;
     
     // Build query filters
     const where: Prisma.InvoiceWhereInput = {
@@ -85,57 +85,102 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const totalAmount = invoices.reduce((sum, inv) => sum + inv.total_amount, 0);
     const totalInvoices = invoices.length;
     
-    // Bolivia-specific calculations (13% IVA)
-    const totalWithoutIVA = totalAmount / 1.13;
-    const totalIVA = totalAmount - totalWithoutIVA;
+    // Bolivia-specific calculations (13% IVA) - only if includeIVA is true
+    const totalWithoutIVA = includeIVA ? totalAmount / 1.13 : 0;
+    const totalIVA = includeIVA ? totalAmount - totalWithoutIVA : 0;
 
     if (format === 'csv') {
       // Create CSV content
-      const csvHeaders = [
-        'Fecha',
-        'Vendedor',
-        'NIT',
-        'NIT/CI/CEX',
-        'Número Recibo',
-        'Código Autorización',
-        'Nombre',
-        'Categoría',
-        'Rubro',
-        'Monto Total (Bs.)',
-        'Monto sin IVA (Bs.)',
-        'IVA (Bs.)'
-      ];
+      const csvHeaders = includeIVA 
+        ? [
+            'Fecha',
+            'Vendedor',
+            'NIT',
+            'NIT/CI/CEX',
+            'Número Recibo',
+            'Código Autorización',
+            'Nombre',
+            'Categoría',
+            'Rubro',
+            'Monto Total (Bs.)',
+            'Monto sin IVA (Bs.)',
+            'IVA (Bs.)'
+          ]
+        : [
+            'Fecha',
+            'Vendedor',
+            'NIT',
+            'NIT/CI/CEX',
+            'Número Recibo',
+            'Código Autorización',
+            'Nombre',
+            'Categoría',
+            'Rubro',
+            'Monto Total (Bs.)'
+          ];
 
-      const csvRows = invoices.map(inv => [
-        new Date(inv.purchase_date).toLocaleDateString('es-BO'),
-        `"${inv.vendor.replace(/"/g, '""')}"`, // Escape quotes in vendor name
-        inv.nit || '',
-        inv.nit_ci_cex || '',
-        inv.number_receipt || '',
-        inv.authorization_code || '',
-        `"${(inv.name || '').replace(/"/g, '""')}"`, // Escape quotes in name
-        inv.category?.name || '',
-        `"${(inv.rubro || '').replace(/"/g, '""')}"`, // Escape quotes in rubro
-        inv.total_amount.toFixed(2),
-        (inv.total_amount / 1.13).toFixed(2),
-        (inv.total_amount - inv.total_amount / 1.13).toFixed(2)
-      ]);
+      const csvRows = invoices.map(inv => {
+        if (includeIVA) {
+          return [
+            new Date(inv.purchase_date).toLocaleDateString('es-BO'),
+            `"${inv.vendor.replace(/"/g, '""')}"`, // Escape quotes in vendor name
+            inv.nit || '',
+            inv.nit_ci_cex || '',
+            inv.number_receipt || '',
+            inv.authorization_code || '',
+            `"${(inv.name || '').replace(/"/g, '""')}"`, // Escape quotes in name
+            inv.category?.name || '',
+            `"${(inv.rubro || '').replace(/"/g, '""')}"`, // Escape quotes in rubro
+            inv.total_amount.toFixed(2),
+            (inv.total_amount / 1.13).toFixed(2),
+            (inv.total_amount - inv.total_amount / 1.13).toFixed(2)
+          ];
+        } else {
+          return [
+            new Date(inv.purchase_date).toLocaleDateString('es-BO'),
+            `"${inv.vendor.replace(/"/g, '""')}"`, // Escape quotes in vendor name
+            inv.nit || '',
+            inv.nit_ci_cex || '',
+            inv.number_receipt || '',
+            inv.authorization_code || '',
+            `"${(inv.name || '').replace(/"/g, '""')}"`, // Escape quotes in name
+            inv.category?.name || '',
+            `"${(inv.rubro || '').replace(/"/g, '""')}"`, // Escape quotes in rubro
+            inv.total_amount.toFixed(2)
+          ];
+        }
+      });
 
       // Add summary row
-      csvRows.push([
-        'RESUMEN',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        totalAmount.toFixed(2),
-        totalWithoutIVA.toFixed(2),
-        totalIVA.toFixed(2)
-      ]);
+      if (includeIVA) {
+        csvRows.push([
+          'RESUMEN',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          totalAmount.toFixed(2),
+          totalWithoutIVA.toFixed(2),
+          totalIVA.toFixed(2)
+        ]);
+      } else {
+        csvRows.push([
+          'RESUMEN',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          totalAmount.toFixed(2)
+        ]);
+      }
 
       // Combine headers and rows
       const csvContent = [
@@ -157,8 +202,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         summary: {
           totalInvoices,
           totalAmount: totalAmount.toFixed(2),
-          totalWithoutIVA: totalWithoutIVA.toFixed(2),
-          totalIVA: totalIVA.toFixed(2),
+          totalWithoutIVA: includeIVA ? totalWithoutIVA.toFixed(2) : '0.00',
+          totalIVA: includeIVA ? totalIVA.toFixed(2) : '0.00',
           period: `${startDate} - ${endDate}`,
           exportDate: new Date().toLocaleDateString('es-BO'),
         },

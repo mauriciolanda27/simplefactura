@@ -57,8 +57,8 @@ export default function RegisterPage() {
       if (!res.ok) {
         throw new Error(data.error || "Error al registrar");
       }
-      // Registro exitoso
-      router.push("/auth/login?registro=ok"); // redirigir a login con indicador
+      // Registro exitoso - redirigir a login
+      router.push("/auth/login?registered=true");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Error desconocido");
     } finally {
@@ -226,7 +226,7 @@ export default function RegisterPage() {
             <Typography variant="body2" color="text.secondary">
               ¿Ya tienes cuenta?{' '}
               <Link 
-                href="/auth/login" 
+                href="/landing" 
                 style={{ 
                   color: '#667eea', 
                   textDecoration: 'none',
@@ -234,6 +234,18 @@ export default function RegisterPage() {
                 }}
               >
                 Inicia sesión aquí
+              </Link>
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              <Link 
+                href="/landing" 
+                style={{ 
+                  color: '#667eea', 
+                  textDecoration: 'none',
+                  fontWeight: 'bold'
+                }}
+              >
+                ← Volver al inicio
               </Link>
             </Typography>
           </Box>

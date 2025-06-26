@@ -24,7 +24,12 @@ import {
   Box,
   Stack,
   Tooltip,
-  Skeleton
+  Skeleton,
+  Pagination,
+  FormControl,
+  Select,
+  MenuItem,
+  SelectChangeEvent
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -54,12 +59,29 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [deleteDialog, setDeleteDialog] = useState<{open: boolean, category: Category | null}>({open: false, category: null});
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Redirect to login if not authenticated
+  // Calculate pagination
+  const totalPages = Math.ceil(categories.length / itemsPerPage);
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCategories = categories.slice(startIndex, endIndex);
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  const handleItemsPerPageChange = (event: SelectChangeEvent<number>) => {
+    setItemsPerPage(Number(event.target.value));
+    setPage(1); // Reset to first page when changing items per page
+  };
+
+  // Redirect to landing page if not authenticated
   useEffect(() => {
     if (status === 'loading') return;
     if (!session) {
-      router.push('/auth/login');
+      router.push('/landing');
     }
   }, [session, status, router]);
 
@@ -172,16 +194,6 @@ export default function CategoriesPage() {
 
   return (
     <Layout title="Categorías">
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Mis Categorías
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Organiza tus facturas en categorías personalizadas
-        </Typography>
-      </Box>
-
       {/* Summary Cards */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mb: 4 }}>
         <Box sx={{ flex: 1 }}>
@@ -284,63 +296,103 @@ export default function CategoriesPage() {
         )}
 
         {!loading && categories.length > 0 && (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell>Facturas</TableCell>
-                <TableCell>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight="medium">
-                      {category.name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {category.description || '-'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={`${category._count?.invoices || 0} factura(s)`}
-                      size="small"
-                      color={category._count?.invoices ? 'primary' : 'default'}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1}>
-                      <Tooltip title="Editar">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => openEditDialog(category)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Eliminar">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => setDeleteDialog({open: true, category})}
-                          disabled={(category._count?.invoices || 0) > 0}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
-                  </TableCell>
+          <>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Nombre</TableCell>
+                  <TableCell>Descripción</TableCell>
+                  <TableCell>Facturas</TableCell>
+                  <TableCell>Acciones</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {currentCategories.map((category) => (
+                  <TableRow key={category.id}>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="medium">
+                        {category.name}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {category.description || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={`${category._count?.invoices || 0} factura(s)`}
+                        size="small"
+                        color={category._count?.invoices ? 'primary' : 'default'}
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Tooltip title="Editar">
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => openEditDialog(category)}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Eliminar">
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => setDeleteDialog({open: true, category})}
+                            disabled={(category._count?.invoices || 0) > 0}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Pagination Controls */}
+            {categories.length > itemsPerPage && (
+              <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Typography variant="body2" color="text.secondary">
+                    Mostrando {startIndex + 1}-{Math.min(endIndex, categories.length)} de {categories.length} categorías
+                  </Typography>
+                  <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <Select
+                      value={itemsPerPage}
+                      onChange={handleItemsPerPageChange}
+                      displayEmpty
+                    >
+                      <MenuItem value={5}>5 por página</MenuItem>
+                      <MenuItem value={10}>10 por página</MenuItem>
+                      <MenuItem value={20}>20 por página</MenuItem>
+                      <MenuItem value={50}>50 por página</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+                
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                  showFirstButton
+                  showLastButton
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      fontSize: '1rem',
+                    }
+                  }}
+                />
+              </Box>
+            )}
+          </>
         )}
       </Paper>
 

@@ -25,7 +25,9 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Pagination,
+  SelectChangeEvent
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -43,21 +45,34 @@ import MetricCard from '../components/MetricCard';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { formatCurrency } from '../theme';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import AnimatedContainer from '../components/AnimatedContainer';
-import { useHoverAnimation } from '../utils/useScrollAnimation';
 import { useAlert } from '../components/AlertSystem';
 import { swrConfigs, cacheKeys } from '../utils/swrConfig';
 
 // Fetcher mejorado con manejo de errores
 const fetcher = async (url: string) => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    const error = new Error('Error en la petición');
-    error.message = await res.text();
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const errorText = await res.text();
+      let errorMessage = 'Error en la petición';
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || errorMessage;
+      } catch {
+        errorMessage = errorText || errorMessage;
+      }
+      
+      const error = new Error(errorMessage);
+      error.message = errorMessage;
+      throw error;
+    }
+    return res.json();
+  } catch (error) {
+    console.error(`Fetcher error for ${url}:`, error);
     throw error;
   }
-  return res.json();
 };
 
 interface Category {
@@ -97,6 +112,8 @@ export default function InvoicesPage() {
   const [deleteDialog, setDeleteDialog] = useState<{open: boolean, id: string | null}>({open: false, id: null});
   const [exportDialog, setExportDialog] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   const query = new URLSearchParams();
   if (filters.start) query.append("start", filters.start);
@@ -128,7 +145,6 @@ export default function InvoicesPage() {
     swrConfigs.critical
   );
   
-  const { handlers: headerHover } = useHoverAnimation();
   const { showSuccess, showError, showInfo } = useAlert();
   
   // Cargar categorías desde SWR
@@ -138,13 +154,28 @@ export default function InvoicesPage() {
     }
   }, [categoriesData]);
   
-  // Redirect to login if not authenticated
+  // Redirect to landing page if not authenticated
   useEffect(() => {
     if (status === 'loading') return; // Still loading
     if (!session) {
-      router.push('/auth/login');
+      router.push('/landing');
     }
   }, [session, status, router]);
+
+  // Calculate pagination
+  const totalPages = invoices ? Math.ceil(invoices.length / itemsPerPage) : 0;
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentInvoices = invoices ? invoices.slice(startIndex, endIndex) : [];
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  const handleItemsPerPageChange = (event: SelectChangeEvent<number>) => {
+    setItemsPerPage(Number(event.target.value));
+    setPage(1); // Reset to first page when changing items per page
+  };
 
   // Show loading while checking authentication
   if (status === 'loading') {
@@ -199,8 +230,8 @@ export default function InvoicesPage() {
   if (error) {
     return (
       <Layout title="Dashboard">
-        <Box sx={{ py: 4, px: 2 }}>
-          <Alert severity="error" sx={{ mb: 3 }}>
+        <Box sx={{ py: 4 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
             Error al cargar las facturas: {error.message}
           </Alert>
           <Button onClick={() => mutate()} variant="contained">
@@ -217,76 +248,60 @@ export default function InvoicesPage() {
 
   return (
     <Layout title="Dashboard">
-      <Box sx={{ py: 3, px: 2 }}>
-        {/* Header compacto */}
+      <Box sx={{ py: 4 }}>
+        {/* Header con métricas */}
         <AnimatedContainer animation="fade-in" delay={200}>
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 1 }} {...headerHover}>
-              Dashboard
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Dashboard de Facturas
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Gestiona tus facturas y mantén el control de tus gastos
+            <Typography variant="body1" color="text.secondary">
+              Gestiona y analiza tus facturas de manera eficiente
             </Typography>
           </Box>
         </AnimatedContainer>
 
-        {/* Métricas principales en una sola fila compacta */}
-        {stats && (
-          <AnimatedContainer animation="fade-in" delay={300}>
-            <Paper sx={{ p: 2, mb: 3, borderRadius: 0 }}>
-              <Box sx={{ 
-                display: 'grid', 
-                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(5, 1fr)' }, 
-                gap: 2 
-              }}>
-                <MetricCard
-                  title="Total Facturas"
-                  value={stats.summary.totalInvoices}
-                  icon={<ReceiptIcon sx={{ fontSize: 24 }} />}
-                  color="primary"
-                  loading={statsLoading}
-                />
-                <MetricCard
-                  title="Monto Total"
-                  value={stats.summary.totalAmount}
-                  icon={<CategoryIcon sx={{ fontSize: 24 }} />}
-                  color="success"
-                  prefix="Bs. "
-                  loading={statsLoading}
-                />
-                <MetricCard
-                  title="Promedio"
-                  value={stats.summary.averageAmount}
-                  icon={<BarChartIcon sx={{ fontSize: 24 }} />}
-                  color="info"
-                  prefix="Bs. "
-                  loading={statsLoading}
-                />
-                <MetricCard
-                  title="Más Alta"
-                  value={stats.summary.totalInvoices > 0 && invoices ? Math.max(...invoices.map(inv => parseFloat(inv.total_amount))) : 0}
-                  icon={<TrendingUpIcon sx={{ fontSize: 24 }} />}
-                  color="success"
-                  prefix="Bs. "
-                  loading={statsLoading}
-                />
-                <MetricCard
-                  title="Más Baja"
-                  value={stats.summary.totalInvoices > 0 && invoices ? Math.min(...invoices.map(inv => parseFloat(inv.total_amount))) : 0}
-                  icon={<TrendingDownIcon sx={{ fontSize: 24 }} />}
-                  color="error"
-                  prefix="Bs. "
-                  loading={statsLoading}
-                />
-              </Box>
-            </Paper>
-          </AnimatedContainer>
-        )}
+        {/* Métricas principales */}
+        <AnimatedContainer animation="fade-in" delay={300}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+            <MetricCard
+              title="Total Facturas"
+              value={stats?.summary?.totalInvoices || 0}
+              icon={<ReceiptIcon />}
+              color="primary"
+              loading={statsLoading}
+            />
+            <MetricCard
+              title="Monto Total"
+              value={parseFloat(stats?.summary?.totalAmount?.toString() || '0')}
+              prefix="Bs. "
+              icon={<TrendingUpIcon />}
+              color="success"
+              loading={statsLoading}
+            />
+            <MetricCard
+              title="Promedio por Factura"
+              value={parseFloat(stats?.summary?.averageAmount?.toString() || '0')}
+              prefix="Bs. "
+              icon={<BarChartIcon />}
+              color="info"
+              loading={statsLoading}
+            />
+            <MetricCard
+              title="Total IVA (13%)"
+              value={parseFloat(stats?.summary?.totalTax?.toString() || '0')}
+              prefix="Bs. "
+              icon={<CategoryIcon />}
+              color="warning"
+              loading={statsLoading}
+            />
+          </Box>
+        </AnimatedContainer>
 
-        {/* Actions Bar compacto */}
+        {/* Barra de acciones */}
         <AnimatedContainer animation="fade-in" delay={400}>
-          <Paper sx={{ p: 2, mb: 2, borderRadius: 0 }}>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+          <Paper sx={{ p: 2, mb: 3, borderRadius: 0 }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
               <Button
                 component={Link}
                 href="/invoices/new"
@@ -303,7 +318,7 @@ export default function InvoicesPage() {
                 startIcon={<FilterListIcon />}
                 sx={{ borderRadius: 0 }}
               >
-                Filtros
+                {showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros'}
               </Button>
               
               {hasActiveFilters && (
@@ -313,15 +328,17 @@ export default function InvoicesPage() {
                   startIcon={<ClearIcon />}
                   sx={{ borderRadius: 0 }}
                 >
-                  Limpiar
+                  Limpiar Filtros
                 </Button>
               )}
+              
+              <Box sx={{ flexGrow: 1 }} />
               
               <Button
                 onClick={() => setExportDialog(true)}
                 variant="outlined"
                 startIcon={<FileDownloadIcon />}
-                sx={{ borderRadius: 0, ml: 'auto' }}
+                sx={{ borderRadius: 0 }}
               >
                 Exportar
               </Button>
@@ -332,15 +349,11 @@ export default function InvoicesPage() {
         {/* Filtros expandibles */}
         {showFilters && (
           <AnimatedContainer animation="fade-in" delay={500}>
-            <Paper sx={{ p: 2, mb: 2, borderRadius: 0 }}>
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Paper sx={{ p: 3, mb: 3, borderRadius: 0 }}>
+              <Typography variant="h6" gutterBottom>
                 Filtros Avanzados
               </Typography>
-              <Box sx={{ 
-                display: 'grid', 
-                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, 
-                gap: 2 
-              }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
                 <TextField
                   label="Fecha Inicio"
                   type="date"
@@ -422,67 +435,107 @@ export default function InvoicesPage() {
                 <SkeletonLoader />
               </Box>
             ) : invoices && invoices.length > 0 ? (
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Fecha</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Vendedor</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>NIT</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Monto</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Categoría</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {invoices.map((invoice) => (
-                    <TableRow key={invoice.id} hover>
-                      <TableCell>{new Date(invoice.purchase_date).toLocaleDateString()}</TableCell>
-                      <TableCell>{invoice.vendor}</TableCell>
-                      <TableCell>{invoice.nit || '-'}</TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={formatCurrency(parseFloat(invoice.total_amount))} 
-                          color="primary" 
-                          size="small"
-                          sx={{ borderRadius: 0 }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={invoice.category.name} 
-                          variant="outlined" 
-                          size="small"
-                          sx={{ borderRadius: 0 }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <Tooltip title="Editar">
-                            <IconButton
-                              component={Link}
-                              href={`/invoices/edit/${invoice.id}`}
-                              size="small"
-                              sx={{ borderRadius: 0 }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Eliminar">
-                            <IconButton
-                              onClick={() => setDeleteDialog({open: true, id: invoice.id})}
-                              size="small"
-                              color="error"
-                              sx={{ borderRadius: 0 }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
+              <>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Fecha</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Vendedor</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>NIT</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Monto</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Categoría</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {currentInvoices.map((invoice) => (
+                      <TableRow key={invoice.id} hover>
+                        <TableCell>{new Date(invoice.purchase_date).toLocaleDateString()}</TableCell>
+                        <TableCell>{invoice.vendor}</TableCell>
+                        <TableCell>{invoice.nit || '-'}</TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={formatCurrency(parseFloat(invoice.total_amount))} 
+                            color="primary" 
+                            size="small"
+                            sx={{ borderRadius: 0 }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={invoice.category.name} 
+                            variant="outlined" 
+                            size="small"
+                            sx={{ borderRadius: 0 }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Tooltip title="Editar">
+                              <IconButton
+                                component={Link}
+                                href={`/invoices/edit/${invoice.id}`}
+                                size="small"
+                                sx={{ borderRadius: 0 }}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Eliminar">
+                              <IconButton
+                                onClick={() => setDeleteDialog({open: true, id: invoice.id})}
+                                size="small"
+                                color="error"
+                                sx={{ borderRadius: 0 }}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+
+                {/* Pagination Controls */}
+                {invoices.length > itemsPerPage && (
+                  <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Typography variant="body2" color="text.secondary">
+                        Mostrando {startIndex + 1}-{Math.min(endIndex, invoices.length)} de {invoices.length} facturas
+                      </Typography>
+                      <FormControl size="small" sx={{ minWidth: 120 }}>
+                        <Select
+                          value={itemsPerPage}
+                          onChange={handleItemsPerPageChange}
+                          displayEmpty
+                        >
+                          <MenuItem value={5}>5 por página</MenuItem>
+                          <MenuItem value={10}>10 por página</MenuItem>
+                          <MenuItem value={20}>20 por página</MenuItem>
+                          <MenuItem value={50}>50 por página</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    
+                    <Pagination
+                      count={totalPages}
+                      page={page}
+                      onChange={handlePageChange}
+                      color="primary"
+                      size="large"
+                      showFirstButton
+                      showLastButton
+                      sx={{
+                        '& .MuiPaginationItem-root': {
+                          fontSize: '1rem',
+                        }
+                      }}
+                    />
+                  </Box>
+                )}
+              </>
             ) : (
               <Box sx={{ p: 4, textAlign: 'center' }}>
                 <Typography variant="h6" color="text.secondary" gutterBottom>

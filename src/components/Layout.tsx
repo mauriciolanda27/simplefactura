@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import {
   Box,
@@ -21,15 +21,18 @@ import {
   CircularProgress
 } from '@mui/material';
 import {
-  Menu as MenuIcon,
-  Dashboard,
-  Receipt,
-  Category,
+  Add,
+  Analytics,
+  Assessment,
   BarChart,
+  Category,
+  Dashboard,
   FileDownload,
-  Person,
   Logout,
-  Add
+  Menu as MenuIcon,
+  Person,
+  Receipt,
+  Help
 } from '@mui/icons-material';
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
@@ -61,11 +64,11 @@ export default function Layout({ children, title = "SimpleFactura" }: LayoutProp
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Redirect to login if not authenticated
+  // Redirect to landing page if not authenticated
   useEffect(() => {
     if (status === 'loading') return;
     if (!session) {
-      router.push('/auth/login');
+      router.push('/landing');
     }
   }, [session, status, router]);
 
@@ -82,8 +85,8 @@ export default function Layout({ children, title = "SimpleFactura" }: LayoutProp
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/signout', { method: 'POST' });
-    router.push('/auth/login');
+    await signOut({ redirect: false });
+    router.push('/landing');
   };
 
   // Don't render layout if not authenticated
@@ -96,6 +99,9 @@ export default function Layout({ children, title = "SimpleFactura" }: LayoutProp
     { text: 'Nueva Factura', icon: <Add />, href: '/invoices/new' },
     { text: 'Categorías', icon: <Category />, href: '/categories' },
     { text: 'Estadísticas', icon: <BarChart />, href: '/stats' },
+    { text: 'Reportes', icon: <Assessment />, href: '/reports' },
+    { text: 'Análisis Estadístico', icon: <Analytics />, href: '/analytics' },
+    { text: 'Tutorial', icon: <Help />, href: '/tutorial' },
   ];
 
   const drawer = (

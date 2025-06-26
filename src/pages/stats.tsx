@@ -65,11 +65,11 @@ export default function Stats() {
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState('month');
 
-  // Redirect to login if not authenticated
+  // Redirect to landing page if not authenticated
   useEffect(() => {
     if (status === 'loading') return;
     if (!session) {
-      router.push('/auth/login');
+      router.push('/landing');
     }
   }, [session, status, router]);
 
@@ -156,22 +156,6 @@ export default function Stats() {
   return (
     <Layout title="Estadísticas">
       <Box sx={{ py: 4, px: 2 }}>
-        {/* Header con animación */}
-        <AnimatedContainer animation="fade-in" delay={200}>
-          <Box sx={{ mb: 4 }}>
-            <Typography 
-              variant="h3" 
-              gutterBottom 
-              sx={{ fontWeight: 'bold' }}
-              {...headerHover}
-            >
-              Dashboard de Estadísticas
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Análisis detallado de tus facturas y gastos
-            </Typography>
-          </Box>
-        </AnimatedContainer>
 
         {/* Filtros */}
         <AnimatedContainer animation="fade-in" delay={300}>

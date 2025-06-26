@@ -5,13 +5,13 @@ import {
   Button, 
   Stack, 
   Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions,
   FormControl, 
   InputLabel, 
   Select, 
   MenuItem,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Box,
   Typography,
   FormHelperText,
@@ -89,19 +89,20 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
 
   // Cargar categorías del usuario
   useEffect(() => {
-    const loadCategories = async () => {
+    const loadData = async () => {
       try {
-        const res = await fetch('/api/categories');
-        if (res.ok) {
-          const data = await res.json();
-          setCategories(data);
+        const categoriesRes = await fetch('/api/categories');
+        
+        if (categoriesRes.ok) {
+          const categoriesData = await categoriesRes.json();
+          setCategories(categoriesData);
         }
       } catch (error) {
-        console.error('Error loading categories:', error);
-        showError('Error al cargar las categorías');
+        console.error('Error loading data:', error);
+        showError('Error al cargar los datos');
       }
     };
-    loadCategories();
+    loadData();
   }, []);
 
   // Handle webcam image capture
@@ -451,7 +452,7 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
             </Box>
             <Box sx={{ flex: 1 }}>
               <TextField
-                label="Vendedor *"
+                label="Proveedor *"
                 value={formData.vendor}
                 onChange={(e) => setFormData(prev => ({ ...prev, vendor: e.target.value }))}
                 onBlur={() => setTouched(prev => ({ ...prev, vendor: true }))}
@@ -521,6 +522,22 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
                   </FormHelperText>
                 )}
               </FormControl>
+              <Button onClick={() => setShowNewCategoryDialog(true)} size="small" sx={{ mt: 1, mb: 2 }}>+ Agregar nueva categoría</Button>
+              <Dialog open={showNewCategoryDialog} onClose={() => setShowNewCategoryDialog(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Nueva Categoría</DialogTitle>
+                <DialogContent>
+                  <Stack spacing={2} sx={{ mt: 1 }}>
+                    <TextField label="Nombre de la categoría *" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} required fullWidth sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
+                    <TextField label="Descripción (opcional)" value={newCategoryDescription} onChange={e => setNewCategoryDescription(e.target.value)} fullWidth multiline rows={3} placeholder="Describe el propósito de esta categoría..." sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }} />
+                  </Stack>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setShowNewCategoryDialog(false)}>Cancelar</Button>
+                  <Button onClick={handleCreateCategory} variant="contained" disabled={creatingCategory || !newCategoryName.trim()}>
+                    {creatingCategory ? 'Guardando...' : 'Guardar'}
+                  </Button>
+                </DialogActions>
+              </Dialog>
               <ValidationStatus field="categoryId" />
             </Box>
           </Stack>
@@ -630,45 +647,6 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
           />
         </Suspense>
       )}
-
-      {/* New Category Dialog */}
-      <Dialog open={showNewCategoryDialog} onClose={() => setShowNewCategoryDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Nueva Categoría</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              label="Nombre de la categoría *"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              fullWidth
-              required
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
-            />
-            <TextField
-              label="Descripción (opcional)"
-              value={newCategoryDescription}
-              onChange={(e) => setNewCategoryDescription(e.target.value)}
-              fullWidth
-              multiline
-              rows={3}
-              placeholder="Describe el propósito de esta categoría..."
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowNewCategoryDialog(false)}>
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleCreateCategory} 
-            variant="contained"
-            disabled={creatingCategory || !newCategoryName.trim()}
-          >
-            {creatingCategory ? 'Creando...' : 'Crear'}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }

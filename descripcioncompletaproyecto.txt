@@ -1,0 +1,751 @@
+Desarrollo Sistema Gestión Facturas Multiplataforma para Pymes en Cochabamba
+
+CAPÍTULO I
+1	MARCO GENERAL 
+1.1	INTRODUCCION
+Desde finales del siglo 20 hubo un cambio revolucionario en el mundo cuando se inició la transición a la era digital gracias a las nuevas tecnologías con el fin de facilitar la vida mediante el software para computadoras, los teléfonos inteligentes y otros dispositivos que se han vuelto parte de nuestro día a día. 
+La pandemia impulsó aún más la digitalización de procesos manuales, buscando reducir la necesidad de la presencia física en actividades. Son varias las alternativas de software que buscan brindar una solución que favorezca a las personas y a las empresas digitalizando procesos manuales y también buscando alternativas que minimicen el contacto con superficies que pueden ser vectores de propagación del virus.
+En la actualidad, existen diversas tecnologías en el mercado que se enfocan en la gestión de facturas para empresas, desde soluciones de código abierto hasta servicios en la nube de pago por uso.
+El presente proyecto busca brindar una solución de gestión de facturas para Pymes, enfocada en la digitalización de procesos y la eficiencia en el almacenamiento y consulta de facturas, utilizando tecnologías modernas y escalables, pasando de una forma tradicional a una digital.
+
+
+
+
+
+
+1.2	ANTECEDENTES
+En el contexto actual de constante avance tecnológico y digitalización de los procesos empresariales, la gestión eficiente de facturas se ha convertido en un aspecto crítico para el buen funcionamiento de las Pequeñas y Medianas Empresas (Pymes). Tradicionalmente, la gestión de facturas en las Pymes de Bolivia se ha llevado a cabo de manera manual, con la clasificación y entrega de facturas físicas a los contadores para su análisis y registro contable. Sin embargo, este enfoque presenta desafíos significativos en términos de eficiencia, seguridad y accesibilidad a la información. Los errores humanos, la pérdida de documentos y la falta de una visión integral y actualizada de las finanzas empresariales se han convertido en obstáculos que dificultan la toma de decisiones informadas y el cumplimiento de las obligaciones legales.
+Afortunadamente, existen sistemas actuales que ofrecen características similares a las propuestas para este proyecto que sirvieron como inspiración. Por ejemplo, aplicaciones como BillFree y Mint brindan a los usuarios un historial completo de facturas, permitiendo la descarga en formato PDF para su referencia o uso particular. Asimismo, aplicaciones como Clarity Money ayudan a los usuarios a controlar sus finanzas, ofreciendo un historial de facturas y la opción de descargarlas en formato PDF. Estos ejemplos demuestran cómo la implementación de soluciones tecnológicas puede brindar a las Pymes un mayor control sobre la gestión de sus facturas y facilitar la toma de decisiones financieras informadas.
+Además, otro servicio posible que se puede considerar es el ofrecido por Digital Invoice, donde un administrador de una cuenta empresarial puede ver el flujo de movimientos económicos que han sucedido en sus sucursales mediante gráficos estadísticos para su propio análisis y toma de decisiones. Estas soluciones tecnológicas proporcionan una base sólida para el desarrollo de una solución de gestión de facturas adaptada a las necesidades específicas de las Pymes en Bolivia.
+1.3	PLANTEAMIENTO DEL PROBLEMA
+En base a las técnicas de recopilación aplicadas en el siguiente proyecto se tiene la siguiente problemática:
+La gestión de facturas en las Pequeñas y Medianas Empresas (Pymes) de Bolivia a menudo se lleva a cabo de manera manual, donde las empresas clasifican manualmente las facturas por rubros o categorías y las entregan a sus contadores para su análisis. Sin embargo, este proceso manual presenta riesgos y desafíos adicionales. Por un lado, se pierde el acceso a los elementos físicos, lo que dificulta el seguimiento y la búsqueda eficiente de facturas específicas cuando exista la necesitad. Por otro lado, también existe el riesgo de enfrentar contadores deshonestos, quienes podrían manipular la información o realizar acciones indebidas que afecten la integridad de los registros contables.
+Tanto las empresas como los individuos pueden enfrentar el riesgo de perder facturas debido a errores humanos, como colocarlas en un lugar equivocado, errores de conteo, accidentes u otras circunstancias imprevistas. Por lo tanto, es crucial contar con un sistema de gestión de facturas eficiente y confiable que permita mantener un registro seguro y accesible. 
+1.3.1	FORMULACION DEL PROBLEMA
+¿Cómo coadyuvar en las dificultades de seguimiento y control que enfrentan las Pymes en Cochabamba para la gestión de facturas, permitiendo que el mismo se adapte a sus necesidades?
+1.4	OBJETIVOS
+1.4.1	Objetivo general
+Desarrollar un sistema gestión facturas multiplataforma para pymes en Cochabamba, que permita un mejor seguimiento y control de facturas en base a sus necesidades específicas.
+1.4.2	Objetivos Específicos
+●	Desarrollar una aplicación web mobile-friendly para la gestión de facturas que permita el seguimiento y control de estas, garantizando su funcionamiento en distintas plataformas como Windows, Linux, macOS, y en diferentes navegadores.
+●	Desarrollar el módulo de autenticación para los usuarios dentro del sistema, asegurando el acceso seguro y la protección de la información confidencial.
+●	Desarrollar el módulo administrativo para la gestión de las facturas, que permitirá a los usuarios autorizados realizar operaciones como la visualización, edición y eliminación de facturas, as√≠ como generar informes y estadísticas relacionados.
+●	Desarrollar el módulo de carga de una factura con la captura de información mediante una imagen de la factura para su registro, utilizando tecnologías de reconocimiento óptico de caracteres (OCR) para extraer automáticamente los datos relevantes.
+●	Desarrollar el módulo de descarga de facturas de tipo CSV para su uso, permitiendo a los usuarios exportar los datos de las facturas en un formato compatible con otras aplicaciones y sistemas.
+1.5	JUSTIFICACIONES 
+1.5.1	Justificación económica
+La gestión manual de facturas en las Pymes ayudará a minimizar las pérdidas monetarias debido a errores humanos o malos actos de terceros. Además, el sistema también puede mejorar la eficiencia en la gestión de facturas, lo que puede ayudar a reducir los costos en horas de trabajo y costos de almacenamiento.
+1.5.2	Justificación social
+La gestión manual de facturas en las Pymes implica una mayor manipulación de documentos físicos, lo que aumenta el riesgo de errores y conlleva costos y problemas asociados. La implementación de un sistema automatizado de gestión de facturas puede reducir la necesidad de manipulación física de facturas, mejorando la eficiencia y rentabilidad de la empresa. Al minimizar los errores en el proceso de gestión de facturas, se reducen los costos y se optimiza la operación comercial en general. La adopción de tecnologías automatizadas y digitales ofrece una solución más eficiente para el almacenamiento y consulta de facturas, brindando a las Pymes una herramienta accesible y rentable para mejorar su productividad y competir en el mercado actual.
+1.5.3	Justificación técnica
+El presente proyecto será desarrollado con estudio de los requerimientos de gestión de facturas para una pyme brindando una alternativa eficiente y gratuita que les permita optimizar su proceso actual. Además, se aplicarán todas las herramientas de la Ingeniería de Sistemas adquiridas durante la formación académica, entre estos se tiene:
+-	JavaScript
+-	TypeScript
+-	Tailwind CSS
+-	MySQL
+-	SQL
+-	Next.JS
+-	ESLint
+-	Git
+-	NodeJS
+1.6	DELIMITACIONES
+1.6.1	Alcances
+En base a los módulos mencionados, se pueden establecer los siguientes alcances para el proyecto:
+-	La aplicación web será desarrollada de forma que sea compatible con diferentes plataformas, como Windows, Linux y macOS, y funcionará correctamente en diversos navegadores populares, como Chrome, Firefox y Safari.
+-	El módulo de autenticación garantizará un acceso seguro y protegerá la información confidencial de los usuarios mediante la implementación de prácticas de autenticación sólidas, como el uso de contraseñas seguras y el cifrado de datos.
+-	El módulo administrativo permitirá a los usuarios autorizados realizar operaciones de gestión de facturas, incluyendo la visualización, edición y eliminación de facturas. Además, ofrecerá funcionalidades para generar informes y estadísticas relacionados con las facturas.
+-	El módulo de carga de facturas utilizará tecnologías de reconocimiento óptico de caracteres (OCR) para extraer automáticamente los datos relevantes de una imagen de la factura. Esto permitirá registrar la información de la factura de manera eficiente y precisa.
+-	El módulo de descarga de facturas proporcionará a los usuarios la opción de exportar los datos de las facturas en formato CSV, lo cual les permitirá utilizarlos en otras aplicaciones y sistemas de forma compatible.
+1.6.2	Limites
+El proyecto se enfocará exclusivamente en la gestión de facturas de las Pequeñas y Medianas Empresas (Pymes) ubicadas en la ciudad de Cochabamba, Bolivia. No se considerarán las Pymes de otras ciudades o regiones del país. Además, el proyecto no abordará la integración de sistemas de gestión de facturas ya existentes en las empresas, sino que se centrará en desarrollar una solución independiente que brinde una gestión eficiente de facturas para las Pymes de Cochabamba.
+1.7	DELIMITACIÓN
+1.7.1	Delimitación espacial o geográfica
+El presente proyecto de software para la gestión de facturas está delimitado geográficamente a la ciudad de Cochabamba, Bolivia. La solución se desarrollará específicamente para las Pequeñas y Medianas Empresas (Pymes) ubicadas en esta región. Se considerarán las características y necesidades particulares de las Pymes de Cochabamba en cuanto a la gestión de facturas, adaptando la solución a sus requerimientos específicos.
+1.7.2	Delimitación temporal 
+El proyecto tiene una delimitación temporal específica de 3 meses, que abarca desde el inicio de la fase de investigación y desarrollo hasta la finalización de la etapa de implementación y validación del prototipo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CAPITULO II
+2	MARCO TEORICO
+2.1	INTELIGENCIA ARTIFICIAL
+La inteligencia artificial (IA) es un campo de estudio que se centra en el desarrollo de sistemas y programas capaces de realizar tareas que requieren inteligencia humana. Estos sistemas son capaces de aprender, razonar, reconocer patrones y tomar decisiones de manera autónoma. La IA ha experimentado avances significativos en los últimos años gracias al desarrollo de algoritmos más sofisticados y al aumento de la capacidad computacional. 
+2.1.1	Deep Learning
+El deep learning, también conocido como aprendizaje profundo, es una rama de la inteligencia artificial que se basa en redes neuronales artificiales con múltiples capas para aprender y extraer características complejas de los datos. A diferencia del aprendizaje automático tradicional, que utiliza algoritmos predefinidos, el deep learning permite que el sistema aprenda de forma autónoma a partir de grandes conjuntos de datos. 
+2.1.2	Machine Learning
+En el ámbito de la inteligencia artificial, el Machine Learning se enfoca en desarrollar algoritmos que permiten a las máquinas aprender de los datos y tomar decisiones basadas en esa experiencia. En la gestión de facturas, esto puede automatizar tareas, mejorar la precisión y brindar análisis más profundos.
+2.1.3	Cradl.AI: Análisis de documentos con Deep Learning
+Cradl.AI es una plataforma altamente versátil y potente que nos permite la construcción y despliegue de analizadores sintácticos de documentos utilizando técnicas de aprendizaje profundo (Deep Learning). 
+Esta herramienta se destaca por su capacidad de crear, entrenar y desplegar modelos de análisis sintáctico de última generación, sin necesidad de tener experiencia previa en aprendizaje automático (Machine Learning).
+La plataforma Cradl.AI se enfoca en facilitar el proceso de análisis de documentos, brindando la capacidad de comprender y extraer información relevante de manera precisa y automatizada. 
+Una de las aplicaciones más destacadas de Cradl.AI se encuentra en la gestión de facturas, donde su capacidad para el reconocimiento óptico de caracteres (OCR, por sus siglas en inglés) y el análisis de contenido resultan especialmente útiles.
+En el caso específico de la gestión de facturas, Cradl.AI ofrece una solución eficiente y precisa. Mediante su Receipt OCR API, la plataforma permite el procesamiento de facturas de manera automatizada, extrayendo datos clave como el número de factura, fechas, conceptos, montos y otros detalles relevantes. Esto agiliza el proceso de gestión de facturas, ya que la información se puede capturar y utilizar de forma rápida y precisa, sin necesidad de ingresar manualmente cada dato.
+2.1.4	Facturas Manuales
+Las facturas manuales, también conocidas como facturas en papel, son documentos fundamentales en el mundo empresarial y comercial. A diferencia de las facturas electrónicas generadas automáticamente por sistemas informáticos, las facturas manuales son elaboradas por individuos y empresas de manera manual. Estas facturas se presentan en una variedad de formas, diseños y formatos, lo que a menudo las hace más desafiantes de analizar y procesar en comparación con sus contrapartes electrónicas.
+2.1.4.1	Características de las Facturas Manuales
+Las facturas manuales pueden variar en varios aspectos, incluyendo:
+-	Diseño y Formato: Cada empresa puede tener su propio diseño de factura, lo que resulta en una amplia diversidad de formatos.
+-	Caligrafía: La legibilidad de las facturas manuales puede verse afectada por la calidad de la escritura o la impresión.
+-	Ubicación de Datos Clave: La ubicación de información clave, como el número de factura, las fechas y los montos, puede variar considerablemente.
+-	Detalles Adicionales: Además de los datos básicos, las facturas manuales pueden contener anotaciones manuscritas o información personalizada.
+2.1.4.2	Problemas de las Facturas Manuales
+Las facturas manuales, en contraste con las generadas electrónicamente, se caracterizan por su diversidad de formatos y estructuras. Estas facturas pueden variar en términos de diseño, tamaño de fuente, ubicación de los elementos clave, entre otros aspectos. Esta variabilidad puede hacer que el procesamiento manual sea extremadamente laborioso y propenso a errores.
+El análisis de facturas manuales implica la extracción precisa de información crucial, como el número de factura, las fechas de emisión y vencimiento, los conceptos detallados de los productos o servicios, así como los montos asociados. Además, se deben tener en cuenta factores como la caligrafía y la calidad de la impresión, lo que agrega una capa adicional de complejidad al proceso.
+2.1.4.3	Facturas Manuales con Cradl.Ai
+Cradl.AI ofrece una solución eficiente y precisa para abordar el análisis de facturas manuales mediante su Receipt OCR API. Esta API está diseñada específicamente para procesar facturas de manera automatizada, permitiendo la extracción precisa de datos clave, incluso en casos de facturas con formatos altamente variados.
+2.1.4.4	Automatización del Reconocimiento Óptico de Caracteres (OCR)
+El primer paso crítico en la solución de Cradl.AI para facturas manuales es el reconocimiento óptico de caracteres (OCR). La plataforma utiliza algoritmos avanzados para convertir la información impresa en las facturas en texto digital, independientemente de la calidad de la escritura o impresión. Esto establece la base para una extracción precisa de datos.
+2.1.4.5	Extracción de Datos Detallados
+Una vez que se ha realizado el OCR, Cradl.AI emplea técnicas de procesamiento de lenguaje natural (NLP) y aprendizaje profundo para identificar y extraer datos clave de las facturas manuales. Esto incluye la identificación del número de factura, fechas, conceptos detallados, montos y otros detalles relevantes, sin importar la variabilidad en el formato de las facturas.
+2.1.5	Estructura y Propiedades de una Factura Manual
+En el contexto del desarrollo de sistemas para la gestión de facturas en Pequeñas y Medianas Empresas (Pymes), es crucial entender la estructura y las propiedades fundamentales de una factura manual, a continuación, exploraremos las opciones existentes:
+-	Categoría: La categoría de una factura se refiere a la clasificación general del tipo de operación o transacción realizada. Ejemplos comunes incluyen ventas, compras, servicios, entre otros. Esta clasificación es esencial para el ordenamiento contable, permitiendo a las empresas organizar sus operaciones de manera eficiente y facilitando el seguimiento y análisis de diferentes segmentos de su actividad económica.
+-	Rubro: El rubro especifica el sector o ámbito específico al que pertenece la transacción documentada en la factura. Por ejemplo, en una factura de venta, el rubro podría indicar si se trata de bienes o servicios y, más detalladamente, a qué sector pertenecen estos (electrónicos, vestimenta, consultoría, etc.). El rubro es crucial para la segmentación y análisis detallado del rendimiento empresarial en diversas áreas.
+-	Vendedor: Identifica al proveedor o emisor de la factura. Incluye datos relevantes como el nombre o razón social, dirección y contacto. Esta información no solo es necesaria para fines de identificación y comunicación entre las partes involucradas, sino que también cumple con requisitos legales y fiscales, asegurando la trazabilidad de las transacciones.
+
+-	Nombre: Se refiere al nombre o razón social del comprador o destinatario de la factura. Esta propiedad es vital para asignar la transacción a la entidad correcta, facilitando la gestión de cuentas por cobrar o por pagar y cumpliendo con las obligaciones tributarias que requieren la identificación clara de ambas partes en una transacción comercial.
+-	NIT: El Número de Identificación Tributaria (NIT) es un código único asignado a cada contribuyente, sea este una empresa o un individuo, por las autoridades fiscales. El NIT en la factura asegura que las transacciones sean registradas oficialmente bajo el contribuyente correcto, siendo fundamental para la declaración y liquidación de impuestos.
+-	NIT/CI/CEX: Además del NIT, las facturas pueden incluir el Carnet de Identidad (CI) o el Carnet de Extranjería (CEX) del comprador. Esta información complementa la identificación del destinatario, especialmente en transacciones con individuos, y cumple con regulaciones específicas en situaciones donde el NIT no es aplicable o suficiente.
+-	Fecha de Compra: Marca el día exacto en que se realizó la transacción. La fecha de compra es crucial para el registro contable, permitiendo la asignación precisa de ingresos y gastos al período fiscal correspondiente, y es indispensable para el cumplimiento de los plazos tributarios.
+-	Total: Representa el monto total de la transacción, incluyendo el precio de los bienes o servicios, menos cualquier descuento, y sumando los impuestos aplicables. El total en la factura es esencial para el análisis financiero, la gestión de flujo de efectivo y la contabilización de las obligaciones fiscales.
+-	Código de Autorización: Es un código único proporcionado por las autoridades fiscales para cada factura, que valida su legitimidad y autorización para fines fiscales. El código de autorización es un elemento de seguridad crucial que ayuda a prevenir fraudes fiscales y garantiza la validez de la factura en auditorías y revisiones tributarias.
+-	Número de Factura: El número de factura es un identificador único asignado secuencialmente a cada factura emitida. Este número es fundamental para el orden y control interno de las transacciones, facilitando la gestión documental, el seguimiento de las ventas o compras, y la verificación de la factura en procesos de auditoría o reclamaciones.
+2.1.6	Procesamiento de Lenguaje Natural (NLP)
+El Procesamiento de Lenguaje Natural, abreviado como NLP por sus siglas en inglés (Natural Language Processing), es una rama de la inteligencia artificial que se enfoca en la interacción entre las computadoras y el lenguaje humano. Esta disciplina tiene como objetivo permitir a las máquinas comprender, interpretar y generar lenguaje humano de manera efectiva.
+2.1.7	NLP en Cradl.AI
+En Cradl.AI, el NLP se utiliza como parte integral de su capacidad para extraer información relevante de las facturas manuales. El sistema de procesamiento de lenguaje natural de Cradl.AI interpreta el texto en las facturas, identifica palabras clave y comprende la relación entre los datos presentes. Esto se traduce en una extracción precisa de información, incluyendo el número de factura, fechas, conceptos y montos, sin importar la variabilidad en la presentación del texto.
+2.2	BASE DE DATOS
+2.2.1	Tipos de base de datos
+Existen varios tipos de bases de datos, cada una con sus características y ventajas. Algunos de los tipos más comunes son:
+-	Bases de datos relacionales: Son basadas en el modelo relacional, que organiza la información en tablas con filas y columnas. Este tipo de base de datos permite establecer relaciones entre las tablas y es ampliamente utilizado en aplicaciones empresariales.
+-	Bases de datos NoSQL: Son bases de datos no relacionales que permiten almacenar y recuperar datos de forma flexible y escalable. Estas bases de datos son ideales para aplicaciones con grandes volúmenes de datos y alta concurrencia.
+-	Bases de datos en memoria: Almacenan datos en la memoria principal del sistema, lo que permite un acceso rápido y eficiente a la información. Estas bases de datos son ideales para aplicaciones que requieren un alto rendimiento y baja latencia.
+2.2.2	Modelo Relacional
+El modelo relacional es uno de los modelos más utilizados en bases de datos. Se basa en la teoría de conjuntos y utiliza tablas para representar entidades y sus relaciones. Cada tabla está compuesta por filas (registros) y columnas (atributos).
+Las relaciones entre las tablas se establecen mediante claves primarias y claves foráneas. Las claves primarias son atributos únicos que identifican de manera única cada registro en una tabla, mientras que las claves foráneas se utilizan para establecer relaciones entre tablas al hacer referencia a las claves primarias de otras tablas.
+El modelo relacional proporciona una estructura organizada y flexible para almacenar y consultar datos. Utilizando consultas SQL (Structured Query Language), es posible realizar operaciones como selección, inserción, actualización y eliminación de datos de manera eficiente.
+2.2.3	MySQL
+MySQL es un sistema de gestión de bases de datos relacional de código abierto ampliamente utilizado en aplicaciones web y empresariales. Es conocido por su rendimiento, confiabilidad y escalabilidad.
+En el contexto del sistema de gestión de facturas, MySQL puede ser utilizado como la base de datos principal para almacenar la información relacionada con las facturas, clientes, proveedores y otros datos relevantes. Proporciona un entorno confiable y eficiente para la gestión de grandes volúmenes de datos y consultas complejas.
+2.2.3.1	PROS de MySQL
+-	Escalabilidad: Puede manejar grandes cantidades de datos y conexiones simultáneas, lo que lo hace adecuado para aplicaciones web y empresariales de alto tráfico. La escalabilidad vertical y horizontal permite adaptarse a las necesidades cambiantes de las aplicaciones a medida que crecen.
+-	Costo: MySQL es de código abierto y gratuito para su uso en la mayoría de los casos. Esto puede resultar en ahorros significativos en comparación con sistemas de gestión de bases de datos comerciales. La licencia de código abierto permite a las empresas reducir costos de licencia y redistribución.
+-	Rendimiento: MySQL se ha optimizado para un rendimiento eficiente. Ofrece una variedad de motores de almacenamiento, lo que permite a los desarrolladores elegir el más adecuado para sus necesidades específicas. También es capaz de manejar consultas complejas y procesar datos de manera rápida y efectiva.
+2.2.3.2	CONS de MySQL
+-	Limitaciones en la Gestión de Transacciones: MySQL tiene limitaciones en la gestión de transacciones, especialmente en comparación con sistemas de bases de datos más avanzados como PostgreSQL. Esto puede ser un problema en aplicaciones que requieren un control más estricto de las transacciones.
+-	Capacidad Limitada para Datos No Estructurados: MySQL está optimizado para el almacenamiento y recuperación de datos estructurados. Si una aplicación necesita gestionar grandes cantidades de datos no estructurados, como documentos o contenido multimedia, puede resultar menos eficiente en comparación con otros sistemas.
+Utilizando MySQL en combinación con el modelo relacional, se puede diseñar una estructura de base de datos adecuada que permita una gestión eficiente y segura de la información de las facturas en el sistema
+2.2.4	SQL (Structured Query Language)
+SQL, o Lenguaje de Consulta Estructurada, es un lenguaje estándar utilizado para gestionar bases de datos relacionales. Proporciona un conjunto de comandos y sintaxis que permiten realizar diversas operaciones en la base de datos, como consultar, modificar, insertar y eliminar datos.
+2.2.4.1	PROS de SQL
+-	Consulta de datos: SQL permite realizar consultas para recuperar datos específicos de la base de datos. Esto se logra utilizando la cláusula SELECT, donde se especifica la información deseada y se pueden aplicar filtros y condiciones.
+-	Manipulación de datos: SQL permite la manipulación de datos en la base de datos. Con las cláusulas INSERT, UPDATE y DELETE, es posible insertar nuevos registros, actualizar valores existentes y eliminar registros, respectivamente.
+-	Definición de datos: SQL también se utiliza para definir la estructura de la base de datos, creando tablas, especificando columnas y sus tipos de datos, y estableciendo restricciones como claves primarias y foráneas.
+-	Control de acceso: SQL ofrece la capacidad de controlar el acceso y los permisos en la base de datos. Esto permite definir quién puede realizar ciertas operaciones en las tablas y asegurar que solo se acceda a la información autorizada.
+-	Creación y modificación de objetos: SQL permite crear y modificar objetos en la base de datos, como vistas, procedimientos almacenados, funciones y desencadenadores (triggers). Estos objetos ofrecen funcionalidades adicionales y permiten automatizar tareas en la base de datos.
+2.2.4.2	CONS de SQL
+-	Posibilidad de Inyección de SQL: La mala gestión de la seguridad en las consultas SQL puede dejar vulnerabilidades abiertas a la inyección de SQL, lo que podría permitir a los atacantes acceder o manipular datos de la base de datos.
+-	Complejidad de Algunas Consultas: Las consultas SQL complejas pueden ser difíciles de diseñar y depurar. En ocasiones, la lógica de programación puede resultar confusa, especialmente para aquellos que carecen de experiencia en SQL.
+-	Rendimiento Limitado en Grandes Volúmenes de Datos: En escenarios de bases de datos masivas, SQL puede mostrar limitaciones de rendimiento. Las consultas que involucran conjuntos de datos extremadamente grandes pueden requerir optimización adicional.
+2.3	INGENIERIA DE SOFTWARE
+2.3.1	Metodología de desarrollo
+En el desarrollo de este proyecto de software, se aplicó una metodología ágil, específicamente Scrum. La metodología Scrum se seleccionó debido a su enfoque iterativo e incremental, lo que permitió una adaptación más flexible a los cambios en los requerimientos y una entrega continua de valor al cliente.
+El desarrollo del sistema de gestión de facturas se dividió en sprints, cada uno con una duración fija de dos semanas. Durante cada sprint, se definieron y priorizaron las funcionalidades a implementar, y se trabajó en su diseño, desarrollo, pruebas y validación.
+Se asumieron todas las responsabilidades como individuo, desempeñando el rol de desarrollador, diseñador de interfaces de usuario y especialista en bases de datos. Se estableció una disciplina personal para llevar a cabo reuniones diarias de seguimiento (daily stand-ups), con el fin de asegurar una comunicación efectiva y mantener un progreso constante en el desarrollo del proyecto.
+2.3.2	Requerimientos y análisis
+El proceso de ingeniería de software comenzó con la recopilación y análisis de los requerimientos para la gestión de facturas en las Pymes de Cochabamba. Se realizaron entrevistas y encuestas a representantes de las Pymes para identificar las funcionalidades y necesidades específicas.
+2.3.3	Diseño de la arquitectura del software
+Se diseñó una arquitectura de software robusta y escalable para el sistema de gestión de facturas. Se seleccionaron tecnologías modernas y adecuadas, como un framework web para el desarrollo de la aplicación y una base de datos relacional para el almacenamiento de las facturas.
+Se establecieron patrones de diseño adecuados para garantizar el modularidad, la flexibilidad y la reutilización de componentes. Se realizaron diagramas de arquitectura y de flujo de información para representar la estructura y las interacciones del sistema.
+2.3.4	Implementación y pruebas
+La implementación del sistema se realizó siguiendo las mejores prácticas de desarrollo de software. Se utilizaron estándares de codificación, se aplicaron pruebas unitarias y se realizaron revisiones de código para garantizar la calidad del software.
+Se realizaron pruebas exhaustivas, tanto manuales como automatizadas, para verificar el funcionamiento correcto del sistema y asegurar que cumplía con los requerimientos establecidos. Se realizaron pruebas de integración para verificar la interacción entre los diferentes componentes del sistema.
+2.3.5	Mantenimiento y evolución
+Se realizaron evaluaciones periódicas del desempeño del sistema y se planificaron actividades de mantenimiento preventivo y correctivo. Se llevaron a cabo actualizaciones para corregir errores, mejorar la seguridad y agregar nuevas funcionalidades solicitadas por los usuarios.
+Además, se estableció un proceso de gestión de cambios para administrar las solicitudes de modificación y asegurar que se evaluara su impacto en el sistema antes de implementarlas. Esto permitió mantener la estabilidad y confiabilidad del software a lo largo del tiempo.
+2.4	LENGUAJES Y HERRAMIENTAS DE DESARROLLO
+2.4.1	Lenguaje de programación JavaScript
+Desde el comienzo del internet, "JavaScript es un lenguaje de programación ampliamente utilizado en el desarrollo web y una herramienta fundamental en la creación de aplicaciones interactivas en el entorno del navegador" (Flanagan, 2020). 
+Lo más importante de escoger este lenguaje de programación es porque hasta ahora sigue siendo la opción más grande y viable para realizar páginas web, gracias a que "JavaScript ha evolucionado hasta convertirse en un lenguaje de programación versátil y poderoso, capaz de realizar diversas tareas tanto en el lado del cliente como en el lado del servidor" (Duckett, 2014).
+2.4.1.1	 PROS de usar JavaScript
+-	Interactividad dinámica: JavaScript permite agregar interactividad y dinamismo a las páginas web. Con este lenguaje de programación, es posible crear efectos visuales, animaciones y otras funcionalidades interactivas que hacen que las páginas sean más atractivas y agradables para los usuarios. La capacidad de respuesta y fluidez de las interacciones con JavaScript mejora la experiencia de navegación del usuario.
+-	Validación de formularios en el lado del cliente: JavaScript facilita la validación de formularios en el lado del cliente antes de enviar los datos al servidor. Esto permite detectar errores o campos incompletos en tiempo real y brindar retroalimentación inmediata al usuario. Al realizar la validación en el lado del cliente, se reduce la necesidad de recargar la página, lo que agiliza el proceso de envío de datos y mejora la experiencia del usuario.
+-	Acceso a la API del navegador: JavaScript brinda acceso a la API del navegador, lo que permite interactuar con diferentes funcionalidades y características del dispositivo del usuario. Esto incluye el acceso a la cámara, el micrófono, la geolocalización y otras capacidades del dispositivo. Aprovechar estas funcionalidades permite crear aplicaciones web más ricas e interactivas, adaptadas a las características específicas del dispositivo del usuario.
+-	Integración con servicios web y APIs externas: JavaScript facilita la integración con servicios web y APIs externas. Esto significa que es posible obtener datos en tiempo real, mostrar contenido dinámico y aprovechar funcionalidades adicionales proporcionadas por terceros. La capacidad de conectarse a APIs de redes sociales, servicios de pago, servicios de mapas y otras fuentes de datos externas permite enriquecer las aplicaciones web y ofrecer funcionalidades más avanzadas.
+2.4.1.2	 CONS de usar JavaScript
+
+-	Seguridad: JavaScript se ejecuta en el lado del cliente, lo que lo hace vulnerable a ataques de seguridad, como la inyección de código malicioso. Se requieren medidas adicionales, como la validación de entrada y la protección contra XSS (Cross-Site Scripting).
+-	Bloqueo de Interacción: En ocasiones, el uso excesivo de JavaScript puede bloquear la interacción del usuario antes de que se cargue completamente la página, lo que puede llevar a una experiencia del usuario óptima.
+-	Rendimiento: Aunque JavaScript es rápido en la mayoría de los navegadores modernos, puede ser más lento en dispositivos más antiguos o con recursos limitados. El rendimiento puede ser una preocupación en aplicaciones web altamente complejas.
+2.4.2	Framework de React Next.js
+Según la plataforma Vercel, "Next.js es un framework de desarrollo web de código abierto basado en JavaScript que se utiliza para crear aplicaciones web modernas y escalables" (Vercel, 2023).
+2.4.2.1	 PROS de usar Next.js
+-	Renderizado del lado del servidor: Next.js permite renderizar las páginas del lado del servidor, lo que mejora el rendimiento y la velocidad de carga de la aplicación al entregar contenido HTML pre-renderizado al cliente.
+-	Enrutamiento sencillo: Next.js ofrece un sistema de enrutamiento intuitivo y fácil de usar, permitiendo a los desarrolladores definir rutas y asociarlas con componentes específicos.
+-	Generación de sitios estáticos: Next.js permite generar sitios estáticos pre-renderizados, lo que mejora aún más el rendimiento y la experiencia de usuario al servir contenido estático en lugar de renderizar las páginas en cada solicitud.
+-	Hot Module Replacement (HMR): Next.js admite HMR, lo que permite a los desarrolladores ver los cambios en tiempo real sin necesidad de recargar la página, lo que agiliza el proceso de desarrollo.
+-	Soporte para API integrada: Next.js facilita la creación de API integradas en la aplicación, lo que permite la comunicación entre el cliente y el servidor de manera eficiente.
+2.4.2.2	 CONS de usar Next.js
+-	Curva de Aprendizaje: Requiere tiempo y esfuerzo aprender las mejores prácticas y aprovechar al máximo las características del framework.
+-	Compatibilidad con Librerías Especificas: La compatibilidad con ciertas librerías y módulos puede ser un desafío en Next.js, ya que algunas dependencias pueden requerir configuraciones adicionales para funcionar correctamente con el enfoque de SSR.
+-	Menos Flexibilidad en el Enrutamiento: Aunque Next.js ofrece un sistema de enrutamiento intuitivo, en algunos casos específicos de enrutamiento muy personalizado, puede ser menos flexible en comparación con enrutadores completamente personalizados.
+2.4.3	NextAuth.js: Autenticación Simplificada para Next.js
+NextAuth.js es un framework de autenticación para Next.js que facilita la incorporación de sistemas de autenticación en aplicaciones web modernas. Este framework es especialmente útil cuando se necesita implementar autenticación de usuario, ya sea mediante redes sociales, proveedores de identidad, o bases de datos locales.
+2.4.3.1	 PROS de usar NextAuth,js
+-	Facilita la Autenticación Social: NextAuth.js permite la autenticación mediante proveedores de redes sociales populares, como Google, Facebook, Twitter y muchos más. Esto simplifica la integración de inicio de sesión social en tu aplicación.
+-	Soporte para Bases de Datos Locales: Además de la autenticación social, NextAuth.js es compatible con la autenticación a través de bases de datos locales, lo que permite a los usuarios registrarse y autenticarse con credenciales almacenadas en tu propia base de datos.
+-	Personalización Flexible: NextAuth.js es altamente personalizable y admite la personalización de flujos de autenticación, páginas de inicio de sesión y más, para adaptarse a las necesidades específicas de tu aplicación.
+-	Seguridad Incorporada: Ofrece características de seguridad incorporadas, como protección contra ataques de fuerza bruta y configuraciones de sesión seguras, lo que te ayuda a mantener la seguridad de tus usuarios.
+-	Sesiones y Tokens de Acceso: NextAuth.js gestiona automáticamente las sesiones de usuario y la generación de tokens de acceso, lo que simplifica la administración de la autenticación y la autorización.
+2.4.3.2	 CONS de usar NextAuth,js
+-	Curva de Aprendizaje: Al igual que con cualquier herramienta nueva, NextAuth.js puede requerir tiempo y estudio para comprender completamente su funcionamiento y aprovechar al máximo sus características.
+-	Configuración Adicional Requerida: En algunas situaciones, especialmente al integrar bases de datos locales o proveedores de identidad personalizados, es posible que se requiera una configuración adicional, lo que podría añadir complejidad al proceso de configuración.
+-	Requiere Integración con la Aplicación: La integración exitosa de NextAuth.js en una aplicación existente puede requerir ciertos cambios en la estructura de la aplicación y en las rutas de autenticación, lo que podría ser un desafío en aplicaciones grandes o complejas.
+2.4.4	Framework de CSS Tailwind CSS
+Tailwind CSS es un framework de diseño de interfaz de usuario (UI) de código abierto que se utiliza para construir interfaces web de manera eficiente y rápida. 
+En lugar de utilizar clases CSS tradicionales que describen estilos específicos, Tailwind CSS utiliza clases utilitarias que representan características de estilo individuales. Estas clases se aplican directamente en el marcado HTML para aplicar estilos de manera rápida y sencilla.
+2.4.4.1	 PROS de Tailwind CSS
+-	Eficiencia en el desarrollo: Tailwind CSS permite un desarrollo rápido al utilizar clases de utilidad predefinidas, lo que acelera el proceso de estilización de elementos.
+-	Flexibilidad y personalización: El framework ofrece opciones de configuración y personalización, adaptándose a las necesidades específicas del proyecto.
+-	Consistencia en el diseño: El uso de clases de utilidad coherentes garantiza una apariencia visual consistente en toda la interfaz de usuario, facilitando el mantenimiento del código.
+-	Capacidad de respuesta: Las interfaces de usuario creadas con Tailwind CSS se adaptan automáticamente a diferentes dispositivos y tamaños de pantalla.
+-	Mejora de la productividad: Gracias a sus estilos predefinidos y reutilizables, Tailwind CSS agiliza el desarrollo y permite a los desarrolladores centrarse en la lógica del negocio.
+2.4.4.2	 CONS de Tailwind CSS
+-	Aprendizaje Inicial: La necesidad de familiarizarse con una gran cantidad de clases y conceptos puede llevar tiempo, especialmente para aquellos que no tienen experiencia previa con el marco.
+-	Inconsistencia Visual: En proyectos grandes o con múltiples equipos de desarrollo, puede ser difícil mantener la coherencia visual en toda la aplicación debido a la flexibilidad de personalización. Esto podría dar como resultado una apariencia inconsistente si no se aplican estrictas directrices de diseño.
+2.4.5	Server-side con NodeJS
+"Node.js es un entorno de tiempo de ejecución de código abierto basado en el motor V8 de JavaScript de Google, que permite la ejecución de código JavaScript fuera de un navegador web" (Node.js, 2018). 
+Node.js utiliza un modelo de programación basado en eventos y una arquitectura de entrada/salida sin bloqueo para el desarrollo de aplicaciones del lado del servidor 
+2.4.5.1	 PROS de NodeJS
+-	Escalabilidad Horizontal: Node.js es altamente escalable y permite agregar más recursos de manera sencilla para manejar un mayor volumen de tráfico. Esto lo hace adecuado para aplicaciones web que deben crecer con el tiempo.
+-	Rendimiento y Eficiencia: Node.js utiliza el motor de JavaScript V8 de Google, que es altamente optimizado y rápido. Esto permite a las aplicaciones desarrolladas en Node.js responder de manera rápida a las solicitudes de los usuarios y manejar un gran número de conexiones simultáneas de manera eficiente.
+-	Lenguaje de Programación Unificado: Node.js utiliza JavaScript tanto en el lado del servidor como en el lado del cliente. Esto significa que los desarrolladores pueden utilizar el mismo lenguaje de programación en todo el proyecto, lo que simplifica el desarrollo y reduce la complejidad del código.
+2.4.5.2	 CONS de NodeJS
+-	Un Solo Hilo de Ejecución: Node.js utiliza un solo hilo de ejecución para manejar todas las solicitudes entrantes. Aunque utiliza operaciones no bloqueantes para evitar bloqueos, aún puede ser un problema en aplicaciones que realizan tareas intensivas en CPU, ya que pueden ralentizar la respuesta de otras solicitudes.
+-	Curva de Aprendizaje: la curva de aprendizaje de Node.js puede ser empinada. Requiere un cambio de mentalidad en la forma de abordar el desarrollo de aplicaciones en comparación con plataformas más tradicionales.
+-	Falta de Estabilidad en Módulos Terceros: Aunque Node.js tiene una amplia gama de módulos disponibles, algunos de los módulos de terceros pueden no estar tan bien mantenidos o ser tan estables como se desearía, lo que puede llevar a problemas de compatibilidad y seguridad.
+2.4.6	PlanetScale como Base de Datos
+"PlanetScale es una plataforma de bases de datos distribuidas y escalables diseñada para abordar los desafíos de almacenamiento y gestión de datos en aplicaciones modernas" (PlanetScale, 2022).
+2.4.6.1	 PROS de PlanetScale
+-	Escalabilidad Horizontal: Esto significa que la plataforma puede manejar cargas de trabajo cada vez mayores a medida que una aplicación crece en usuarios y datos.
+-	Seguridad Avanzada: PlanetScale incorpora características de seguridad avanzadas, como el cifrado de datos en reposo y en tránsito, autenticación de dos factores y control de acceso granular. Estas características ayudan a proteger los datos críticos de la empresa y cumplir con las regulaciones de privacidad de datos.
+-	Alta Disponibilidad: Esto garantiza que los datos estén disponibles incluso en caso de fallos en una ubicación específica.
+2.4.6.2	 CONS de PlanetScale
+-	Curva de Aprendizaje: Los equipos de desarrollo y operaciones pueden necesitar tiempo para familiarizarse con la plataforma y aprovechar al máximo sus capacidades. Esto puede retrasar la implementación de proyectos.
+-	Dependencia de Terceros: Las organizaciones pueden depender en gran medida de un proveedor externo para la gestión de sus bases de datos. Esto puede plantear preocupaciones sobre la dependencia y la continuidad del servicio en caso de cambios en el proveedor o problemas técnicos.
+-	Integración Compleja: Requiere planificación cuidadosa y ajustes en la arquitectura de la aplicación para aprovechar al máximo sus capacidades. Esto puede requerir esfuerzos adicionales de desarrollo.
+2.4.7	Lenguaje de Programación TypeScript
+"TypeScript es un lenguaje de programación de alto nivel desarrollado por Microsoft que se basa en JavaScript" (TypeScript, 2023). 
+TypeScript nos proporciona características adicionales y mejoras a JavaScript, como el soporte para tipos estáticos, lo que permite la detección temprana de errores y un desarrollo más seguro y confiable.
+2.4.7.1	 PROS de TypeScript
+-	Facilita el Mantenimiento del Código: El sistema de tipos de TypeScript ayuda a documentar la estructura y el flujo de datos en una aplicación, lo que simplifica el mantenimiento a lo largo del ciclo de vida del software.
+-	Mejora la Seguridad del Código: Una de las ventajas más destacadas de TypeScript es su capacidad para atrapar errores de tipo en tiempo de compilación. Esto ayuda a prevenir errores comunes que podrían conducir a fallos en tiempo de ejecución, mejorando así la seguridad y confiabilidad del código.
+-	Mejora la Legibilidad del Código: TypeScript permite a los desarrolladores definir tipos de datos explícitos, lo que hace que el código sea más legible y comprensible. Los nombres de variables y funciones se vuelven más descriptivos, facilitando la colaboración entre equipos de desarrollo.
+2.4.7.2	 CONS de TypeScript
+-	Mayor Cantidad de Código: El uso de TypeScript a menudo resulta en un código más extenso en comparación con JavaScript puro. La necesidad de definir tipos y anotaciones puede aumentar la cantidad de líneas de código, lo que puede ser percibido como una desventaja en proyectos donde se busca la concisión.
+-	Integración con Librerías Existentes: Integrar TypeScript en proyectos que utilizan librerías o código JavaScript existente puede ser un desafío. A veces, es necesario crear definiciones de tipos personalizadas o realizar ajustes en el código existente para lograr una integración fluida.
+-	Requiere Compilación Adicional: El uso de TypeScript requiere una etapa de compilación adicional antes de que el código pueda ser ejecutado en el navegador o en el entorno de Node.js. Esto puede agregar una complejidad adicional al proceso de desarrollo y despliegue.
+2.4.8	Vercel
+"Vercel se destaca por su enfoque en la creación de aplicaciones web estáticas y de una sola página (SPA, por sus siglas en inglés). Utilizando tecnologías como React, Next.js y Vue.js, Vercel permite a los desarrolladores crear aplicaciones web rápidas, interactivas y altamente escalables" (Vercel, 2023).
+2.4.8.1	 PROS de Vercel
+-	Integración con Git: Vercel se integra perfectamente con sistemas de control de versiones como Git, lo que facilita la implementación continua y la colaboración en equipos de desarrollo. Puede configurar fácilmente despliegues automáticos desde su repositorio de Git, lo que simplifica el flujo de trabajo y garantiza que las actualizaciones se implementen de manera consistente.
+-	Rendimiento de Alta Velocidad: Vercel utiliza una red de distribución de contenido (CDN) global que coloca su sitio web cerca de los usuarios, lo que disminuye significativamente los tiempos de carga.
+-	Escalabilidad Automatizada: A medida que el proyecto crece y experimenta picos de tráfico, Vercel escala dinámicamente los recursos para garantizar un rendimiento constante. Esto elimina la necesidad de preocuparse por la gestión de la infraestructura y permite a los desarrolladores centrarse en la creación de aplicaciones de alta calidad.
+2.4.8.2	 CONS de Vercel
+-	Costos Variables: Si bien Vercel ofrece un modelo de precios inicialmente atractivo con su plan gratuito, los costos pueden aumentar a medida que su proyecto crece y requiere más recursos. Los precios se basan en el consumo de recursos y el tráfico, lo que significa que podría experimentar costos imprevistos si su sitio web se vuelve muy popular.
+-	Dependencia de la Red de Vercel: Al confiar en la red global de Vercel, los sitios web y aplicaciones alojados en la plataforma pueden estar sujetos a problemas fuera de su control, como interrupciones en la red de Vercel.
+-	Requiere Conocimientos Técnicos: La configuración inicial y la gestión de proyectos pueden requerir cierto nivel de conocimiento técnico, lo que podría ser una barrera para algunos usuarios.
+2.4.9	ESLint
+ESLint es una herramienta de linting para JavaScript ampliamente utilizada en el desarrollo de software (ESLint, 2023)
+Su objetivo principal es ayudar a los desarrolladores a identificar y corregir errores de código, así como mantener un estilo consistente en todo el proyecto.
+Con ESLint, es posible definir reglas personalizadas o utilizar conjuntos de reglas predefinidas que abarcan diferentes convenciones de codificación y buenas prácticas. Las reglas se aplican al código fuente y generan advertencias o errores cuando se detectan violaciones.
+2.4.9.1	 PROS de ESLint
+-	Mejora la Calidad del Código: ESLint es una herramienta altamente configurable que permite definir reglas de estilo y de calidad de código. Esto asegura que el código fuente cumpla con estándares predefinidos, lo que conduce a un código más limpio y legible.
+-	Detección Temprana de Errores: ESLint realiza un análisis estático del código en tiempo real, identificando posibles errores y problemas potenciales antes de la ejecución. Esto ayuda a reducir los errores en tiempo de ejecución y facilita la depuración.
+-	Estándares de Codificación Consistentes: Facilita la colaboración en equipos de desarrollo al imponer un conjunto coherente de reglas de codificación. Esto asegura que todos los miembros del equipo sigan las mismas convenciones, lo que facilita la revisión y mantenimiento del código.
+2.4.9.2	 CONS de ESLint
+-	Configuración Inicial Compleja: La configuración inicial de ESLint puede resultar complicada, especialmente para equipos sin experiencia previa en su uso. La selección de reglas y ajustes adecuados puede requerir tiempo y esfuerzo.
+-	Posibles Falsos Positivos y Negativos: ESLint, en algunos casos, puede generar falsos positivos (señalar errores que no lo son) o falsos negativos (no señalar errores reales). Esto puede llevar a cierta frustración en los desarrolladores.
+-	Impacto en el Rendimiento: En proyectos grandes, la ejecución de ESLint en cada cambio de código puede tener un impacto en el rendimiento de la compilación, ralentizando el proceso de desarrollo.
+2.5	HERRAMIENTAS DE INTEGRACION
+2.5.1	GIT
+"Git es un sistema de control de versiones distribuido ampliamente utilizado en el desarrollo de software" (Chacon, 2014). Fue creado con el objetivo de proporcionar una herramienta eficiente y confiable para gestionar el código fuente de proyectos de software.
+"Git permite a los desarrolladores realizar un seguimiento de los cambios en los archivos a lo largo del tiempo, colaborar con otros miembros del equipo y gestionar ramificaciones y fusiones de código de manera efectiva" (Loeliger, 2012). 
+La idea principal detrás de Git es de utilizar un modelo distribuido en el que cada miembro tiene una copia completa del repositorio, lo que facilita el trabajo sin conexión y tener un respaldo en caso de errores, a la par de tener un histórico de los cambios realizados en el proyecto.
+2.5.1.1	 PROS de Git
+-	Control de Versiones: Esto permite a los desarrolladores rastrear los cambios a lo largo del tiempo, identificar problemas y regresar a versiones anteriores en caso de problemas. Además, se pueden etiquetar versiones importantes para una fácil referencia.
+-	Historial Detallado de Cambios: Git registra meticulosamente cada cambio realizado en el código, lo que proporciona un historial completo de quién hizo qué y cuándo. Esto es invaluable para la depuración, la auditoría y la responsabilidad en el equipo de desarrollo.
+-	Eficiencia en la Colaboración: Git facilita la colaboración en proyectos de desarrollo de software al permitir que múltiples personas trabajen en el mismo código de manera simultánea. Esto se logra mediante la capacidad de ramificar y fusionar cambios de manera eficiente, lo que facilita la gestión de conflictos y la integración de nuevas funcionalidades.
+2.4.3.2	 CONS de Git
+-	Riesgo de Conflictos: A pesar de las herramientas de resolución de conflictos, Git no elimina por completo el riesgo de conflictos durante la fusión de ramas. La gestión de conflictos puede ser un proceso delicado y requerir habilidades adicionales.
+-	Tamaño de Repositorio: Los repositorios de Git pueden volverse grandes con el tiempo, especialmente si el historial de cambios es extenso. Esto puede resultar en un uso intensivo de espacio en disco y requerir un almacenamiento adicional.
+-	Curva de Aprendizaje: Git puede ser complejo para los principiantes, y su curva de aprendizaje puede ser empinada. La comprensión completa de conceptos como ramificaciones, fusiones y conflictos puede llevar tiempo y esfuerzo.
+2.4.4	Modelo de ramificación "One Flow"
+El modelo de ramificación "One Flow" es un enfoque simplificado para la gestión de ramificaciones en el control de versiones, específicamente diseñado para proyectos pequeños o medianos con un flujo de trabajo lineal y sin la necesidad de una estructura de ramificación compleja (Brown, 2019).
+En este modelo, solo existe una rama principal, generalmente llamada "main" o "máster", donde se encuentra el código base del proyecto. Todos los cambios se realizan directamente en esta rama principal, sin crear ramificaciones adicionales (Wirth, 2016). Esto facilita el seguimiento de los cambios y reduce la complejidad del flujo de trabajo.
+El modelo "One Flow" se centra en mantener la rama principal en un estado siempre funcional y desplegable. Esto alienta a que el desarrollador realice cambios pequeños y frecuentes en lugar de grandes cambios que podrían romper la funcionalidad existente. Esto permite una entrega continua y una iteración rápida.
+Si es necesario trabajar en nuevas características o solucionar problemas sin afectar la rama principal, se pueden utilizar ramas locales o ramas temporales para desarrollar y probar esos cambios antes de fusionarlos con la rama principal.
+2.4.4.1	PROS de One Flow
+
+-	Simplificación del Proceso de Desarrollo: One Flow simplifica el proceso de desarrollo al reducir la cantidad de ramas que necesitan ser gestionadas. Esto facilita la comprensión del historial del proyecto y mejora la eficiencia, especialmente en equipos pequeños o en proyectos con ciclos de desarrollo rápidos. 
+-	Mejora en la Integración Continua: La estrategia promueve la integración continua al fomentar que los cambios sean integrados a la rama principal con frecuencia. Esto permite una detección temprana de errores y conflictos, contribuyendo a la estabilidad y calidad del código.
+-	Facilita el Despliegue Continuo: Al mantener un único historial lineal de cambios, One Flow se alinea bien con prácticas de despliegue continuo, donde se espera que cualquier versión de la rama principal esté lista para ser desplegada en producción, reduciendo los tiempos de entrega.
+-	Transparencia y Comunicación Mejorada: Con un único flujo de trabajo y menos ramas que gestionar, se promueve una mayor transparencia dentro del equipo de desarrollo. Esto mejora la comunicación y facilita la colaboración, ya que todos los miembros del equipo trabajan hacia un objetivo común.
+2.4.4.2	 CONS de One Flow
+
+-	Menos Flexibilidad para Proyectos Complejos: Para proyectos de gran envergadura o aquellos que requieren mantener varias versiones en paralelo, One Flow puede resultar menos flexible que otros modelos como Git Flow, limitando la capacidad para gestionar múltiples líneas de desarrollo simultáneamente.
+-	Riesgo de Inestabilidad en la Rama Principal: Si no se implementan adecuadamente prácticas rigurosas de pruebas automatizadas y revisión de código, existe el riesgo de que la rama principal pueda volverse inestable debido a la integración frecuente de nuevas características o cambios.
+-	Desafíos en la Gestión de Lanzamientos: Aunque One Flow simplifica el proceso de desarrollo, puede presentar desafíos en la gestión de lanzamientos, especialmente si se requiere la capacidad de realizar parches rápidos o mantener versiones anteriores accesibles y seguras.
+-	Dependencia de la Disciplina del Equipo: La efectividad de One Flow depende en gran medida de la disciplina del equipo para seguir las mejores prácticas, como la realización de pruebas exhaustivas y la integración continua. Sin estas prácticas, el modelo puede llevar a problemas de calidad y rendimiento.
+
+2.4.5	SCRUM
+SCRUM es una metodología de desarrollo ágil que se caracteriza por implementar un enfoque iterativo e incremental en la gestión de proyectos, particularmente en el ámbito del desarrollo de software
+SCRUM se distingue por su estructura organizativa, que involucra roles claramente definidos, ceremonias específicas y artefactos que guían el proceso de desarrollo. Los equipos de SCRUM son típicamente pequeños, variando de 6 a 12 miembros, lo que fomenta la comunicación eficiente y la toma de decisiones rápida (Schwaber & Sutherland, 2020).
+2.4.5.1	 Aplicación en el Desarrollo de Software
+SCRUM ha ganado popularidad en la industria del desarrollo de software debido a su flexibilidad y eficacia en la gestión de proyectos complejos. Permite a los equipos adaptarse rápidamente a los cambios, fomentando una cultura de trabajo colaborativo y mejora continua. Este enfoque ágil no solo mejora la productividad y calidad del software desarrollado, sino que también aumenta la satisfacción tanto del cliente como del equipo de desarrollo (Sutherland & Schwaber, 2017).
+4.4.5.2	PROS de SCRUM
+-	Flexibilidad y Adaptabilidad: SCRUM es altamente adaptable a cambios durante el ciclo de desarrollo del proyecto. Esto permite a los equipos responder de manera eficaz a los requerimientos cambiantes o a nuevos insights obtenidos durante las iteraciones de desarrollo (Sprints).
+-	Fomenta la Colaboración y Comunicación: Al centrarse en el trabajo en equipo y la colaboración, SCRUM promueve un entorno en el que la comunicación es constante tanto dentro del equipo de desarrollo como con los stakeholders, mejorando el entendimiento del proyecto y la calidad del producto final.
+-	Mejora la Calidad del Producto: Las revisiones y pruebas regulares en cada Sprint aseguran que los problemas se identifiquen y solucionen rápidamente, lo que lleva a una mejora continua en la calidad del producto. Además, al centrarse en entregas incrementales, se asegura que cada funcionalidad cumpla con los requisitos del usuario.
+-	Transparencia y Control de Progreso: SCRUM ofrece una visibilidad completa del progreso del proyecto a través de reuniones regulares y el uso de artefactos como el Sprint Backlog y el Burndown Chart. Esto permite un seguimiento detallado del avance y la identificación temprana de posibles retrasos.
+2.4.5.3	CONS de SCRUM
+-	Dependencia del Compromiso del Equipo: El éxito de SCRUM depende en gran medida del compromiso y la participación activa del equipo y los stakeholders. La falta de implicación puede conducir a malentendidos, retrasos y un producto que no cumple con las expectativas.
+-	Riesgo de Sobrecarga de Trabajo: Sin una gestión adecuada, los Sprints pueden conducir a la sobrecarga de trabajo para los miembros del equipo, especialmente si las estimaciones de tiempo no son realistas o si constantemente se agregan tareas a la lista de pendientes.
+-	Requiere Experiencia en SCRUM: Para que SCRUM sea efectivo, al menos algunos miembros del equipo deben tener una buena comprensión de la metodología. La falta de experiencia en SCRUM puede resultar en una implementación incorrecta, disminuyendo su efectividad y potencialmente llevando a la confusión y al desgaste del equipo.
+-	Menos Efectivo en Equipos Grandes o Distribuidos: SCRUM puede ser menos efectivo en equipos grandes o geográficamente distribuidos debido a los desafíos inherentes a la coordinación y comunicación. Esto puede requerir adaptaciones en la metodología para mantener la eficiencia.
+2.4.6	Método MoSCoW
+El Método MoSCoW es una técnica de priorización utilizada en la gestión de proyectos, desarrollo de software, y gestión de productos para clasificar la importancia de un conjunto de requisitos o tareas (Cadle & Yeates, 2008).
+Este método divide los requisitos en cuatro categorías: Must have (Debe tener), Should have (Debería tener), Could have (Podría tener), y Won't have (No tendrá para esta ocasión). La clave del método MoSCoW es ayudar a los equipos a comprender cuáles son las características esenciales para el lanzamiento de un proyecto y cuáles pueden ser descartadas o pospuestas para fases futuras.
+-	Must Have (M): Son requisitos críticos que el proyecto debe satisfacer para ser considerado un éxito. Su ausencia compromete la viabilidad del proyecto.
+-	Should Have (S): Importantes, pero no vitales. Son requisitos que no afectan la puesta en marcha del proyecto, pero su inclusión aportaría un valor significativo.
+-	Could Have (C): Deseables, pero no necesarios. Son requisitos que, aunque beneficiosos, tienen un impacto menor y pueden ser sacrificados si es necesario.
+-	Won't Have (W): Se refieren a requisitos que, aunque identificados, no serán implementados en el proyecto actual, pero pueden considerarse para el futuro.
+2.4.6.1	PROS de Método MoSCoW
+-	Claridad en la Priorización: El Método MoSCoW aporta claridad y estructura al proceso de priorización, facilitando la toma de decisiones sobre qué características o tareas son esenciales para el lanzamiento del proyecto y cuáles pueden esperar o descartarse. Esta claridad es vital para la gestión eficiente del tiempo y los recursos.
+-	Flexibilidad en el Desarrollo: Al identificar claramente las prioridades, el equipo puede ser más flexible y adaptativo. Si surgen cambios o limitaciones de tiempo, el equipo ya sabe qué elementos son negociables y cuáles no, permitiendo ajustes rápidos sin comprometer el resultado final del proyecto.
+-	Mejora la Comunicación con los Stakeholders: El método facilita la comunicación con los stakeholders al establecer expectativas claras desde el inicio del proyecto. Al involucrarlos en el proceso de clasificación, se asegura que sus necesidades y preocupaciones sean consideradas y se minimizan malentendidos o cambios tardíos.
+-	Enfoque en la Entrega de Valor: Priorizando las tareas y características según su impacto en los objetivos del proyecto, el equipo puede centrarse en las actividades que realmente aportan valor al cliente final, optimizando la asignación de recursos y mejorando la satisfacción del cliente.
+2.4.6.2	CONS de Método MoSCoW
+-	Subjetividad en la Clasificación: La determinación de qué elementos pertenecen a cada categoría puede ser subjetiva y variar según la percepción individual, lo que puede llevar a debates o conflictos entre el equipo de desarrollo y los stakeholders.
+-	Riesgo de Ignorar Elementos "Could Have": Existe el riesgo de que los elementos clasificados como "Could have" sean continuamente postergados o ignorados, aunque aporten valor significativo al proyecto. Esto puede resultar en un producto final menos robusto o en la pérdida de oportunidades para innovar.
+-	Dificultad en Proyectos con Requerimientos Cambiantes: En proyectos donde los requerimientos cambian frecuentemente o no están bien definidos desde el inicio, la aplicación efectiva del Método MoSCoW puede ser desafiante, requiriendo revisiones constantes de las prioridades establecidas.
+-	Dependencia de una Planificación Efectiva: Para que el método sea efectivo, es esencial tener una planificación detallada y realista del proyecto. Sin una comprensión clara de los requerimientos, plazos y recursos disponibles, la clasificación de tareas puede ser inexacta, afectando negativamente la ejecución del proyecto.
+
+
+
+
+
+CAPITULO III
+3	MARCO METODOLÓGICO
+3.1	TIPO DE INVESTIGACION
+El tipo de investigación utilizado en este proyecto es una investigación aplicada. El objetivo principal es desarrollar un sistema de gestión de facturas para Pymes en Cochabamba, utilizando tecnologías modernas y escalables. La investigación aplicada se enfoca en la solución práctica de problemas y la generación de conocimiento que puede ser aplicado directamente en un contexto específico.
+3.2	DISENO DE INVESTIGACION
+ El diseño de investigación utilizado en este proyecto es el diseño de desarrollo de software. Este diseño se centra en el desarrollo y la implementación de un sistema de gestión de facturas para Pymes en Cochabamba. Se seguirá una metodología ágil, específicamente Scrum, que permite un enfoque iterativo e incremental para el desarrollo del software.
+3.3	METODOS, TECNICAS E INSTRUMENTOS DE INVESTIGACION A UTILIZAR
+3.3.1	Método
+El método utilizado en este proyecto es el método de desarrollo de software, que se basa en procesos estructurados para diseñar, implementar y probar el software. Se seguirá una metodología ágil, en particular Scrum, que divide el desarrollo en Sprint de dos semanas y permite una entrega continua de valor al cliente.
+3.3.2	Técnicas
+Las técnicas utilizadas en este proyecto incluyen:
+-	Entrevistas: Se realizarán entrevistas a representantes de las Pymes de Cochabamba para recopilar información sobre sus necesidades y requerimientos en la gestión de facturas.
+-	Encuestas: Se realizarán encuestas a las Pymes de Cochabamba para obtener una visión más amplia de los desafíos y problemas actuales en la gestión de facturas.
+-	Análisis de requisitos: Se realizará un análisis detallado de los requisitos del sistema de gestión de facturas, identificando las funcionalidades y características necesarias.
+-	Diseño de arquitectura: Se realizará un diseño de la arquitectura del software, definiendo los componentes, la estructura y las interacciones del sistema.
+-	Pruebas: Se llevarán a cabo pruebas exhaustivas, tanto manuales como automatizadas, para verificar el correcto funcionamiento del sistema y asegurar que cumpla con los requisitos establecidos.
+3.3.3	Herramientas
+Las herramientas utilizadas en este proyecto incluyen:
+-	Lenguajes de programación: JavaScript y TypeScript serán utilizados para el desarrollo del sistema de gestión de facturas.
+-	Frameworks: Se utilizará Next.js como framework de desarrollo web y Tailwind CSS como framework de diseño de interfaz de usuario.
+-	Base de datos: Se utilizará MySQL como base de datos relacional para almacenar la información relacionada con las facturas.
+-	Control de versiones: Git será utilizado como sistema de control de versiones para gestionar el código fuente del proyecto.
+-	Gestión de proyectos: Se utilizará una herramienta de gestión de proyectos, como Trello, para organizar las tareas, establecer prioridades y realizar un seguimiento del progreso del proyecto.
+-	Herramientas de pruebas: Se utilizarán herramientas de pruebas automatizadas, como Jest o Cypress, para realizar pruebas unitarias y de integración.
+-	Herramientas de desarrollo: Se utilizarán herramientas de desarrollo como Visual Studio Code, ESLint y Prettier para mejorar la calidad del código y mantener una estructura consistente.
+3.4	Análisis de Resultados
+La implementación de las técnicas y herramientas descritas previamente ha permitido un análisis exhaustivo del manejo de facturas tanto en PYMES como en personas comunes. A continuación, se detallan los hallazgos principales de cada método utilizado:
+Entrevista a PYMES: La gestión de facturas en las empresas pequeñas y medianas revela una tendencia hacia el manejo manual de registros, con una inclinación por sistemas de facturación automatizados en menor medida. Los problemas identificados incluyen el extravío de facturas y dificultades en el almacenamiento y organización, lo cual señala una necesidad imperante de soluciones más eficientes y seguras. La pandemia de COVID-19 ha exacerbado estas dificultades, aumentando la necesidad de evitar el manejo físico de facturas para minimizar el riesgo de contagio y pérdida de documentos importantes.
+Entrevista a Personas Comunes: En cuanto a la gestión individual de facturas, se observa una preferencia por el almacenamiento físico en carpetas, aunque esto conlleva problemas de pérdida y dificultades en la organización y acceso a las facturas cuando se necesitan. La situación pandémica ha agudizado la conciencia sobre los riesgos del manejo físico de documentos, impulsando un interés en la digitalización y gestión electrónica de facturas.
+Anexo 1: Transcripción de entrevista a PYMES destaca la prevalencia del registro manual y los desafíos asociados, agravados por la situación de la pandemia.
+Anexo 2 y 3: La encuesta realizada a personas comunes refleja la tendencia hacia la gestión manual de facturas, con un porcentaje significativo de individuos que han experimentado problemas relacionados y considerarían la adopción de sistemas de gestión de facturas digitales.
+3.5	Conclusión del Análisis de Resultados
+La información recopilada a través de entrevistas y encuestas evidencia desafíos comunes en la gestión de facturas tanto en el ámbito empresarial como personal. La dependencia de sistemas manuales y el almacenamiento físico de documentos resultan en problemas de pérdida, ineficiencia en la organización y una creciente vulnerabilidad en el contexto de la pandemia COVID-19.
+Se destaca la necesidad imperante de adoptar soluciones digitales para la gestión de facturas. La implementación de sistemas automatizados no solo abordaría los problemas de eficiencia y seguridad, sino que también facilitaría la adaptación a las condiciones impuestas por la pandemia, minimizando el contacto físico con documentos y mejorando la accesibilidad y organización de la información financiera.
+Este análisis subraya la importancia de avanzar hacia la digitalización y automatización en la gestión de facturas, tanto para empresas como para individuos, como un medio para superar los desafíos actuales y mejorar la eficiencia y seguridad en la administración financiera.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CAPÍTULO IV
+4	INGENIERIA DEL PROYECTO
+4.1	ANALISIS Y DEFINICION DE REQUERIMIENTOS
+El análisis y la definición de requerimientos constituyen la piedra angular del desarrollo de sistemas de software. Este proceso implica una comprensión profunda de las necesidades y expectativas de los usuarios finales, así como de las restricciones técnicas y empresariales. Para el proyecto de gestión de facturas dirigido a pymes en Cochabamba, se adoptó un enfoque estructurado para capturar, analizar y priorizar los requisitos.
+4.1.1	Requisitos Funcionales
+Los requisitos funcionales describen las acciones específicas o comportamientos del sistema. Para el sistema de gestión de facturas, se identificaron los siguientes requisitos principales:
+-	Registro y Autenticación de Usuarios: El sistema debe permitir el registro de nuevos usuarios y la autenticación de usuarios existentes para garantizar un acceso seguro.
+-	Carga y Digitalización de Facturas: Implementar una funcionalidad para cargar imágenes de facturas y utilizar OCR para extraer y almacenar datos relevantes de forma automática.
+-	Gestión de Facturas: Permitir a los usuarios visualizar, editar, y eliminar facturas. Además, ofrecer la capacidad de clasificar facturas por categorías y fechas.
+-	Generación de Reportes: Facilitar la creación de informes financieros personalizados basados en las facturas almacenadas.
+
+
+
+4.1.2	Requisitos No Funcionales
+Los requisitos no funcionales se relacionan con la seguridad, rendimiento, y aspectos operativos del sistema. Incluyen:
+-	Seguridad: Implementación de protocolos robustos para la protección de datos y la prevención de accesos no autorizados.
+-	Usabilidad: Diseño de una interfaz de usuario intuitiva y fácil de usar que requiera mínima capacitación.
+-	Escalabilidad: Capacidad del sistema para adaptarse a un creciente volumen de facturas y usuarios sin degradar el rendimiento.
+-	Compatibilidad: Soporte para diversos dispositivos y navegadores, garantizando el acceso desde cualquier lugar.
+4.1.3	Priorización de Requisitos
+Para priorizar los requisitos, se empleó el método MoSCoW, clasificándolos en Must have, Should have, Could have, y Won't have en esta fase. Esta priorización facilitó la planificación del alcance del proyecto y aseguró que los esfuerzos se centraran en las funcionalidades críticas para el lanzamiento inicial.
+4.1.4	Historias de Usuario
+Basándonos en los requisitos identificados, se crearon historias de usuario detalladas para cada funcionalidad clave. Cada historia de usuario incluye:
+-	Título: narrativa corta que indica a nivel general un módulo a realizar.
+-	Criterios de Aceptación: Condiciones específicas que deben cumplirse para que la historia sea considerada completa.
+-	Prioridad: Basada en el método MoSCoW para reflejar la importancia de la historia en el proyecto.
+-	Riesgo: Evaluación del impacto potencial en el proyecto si la implementación de la historia enfrenta obstáculos.
+Título	Descripción	Prioridad	Riesgo
+Autenticación de Usuarios	El sistema debe permitir que los empleados se autentiquen para garantizar la seguridad de la información y asegurar que cada usuario acceda solo a los módulos autorizados.	Debe tener	Medio
+Registro de Facturas	El sistema debe ofrecer la capacidad de registrar facturas recibidas y emitidas por la empresa para mantener un control financiero y cumplir con las obligaciones fiscales.	Debe tener	Bajo
+Visualización de Facturas	El sistema debe permitir visualizar todas las facturas emitidas y recibidas en un período determinado para ofrecer un panorama claro de las finanzas de la empresa.	Debe tener	Bajo
+Edición y Eliminación de Facturas	El sistema debe permitir editar o eliminar facturas registradas incorrectamente para asegurar la precisión de la información contable.	Debería tener	Medio
+Generación de Informes	El sistema debe permitir generar informes de facturación por cliente, proveedor o período para analizar la salud financiera de la empresa.	Debería tener	Medio
+Carga de Facturas con OCR	El sistema debe facilitar la carga rápida de facturas utilizando la cámara de un dispositivo para capturar la imagen de la factura y extraer automáticamente los datos relevantes mediante OCR.	Podría tener	Alto
+Exportación de Datos	El sistema debe permitir exportar los datos de las facturas a formatos CSV o PDF para realizar análisis externos o compartir la información con terceros de manera segura.	Podría tener	Bajo
+
+A partir de los requerimientos definidos, se pone en marcha el diseño y la planificación del desarrollo mediante la metodología SCRUM, empezando por definir los roles del equipo, que, en este caso, al ser un proyecto de grado, se tiene un solo actor para desempeñar los diferentes roles.
+4.2	DISENO Y DESARROLLO SEGÚN LA METODOLOGIA SCRUM
+4.2.1	Roles en el Método SCRUM
+En el marco de la metodología ágil SCRUM, la definición y asignación de roles son fundamentales para el éxito del proceso de desarrollo. Aunque SCRUM se concibe típicamente para equipos de trabajo, su adaptabilidad permite la aplicación en proyectos gestionados por un único desarrollador. En este contexto, el desarrollador asume múltiples roles, cada uno con responsabilidades específicas que contribuyen al progreso y éxito del proyecto. A continuación, se detallan los roles asumidos por un desarrollador que aplica el método SCRUM:
+Product Owner (Propietario del Producto): El desarrollador asume el rol de Product Owner, siendo responsable de definir y priorizar las funcionalidades y requisitos del software. Esto implica la identificación de las necesidades del proyecto y la toma de decisiones sobre qué características implementar.
+-	Definición y Priorización de Requerimientos: El desarrollador identifica las necesidades del proyecto y establece un orden de prioridad para las funcionalidades y tareas basándose en su impacto y valor. Esto se materializa en la gestión del Product Backlog, asegurando que refleje los objetivos del proyecto y las expectativas del usuario o cliente.
+-	Toma de Decisiones: Como Product Owner, el desarrollador tiene la autoridad para tomar decisiones críticas sobre el producto, incluyendo qué características incluir y en qué orden se deben desarrollar. Esto requiere un profundo entendimiento del mercado, el usuario final y los objetivos del proyecto.
+Scrum Máster: Aunque no se requiere un Scrum Máster en un proyecto individual, el desarrollador debe ser auto disciplinado y asumir la responsabilidad de mantener el proceso Scrum en marcha. Esto implica garantizar que se sigan las prácticas y que los obstáculos se aborden de manera oportuna.
+-	Autodisciplina y Gestión del Proceso: El desarrollador debe ser auto disciplinado, manteniendo un compromiso firme con los principios y prácticas de SCRUM. Esto incluye la organización del trabajo en Sprints, la realización de reuniones de revisión y retrospectivas consigo mismo para evaluar el progreso e identificar áreas de mejora.
+-	Superación de Obstáculos: El desarrollador se encarga de identificar y resolver cualquier impedimento que pueda afectar la continuidad del proyecto, asegurando un flujo de trabajo constante y eficiente.
+4.2.2	Sprint Backlog
+Una vez definidos los roles, se construyó el Sprint Backlog, que especifica cada uno de los módulos a desarrollar, las tareas del sprint, tiempo estimado y el tiempo real en el que se realizó la tarea. 
+Número de Sprint	Módulo	Duración (semanas)	Tareas del Sprint	Esfuerzo en horas (Estimado/Real)
+1	Autenticación de Usuarios	2	Diseño de la interfaz de autenticación, Implementación del sistema de login, Pruebas de seguridad	40/45
+1	Registro de Facturas	2	Creación de formulario de registro, Implementación de la lógica de negocio, Pruebas unitarias	30/35
+2	Visualización de Facturas	2	Diseño de interfaz de listado de facturas, Desarrollo de filtrado y búsqueda, Integración con la base de datos	40/42
+2	Edición y Eliminación de Facturas	2	Implementación de funcionalidades de edición y eliminación, Pruebas de integración	32/30
+3	Generación de Informes	2	Diseño de reportes, Desarrollo de generación de informes basados en criterios, Pruebas de rendimiento	45/50
+3	Carga de Facturas con OCR	2	Integración con OCR para captura de facturas, Implementación de extracción de datos, Pruebas de precisión OCR	50/55
+4	Exportación de Datos	2	Desarrollo de funcionalidad de exportación a CSV/PDF, Pruebas de exportación	25/20
+
+4.2.2	Herramientas y Tecnologías
+Dentro del marco SCRUM, es fundamental contar con herramientas y tecnologías que faciliten la planificación, seguimiento y gestión del proyecto. Una de las herramientas ampliamente utilizadas que puede ser beneficiosa para proyectos individuales es Trello.
+4.2.3	Trello en SCRUM Individual
+Trello es una plataforma de gestión de proyectos y colaboración que se basa en el uso de tableros, listas y tarjetas. Es conocida por su enfoque visual y su facilidad de uso, lo que la hace adecuada tanto para equipos grandes como para proyectos individuales.
+4.2.4	PROS de SCRUM en Proyectos Individuales
+Hay que destacar las ventajas de aplicar el método Scrum en proyectos individuales puede proporcionar una perspectiva más completa. Algunas ventajas podrían incluir:
+-	Flexibilidad: Scrum permite la adaptación continua a medida que el desarrollador obtiene una comprensión más profunda de los requisitos y las necesidades del proyecto.
+-	Visibilidad del Progreso: Mediante las reuniones diarias y las revisiones de sprint, el desarrollador tiene una visión clara del progreso y puede tomar decisiones informadas.
+-	Feedback Constante: El enfoque iterativo de Scrum permite recibir retroalimentación constante y realizar mejoras continuas en el software.
+4.3	KANBAN
+Kanban es un método visual de gestión de tareas que permite al desarrollador individual organizar y controlar su flujo de trabajo de manera eficiente. A continuación, se presenta un ejemplo de cómo se podría aplicar el método Kanban en un proyecto de desarrollo de software individual para la gestión de facturas, para trabajar con Kanban hay que realizar lo siguiente:
+-	Crear un tablero Kanban: Crear un tablero Kanban con columnas que representan los diferentes estados de las tareas, como "Por hacer", "En progreso" y "Completado".
+-	Crear tarjetas de tareas: Escribir las diferentes tareas necesarias para completar el proyecto en tarjetas separadas y las coloca en la columna "Por hacer" en el tablero Kanban.
+-	Asignar tareas y mover tarjetas: Seleccionar una tarea de la columna "Por hacer" y la coloca en la columna "En progreso". A medida que trabaja en una tarea, mueve la tarjeta a la columna "Completado" cuando finaliza.
+-	Controlar el flujo de trabajo: Mantener un flujo constante de trabajo asegurándose de que no haya demasiadas tareas en progreso a la vez. Se enfoca en completar tareas antes de iniciar nuevas, evitando la acumulación excesiva de trabajo en una sola etapa del proceso.
+-	Revisar y mejorar: Revisar periódicamente el tablero Kanban para identificar cuellos de botella, identificar áreas de mejora y ajustar el flujo de trabajo según sea necesario.
+Tarjetas de Tareas
+En el marco de Kanban, las tareas individuales se representan mediante tarjetas. Cada tarjeta de tarea contiene información crítica que facilita su gestión y seguimiento
+4.3.1	Descripción de la Tarea
+Cada tarjeta de tarea debe incluir una descripción concisa pero completa de la tarea en cuestión. Esta descripción debe ser lo suficientemente clara para que cualquier persona que consulte el tablero Kanban pueda comprender la naturaleza y los requisitos de la tarea sin ambigüedades.
+4.3.2	Responsable
+Para una asignación efectiva de tareas, cada tarjeta debe especificar quién es el responsable de llevar a cabo la tarea. Esto garantiza que haya claridad sobre quién debe trabajar en cada tarea y evita confusiones o duplicaciones de esfuerzo.
+4.3.3	Estado Actual
+Cada tarjeta de tarea debe indicar su estado actual dentro del flujo de trabajo. En el contexto de Kanban, los estados comunes incluyen "Por hacer," "En progreso" y "Completado." Actualizar el estado de las tarjetas es una práctica esencial para rastrear el progreso y determinar qué tareas requieren atención inmediata.
+4.3.4	Comentarios y Notas
+Para facilitar la comunicación y el registro de información adicional, las tarjetas de tarea pueden incluir secciones para comentarios y notas para discutir detalles, registrar problemas o proporcionar actualizaciones relevantes sobre la tarea.
+4.3.5	Movimiento de Tarjetas
+El proceso de movimiento de tarjetas en el tablero Kanban es una parte crucial de la metodología. El desarrollador individual debe comprender cómo y cuándo mover una tarjeta de una columna a otra. Esto se realiza de acuerdo con el progreso de la tarea y las reglas establecidas en el proyecto. El cambio de estado de una tarjeta debe reflejar con precisión su estado actual en el proceso de desarrollo.
+4.3.6	Criterios de Aceptación
+Los criterios de aceptación son una parte esencial de una tarjeta de tarea en Kanban. Estos criterios definen los estándares que deben cumplirse para considerar que la tarea está completa. Deben ser específicos, medibles y verificables, lo que permite una evaluación objetiva del trabajo realizado.
+4.4	DIAGRAMAS UML
+Los diagramas UML son como un lenguaje visual universal para describir y representar sistemas de software. Son como un conjunto de dibujos que nos permiten mostrar cómo funciona un sistema, cómo se relacionan sus diferentes partes y cómo interactúan con los usuarios.
+4.4.1	Diagramas de Casos de Uso
+
+Los diagramas de casos de uso en UML (Lenguaje de Modelado Unificado) ayudan a describir las interacciones entre los usuarios y el sistema. A continuación, se muestra un ejemplo de un diagrama de casos de uso para un sistema de gestión de facturas.
+Para un Usuario:
+
+4.4.2	Diagramas de Clases
+Los diagramas de clases en UML representan la estructura estática de un sistema y las relaciones entre las clases. A continuación, se muestra un ejemplo simplificado de un diagrama de clases para un sistema de gestión de facturas.
+
+Una vez detalladas las tareas en el Sprint Backlog, y se desarrollaron los diagramas de clases y entidad relación de la base de datos del sistema en general, el desarrollo del proyecto paso al desarrollo de los sprints para obtener el producto. En los capítulos a continuación, se detalla, mediante imágenes y diagramas, el proceso que siguió para el desarrollo de cada módulo.
+4.4.3	Sprint 1: Autenticación de Usuarios y Registro de Facturas
+Duración: 2 semanas.
+Preparación del Sprint
+-	Revisión de Requisitos: El equipo revisa los requisitos específicos para los módulos de Autenticación de Usuarios y Registro de Facturas, asegurándose de comprender completamente las necesidades del usuario y las especificaciones técnicas requeridas.
+-	Planificación del Sprint: Se establecen las tareas a realizar, se asignan responsabilidades y se estima el esfuerzo requerido para cada tarea.
+
+Desarrollo
+Módulo de Autenticación de Usuarios
+Análisis de Requisitos:
+-	Definición de los casos de uso para el inicio de sesión, registro y recuperación de contraseña.
+-	Especificación de los requisitos de seguridad, como la encriptación de contraseñas y la protección contra ataques de fuerza bruta.
+Diseño:
+-	Diseño de la interfaz de usuario para las pantallas de inicio de sesión, registro y recuperación de contraseña, enfocándose en la usabilidad y la experiencia del usuario.
+-	Diseño de la arquitectura de seguridad para la autenticación, incluyendo el uso de tokens JWT para la gestión de sesiones.
+Desarrollo:
+-	Implementación de la lógica de autenticación utilizando NodeJS y frameworks como NextAuth.js para facilitar el proceso.
+Módulo de Registro de Facturas
+Análisis de Requisitos:
+-	Identificación de los campos de datos necesarios para el registro de facturas, como número de factura, fecha, proveedor, concepto y monto.
+-	Especificación de los requisitos para la validación de datos y el formato de las facturas.
+Diseño:
+-	Diseño de la interfaz de usuario para el formulario de registro de facturas, priorizando la claridad y la facilidad de uso.
+-	Diseño del modelo de datos para el almacenamiento de facturas en la base de datos MySQL, considerando la integridad y la normalización de los datos.
+Desarrollo:
+-	Implementación del formulario de registro y la lógica de validación de datos en el frontend utilizando JavaScript y frameworks como React con Tailwind CSS para el diseño.
+-	Desarrollo de la API en el backend para el procesamiento y almacenamiento de facturas en la base de datos MySQL, utilizando NodeJS.
+
+4.4.4	Sprint 2: Visualización de Facturas y Edición/Eliminación de Facturas
+
+Duración: 2 semanas.
+Preparación del Sprint
+Revisión de Requisitos: Analizar los requisitos para los módulos de Visualización y Edición/Eliminación de Facturas, asegurando una comprensión clara de las funcionalidades esperadas.
+Planificación del Sprint: Detallar las tareas, asignar responsabilidades y estimar el esfuerzo necesario.
+Desarrollo
+Módulo de Visualización de Facturas
+Análisis de Requisitos:
+-	Determinar los filtros y opciones de búsqueda necesarios para los usuarios.
+-	Especificar los requisitos para la visualización detallada de las facturas.
+Diseño:
+-	Crear wireframes para las interfaces de visualización de facturas, incluyendo listados y detalles.
+-	Diseñar la lógica para filtrar y ordenar facturas en la interfaz de usuario.
+Desarrollo:
+-	Implementar la funcionalidad de visualización de facturas, integrando con la base de datos para recuperar los datos de facturas.
+-	Desarrollar la interfaz de usuario utilizando React y Tailwind CSS.
+
+
+Módulo de Edición y Eliminación de Facturas
+Análisis de Requisitos:
+-	Definir el flujo de trabajo para la edición y eliminación de facturas por parte del usuario.
+Diseño:
+-	Diseñar las interfaces de usuario para la edición y eliminación de facturas, incluyendo formularios de edición y confirmaciones de eliminación.
+Desarrollo:
+-	Implementar la lógica en el backend para soportar la edición y eliminación de facturas.
+-	Crear las interfaces de usuario en el frontend para permitir a los usuarios editar y eliminar facturas.
+
+4.4.5	Sprint 3: Generación de Informes y Carga de Facturas con OCR
+Duración: 2 semanas.
+Preparación del Sprint
+Revisión de Requisitos: Se definen los requisitos detallados para la generación de informes y la carga de facturas mediante OCR.
+Planificación del Sprint: Se asignan tareas y se hace una estimación del esfuerzo requerido.
+Desarrollo
+Módulo de Generación de Informes
+Análisis de Requisitos:
+-	Definición de los tipos de informes a generar y los datos necesarios para cada uno.
+
+Diseño:
+-	Diseño de las plantillas de informes y la selección de las herramientas de generación de informes.
+Desarrollo:
+-	Desarrollo de la lógica para generar informes basados en los datos de facturación almacenados.
+Módulo de Carga de Facturas con OCR
+Análisis de Requisitos:
+Evaluación de herramientas OCR disponibles y definición de los requisitos de extracción de datos.
+Diseño:
+-	Integración del OCR y diseño del flujo de usuario para la carga y validación de facturas.
+Desarrollo:
+-	Implementación de la integración OCR y pruebas de precisión de extracción de datos.
+4.4.6	Sprint 4: Exportación de Datos
+Duración: 2 semanas.
+Preparación del Sprint
+Revisión de Requisitos: Detallar los requisitos para la exportación de datos y las notificaciones de vencimiento.
+Planificación del Sprint: Asignación de tareas y estimación de esfuerzo.
+Desarrollo
+Módulo de Exportación de Datos
+
+Análisis de Requisitos:
+-	Identificación de los formatos de exportación requeridos y los datos a incluir.
+Diseño:
+-	Diseño del proceso de exportación y la interfaz de usuario para seleccionar opciones de exportación.
+Desarrollo:
+-	Implementación de la funcionalidad de exportación y pruebas de funcionalidad.
+4.4.6.1	Pruebas Unitarias con Jest
+Tabla de Pruebas Unitarias para Registro de Usuarios
+ID Prueba	Descripción	Entrada	Resultado Esperado	Resultado Obtenido	Estado
+1	Registro de usuario con datos válidos	Email: usuario@example.com, Contraseña: 12345	Usuario registrado exitosamente	Usuario registrado exitosamente	Pasó
+2	Registro de usuario con email inválido	Email: usuario, Contraseña: 12345	Error: Formato de email inválido	Error: Formato de email inválido	Pasó
+3	Registro de usuario con contraseña corta	Email: usuario@example.com, Contraseña: 123	Error: La contraseña debe tener al menos 5 caracteres	Error: La contraseña debe tener al menos 5 caracteres	Pasó
+
+
+
+Tabla de Pruebas Unitarias para Inicio de Sesión
+ID Prueba	Descripción	Entrada	Resultado Esperado	Resultado Obtenido	Estado
+1	Inicio de sesión con credenciales válidas	Email: usuario@example.com, Contraseña: 12345	Sesión iniciada exitosamente	Sesión iniciada exitosamente	Pasó
+2	Inicio de sesión con email inválido	Email: usuario, Contraseña: 12345	Error: Usuario no encontrado	Error: Usuario no encontrado	Pasó
+3	Inicio de sesión con contraseña incorrecta	Email: usuario@example.com, Contraseña: 54321	Error: Contraseña incorrecta	Error: Contraseña incorrecta	Pasó
+
+Tabla de Pruebas Unitarias para Generación de Reportes
+ID Prueba	Descripción	Entrada	Resultado Esperado	Resultado Obtenido	Estado
+1	Generación de reporte con rango de fechas válido	Rango de fechas válido	Reporte generado correctamente	Reporte generado correctamente	Pasó
+2	Generación de reporte con rango de fechas inválido	Fecha inicio > Fecha fin	Error: Rango de fechas inválido	Error: Rango de fechas inválido	Pasó
+
+
+Tabla de Pruebas Unitarias para Autenticación y Seguridad
+ID Prueba	Descripción	Entrada	Resultado Esperado	Resultado Obtenido	Estado
+1	Inicio de sesión con credenciales correctas	Email: correcto@example.com, Contraseña: correcta123	Acceso concedido	Acceso concedido	Pasó
+2	Inicio de sesión con contraseña incorrecta	Email: usuario@example.com, Contraseña: incorrecta	Error: Credenciales incorrectas	Error: Credenciales incorrectas	Pasó
+3	Inicio de sesión con usuario no registrado	Email: noexiste@example.com, Contraseña: cualquier	Error: Usuario no encontrado	Error: Usuario no encontrado	Pasó
+
+Figura 6
+Captura de Unit Tests Exitosos
+
+CAPÍTULO VI
+6	CONCLUSIONES Y RECOMENDACIONES
+6.1	CONCLUSIONES 
+
+En base a los objetivos específicos y alcances establecidos, se pueden extraer las siguientes conclusiones:
+-	Se logró desarrollar una aplicación web mobile-friendly para la gestión de facturas que cumple con los requisitos de compatibilidad en diferentes plataformas y navegadores. Esto garantiza que los usuarios puedan acceder y utilizar la aplicación de manera efectiva, independientemente del sistema operativo o navegador que utilicen.
+-	El módulo de autenticación implementado en el sistema garantiza un acceso seguro a la aplicación, protegiendo la información confidencial de los usuarios. Mediante prácticas sólidas de autenticación, como contraseñas seguras y cifrado de datos, se brinda un entorno seguro y confiable para la gestión de facturas.
+-	El módulo administrativo desarrollado permite a los usuarios autorizados realizar diversas operaciones de gestión de facturas de manera eficiente. La visualización, edición y eliminación de facturas se lleva a cabo de manera intuitiva, y la generación de informes y estadísticas proporciona a los usuarios una visión clara y detallada de su información financiera.
+-	La implementación del módulo de carga de facturas utilizando tecnologías de reconocimiento óptico de caracteres (OCR) ha demostrado ser una solución efectiva para el registro automatizado de información. Al capturar datos relevantes mediante una imagen de la factura, se ha optimizado el proceso de ingreso de datos, reduciendo la carga manual y mejorando la precisión en la captura de información.
+-	El módulo de descarga de facturas en formato CSV permite a los usuarios exportar los datos de las facturas de manera compatible con otras aplicaciones y sistemas. Esto brinda flexibilidad y facilita el intercambio de información financiera con otros sistemas utilizados por las Pymes.
+6.2	RECOMENDACIONES 
+Bajo la experiencia adquirida en el proyecto, se propone:
+-	Para garantizar un seguimiento oportuno de las facturas, se sugiere incorporar un módulo de notificaciones y recordatorios que envíe alertas a los usuarios sobre eventos relevantes. 
+-	Para brindar una mayor capacidad de análisis, se podría agregar un módulo de análisis de datos que permita generar informes avanzados, realizar análisis de tendencias y obtener insights valiosos sobre el rendimiento financiero de la empresa.
+-	Para promover la adopción y el uso efectivo de la aplicación, se podría incluir un módulo de capacitación y soporte en línea. Este módulo brindaría a los usuarios recursos de capacitación, tutoriales interactivos y asistencia técnica para familiarizarse con la aplicación y aprovechar al máximo todas sus funcionalidades.
+
+
+
+
+
+
+
+
+
+
+BIBLIOGRAFÍA
+●	Flanagan, D. (2020). JavaScript - The Definitive Guide (7a ed.). O'Reilly Media.
+●	Duckett, J. (2014). JavaScript and jQuery: Interactive front-end web development hardcover. John Wiley & Sons.
+●	The React framework for the Web. (s/f). Nextjs.org. Recuperado el 1 de mayo de 2023, de https://nextjs.org/
+●	Node.js. (s/f). Node.js. Recuperado el 1 de mayo de 2023, de https://nodejs.org/es
+●	PlanetScale: The world's most advanced database platform. (s/f). Planetscale.com. Recuperado el 1 de mayo de 2023, de https://www.planetscale.com/.
+●	JavaScript with syntax for types. (s/f). Typescriptlang.org. Recuperado el 1 de mayo de 2023, de https://www.typescriptlang.org/
+●	Vercel: Develop. Preview. Ship. For the best front-end teams. (s/f). Vercel.com. Recuperado el 1 de mayo de 2023, de https://vercel.com/
+●	Find and fix problems in your JavaScript code - ESLint - Pluggable JavaScript Linter. (s/f). Eslint.org. Recuperado el 1 de mayo de 2023, de https://eslint.org/
+●	Chacon, S., & Straub, B. (2014). Pro Git (2a ed.). APress.
+●	Loeliger, J. (2012). Version control with git: Powerful tools and techniques for collaborative software development (2a ed.). O'Reilly Media.
+●	OneFlow – A Branching Model for Small to Medium Sized Teams. (s/f). Endoflineblog.com. Recuperado el 1 de mayo de 2023, de https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow
+●	OneFlow – A Simple Git Branching Model and Workflow. (S/f). Slideshare.net. Recuperado el 15 de mayo de 2023, de https://www.slideshare.net/RaphaelWirth/oneflow-a-simple-git-branching-model-and-workflow
+●	Schwaber, K., & Sutherland, J. (2020). The Scrum Guide. Recuperado el 15 de mayo de 2023, de https://scrumguides.org/scrum-guide.html
+●	Cadle, J., & Yeates, D. (2008). Project Management for Information Systems (5th ed.). Pearson Education.
+●	Sutherland, J., & Schwaber, K. (2017). Software in 30 Days: How Agile Managers Beat the Odds, Delight Their Customers, And Leave Competitors in Dust. Wiley.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ANEXOS
+ANEXO 1.  
+TRANSCRIPCION DE ENTREVISTA A PYMES
+
+¿Cómo lleva actualmente la gestión de facturas en su empresa?
+Respuestas: Los entrevistados indican que llevan un registro manual de las facturas, mientras que otros mencionan que han implementado un sistema de facturación automatizado.
+¿Qué problemas ha enfrentado en la gestión de facturas?
+Respuestas: Los entrevistados mencionan que han experimentado extravío de facturas, problemas con el almacenamiento y organización de estas, entre otros.
+¿Cómo ha afectado la situación actual (pandemia de COVID-19) en la gestión de facturas de su empresa?
+Respuestas: Los entrevistados indican que la situación actual ha aumentado la necesidad de evitar el manejo físico de facturas para minimizar el riesgo de contagio y pérdida de documentos importantes.
+Entrevista a Personas Comunes:
+
+¿Cómo suele guardar y organizar sus facturas?
+Respuestas: Los entrevistados mencionan que guardan las facturas en carpetas físicas.
+¿Ha experimentado problemas en la gestión de sus facturas?
+Respuestas: Los entrevistados mencionan que han perdido facturas o no han podido encontrarlas en el momento en que las necesitaban, o que han experimentado problemas para recordar cuánto deben pagar en una factura en particular.
+¿Ha considerado la implementación de un sistema de gestión de facturas?
+Respuestas: Los entrevistados mencionan que pueden haber considerado implementar un sistema de gestión de facturas para ayudar a mantener sus facturas organizadas y accesibles. Otros mencionan no estar familiarizados con estas herramientas o no estar interesados en usarlas.
+¿Cómo ha afectado la situación actual (pandemia de COVID-19) en su gestión de facturas?
+Respuestas: Los entrevistados mencionan que han aumentado la necesidad de evitar el manejo de facturas físicas debido a la situación actual. También que han experimentado dificultades para pagar facturas en persona debido a los cierres de tiendas o al distanciamiento social.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ANEXO 2.  
+ENCUESTA A PERSONAS COMUNES
+¿Cómo suele guardar y organizar sus facturas?
+ [ ] - Guardo mis facturas en una carpeta física en mi oficina.
+ [ ] - Utilizo una aplicación de escaneo de facturas en mi teléfono y las almaceno digitalmente en mi dispositivo.
+¿Ha experimentado problemas en la gestión de sus facturas?
+
+[ ] - Sí, he perdido algunas facturas importantes y he tenido dificultades para encontrarlas cuando las necesito.
+[ ] - No he tenido problemas importantes
+¿Ha considerado la implementación de un sistema de gestión de facturas?
+[ ] - Sí, he considerado utilizar una aplicación o software para gestionar mis facturas y mantenerlas organizadas.
+[ ] - No he pensado mucho en ello, ya que no estoy seguro de cómo funcionarían esas herramientas.
+¿Cómo ha afectado la situación actual (pandemia de COVID-19) en su gestión de facturas?
+[ ] - La situación actual ha aumentado mi preocupación por evitar el manejo de facturas físicas debido a la pandemia. Estoy buscando formas de hacerlo de manera más segura.
+[ ] - No he sentido un gran impacto en la gestión de mis facturas debido a la pandemia, pero he evitado pagar en persona cuando es posible.
+
+
+ANEXO 3.  
+RESULTADOS DE LAS ENCUESTAS
+Resultados de la encuesta realizada a 12 personas comunes sobre la gestión de facturas:
+¿Cómo suele guardar y organizar sus facturas?
+ [X] - Guardo mis facturas en una carpeta física en mi oficina.(53%)
+ [ ] - Utilizo una aplicación de escaneo de facturas en mi teléfono y las almaceno digitalmente en mi dispositivo.(47%)
+¿Ha experimentado problemas en la gestión de sus facturas?
+[X] - Sí, he perdido algunas facturas importantes y he tenido dificultades para encontrarlas cuando las necesito.(68%)
+[ ] - No he tenido problemas importantes(32%)
+¿Ha considerado la implementación de un sistema de gestión de facturas?
+[X] - Sí, he considerado utilizar una aplicación o software para gestionar mis facturas y mantenerlas organizadas.(74%)
+[ ] - No he pensado mucho en ello, ya que no estoy seguro de cómo funcionarían esas herramientas.(26%)
+¿Cómo ha afectado la situación actual (pandemia de COVID-19) en su gestión de facturas?
+[ ] - La situación actual ha aumentado mi preocupación por evitar el manejo de facturas físicas debido a la pandemia. Estoy buscando formas de hacerlo de manera más segura.(41%)
+[X] - No he sentido un gran impacto en la gestión de mis facturas debido a la pandemia, pero he evitado pagar en persona cuando es posible.(59%)
+

@@ -25,12 +25,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           where: {
             userId: user.id
           },
+          include: {
+            _count: {
+              select: {
+                invoices: true
+              }
+            }
+          },
           orderBy: {
             name: 'asc'
           }
         });
         
-        console.log('Categorías encontradas:', categories.map(c => ({ id: c.id, name: c.name })));
+        console.log('Categorías encontradas:', categories.map(c => ({ id: c.id, name: c.name, invoiceCount: c._count.invoices })));
         
         return res.status(200).json(categories);
       } catch (e) {

@@ -21,8 +21,12 @@ model User {
   password_hash String
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+  
+  // Relations
   categories   Category[]
   invoices     Invoice[]
+  auditLogs    AuditLog[]
+  settings     UserSettings?
 }
 
 model Category {
@@ -53,4 +57,29 @@ model Invoice {
   updated_at         DateTime @updatedAt
   user               User     @relation(fields: [userId], references: [id])
   userId             String
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String   // CREATE, UPDATE, DELETE
+  table_name  String
+  record_id   String
+  old_values  Json?
+  new_values  Json?
+  ip_address  String?
+  created_at  DateTime @default(now())
+}
+
+model UserSettings {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  theme           String   @default("light")
+  language        String   @default("es")
+  notifications   Boolean  @default(true)
+  export_format   String   @default("csv")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 }
