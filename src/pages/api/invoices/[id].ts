@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import { PrismaClient } from '@prisma/client';
+import { logInvoiceAction, LOG_ACTIONS } from '../../../utils/logging';
+
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -31,6 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
           include: {
             category: true, // Incluir datos de la categoría
+            rubro: true
           }
         });
         
@@ -55,12 +58,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           purchase_date, 
           total_amount, 
           vendor,
-          rubro,
+          rubroId,
           categoryId
         } = req.body;
         
         // Validaciones básicas
-        if (!purchase_date || !vendor || total_amount == null || !rubro || !categoryId) {
+        if (!purchase_date || !vendor || total_amount == null || !rubroId || !categoryId) {
           return res.status(400).json({ error: "Fecha, vendedor, monto, rubro y categoría son obligatorios" });
         }
         
@@ -100,13 +103,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             purchase_date: new Date(purchase_date),
             total_amount: Number(total_amount),
             vendor: vendor,
-            rubro: rubro,
+            rubroId: rubroId,
             categoryId: categoryId
           },
           include: {
             category: true, // Incluir datos de la categoría
+            rubro: true
           }
         });
+
+        // Log the action
+        await logInvoiceAction(
+          user.id,
+          LOG_ACTIONS.UPDATE_INVOICE,
+          updatedInvoice.id,
+          {
+            invoiceNumber: number_receipt,
+            vendor,
+            totalAmount: total_amount,
+            categoryId,
+            rubroId,
+            previousAmount: existingInvoice.total_amount
+          }
+        );
         
         return res.status(200).json(updatedInvoice);
       } catch (e) {
@@ -127,6 +146,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!invoice) {
           return res.status(404).json({ error: "Factura no encontrada" });
         }
+
+        // Log the action before deletion
+        await logInvoiceAction(
+          user.id,
+          LOG_ACTIONS.DELETE_INVOICE,
+          invoice.id,
+          {
+            invoiceNumber: invoice.number_receipt,
+            vendor: invoice.vendor,
+            totalAmount: invoice.total_amount,
+            categoryId: invoice.categoryId,
+            rubroId: invoice.rubroId
+          }
+        );
         
         await prisma.invoice.delete({
           where: { id: id }

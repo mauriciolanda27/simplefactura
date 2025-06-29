@@ -217,7 +217,7 @@ export default function Stats() {
 
         {/* Métricas principales */}
         <AnimatedContainer animation="fade-in" delay={400}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(5, 1fr)' }, gap: 3, mb: 4 }}>
             <MetricCard
               title="Total Facturas"
               value={summary.totalInvoices}
@@ -247,6 +247,12 @@ export default function Stats() {
               value={vendorData.length}
               icon={<Business />}
               color="warning"
+            />
+            <MetricCard
+              title="Rubros"
+              value={rubroData.length}
+              icon={<CategoryIcon />}
+              color="secondary"
             />
           </Box>
         </AnimatedContainer>

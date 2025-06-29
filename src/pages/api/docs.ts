@@ -470,48 +470,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
           },
           required: ['email', 'password']
         },
-        UserSettings: {
-          type: 'object',
-          properties: {
-            id: {
-              type: 'string',
-              description: 'Settings unique identifier'
-            },
-            userId: {
-              type: 'string',
-              description: 'User ID reference'
-            },
-            theme: {
-              type: 'string',
-              enum: ['light', 'dark', 'auto'],
-              description: 'User interface theme preference'
-            },
-            language: {
-              type: 'string',
-              enum: ['es', 'en'],
-              description: 'User language preference'
-            },
-            notifications: {
-              type: 'boolean',
-              description: 'Enable/disable system notifications'
-            },
-            export_format: {
-              type: 'string',
-              enum: ['csv', 'pdf'],
-              description: 'Default export format preference'
-            },
-            created_at: {
-              type: 'string',
-              format: 'date-time',
-              description: 'Settings creation timestamp'
-            },
-            updated_at: {
-              type: 'string',
-              format: 'date-time',
-              description: 'Settings last update timestamp'
-            }
-          }
-        },
         ReportFilters: {
           type: 'object',
           properties: {
@@ -2137,137 +2095,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
           }
         }
       },
-      '/user-settings': {
-        get: {
-          tags: ['User Settings'],
-          summary: 'Get user settings',
-          description: 'Retrieve user preferences and configuration settings. Note: Currently only theme is used in the UI, other settings are stored but not exposed in the frontend.',
-          security: [{ sessionAuth: [] }],
-          responses: {
-            '200': {
-              description: 'User settings retrieved successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    $ref: '#/components/schemas/UserSettings'
-                  },
-                  examples: {
-                    'current_implementation': {
-                      summary: 'Current implementation (only theme used)',
-                      value: {
-                        id: 'clx1234567894',
-                        userId: 'clx1234567890',
-                        theme: 'light',
-                        language: 'es',
-                        notifications: true,
-                        export_format: 'csv',
-                        created_at: '2024-01-15T10:30:00.000Z',
-                        updated_at: '2024-01-15T10:30:00.000Z'
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            '401': {
-              description: 'Unauthorized',
-              content: {
-                'application/json': {
-                  schema: {
-                    $ref: '#/components/schemas/Error'
-                  }
-                }
-              }
-            }
-          }
-        },
-        put: {
-          tags: ['User Settings'],
-          summary: 'Update user settings',
-          description: 'Update user preferences and configuration settings. Note: Currently only theme is used in the UI, other settings are stored but not exposed in the frontend.',
-          security: [{ sessionAuth: [] }],
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    theme: {
-                      type: 'string',
-                      enum: ['light', 'dark'],
-                      description: 'User interface theme preference (currently the only setting used in UI)'
-                    },
-                    language: {
-                      type: 'string',
-                      enum: ['es', 'en'],
-                      description: 'User language preference (stored but not used in current UI)'
-                    },
-                    notifications: {
-                      type: 'boolean',
-                      description: 'Enable/disable system notifications (stored but not used in current UI)'
-                    },
-                    export_format: {
-                      type: 'string',
-                      enum: ['csv', 'pdf'],
-                      description: 'Default export format preference (stored but not used in current UI)'
-                    }
-                  }
-                },
-                examples: {
-                  'update_theme_only': {
-                    summary: 'Update theme only (current UI usage)',
-                    value: {
-                      theme: 'dark'
-                    }
-                  },
-                  'update_all_settings': {
-                    summary: 'Update all settings (stored but not used in UI)',
-                    value: {
-                      theme: 'dark',
-                      language: 'en',
-                      notifications: false,
-                      export_format: 'pdf'
-                    }
-                  }
-                }
-              }
-            }
-          },
-          responses: {
-            '200': {
-              description: 'User settings updated successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    $ref: '#/components/schemas/UserSettings'
-                  }
-                }
-              }
-            },
-            '401': {
-              description: 'Unauthorized',
-              content: {
-                'application/json': {
-                  schema: {
-                    $ref: '#/components/schemas/Error'
-                  }
-                }
-              }
-            },
-            '500': {
-              description: 'Internal server error',
-              content: {
-                'application/json': {
-                  schema: {
-                    $ref: '#/components/schemas/Error'
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       '/reports/export': {
         get: {
           tags: ['Reports'],
@@ -2436,10 +2263,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       {
         name: 'Testing',
         description: 'Testing and development endpoints'
-      },
-      {
-        name: 'User Settings',
-        description: 'User settings management endpoints'
       },
       {
         name: 'Reports',

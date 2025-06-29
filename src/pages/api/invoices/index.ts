@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]';
 import { PrismaClient } from '@prisma/client';
+import { logInvoiceAction, LOG_ACTIONS } from '../../../utils/logging';
 
 const prisma = new PrismaClient();
 
@@ -36,10 +37,12 @@ async function getInvoices(req: NextApiRequest, res: NextApiResponse, userId: st
     const invoices = await prisma.invoice.findMany({
       where: { userId },
       include: {
-        category: true
+        category: true,
+        rubro: true
       },
       orderBy: { purchase_date: 'desc' }
     });
+
     return res.status(200).json(invoices);
   } catch (error) {
     console.error('Error al obtener facturas:', error);
@@ -58,11 +61,11 @@ async function createInvoice(req: NextApiRequest, res: NextApiResponse, userId: 
       purchase_date,
       total_amount,
       vendor,
-      rubro,
+      rubroId,
       categoryId
     } = req.body;
 
-    if (!authorization_code || !name || !nit || !number_receipt || !purchase_date || !total_amount || !categoryId) {
+    if (!authorization_code || !name || !nit || !number_receipt || !purchase_date || !total_amount || !categoryId || !rubroId) {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
 
@@ -76,14 +79,30 @@ async function createInvoice(req: NextApiRequest, res: NextApiResponse, userId: 
         purchase_date: new Date(purchase_date),
         total_amount: parseFloat(total_amount),
         vendor,
-        rubro,
+        rubroId,
         categoryId,
         userId
       },
       include: {
-        category: true
+        category: true,
+        rubro: true
       }
     });
+
+    // Log the action
+    await logInvoiceAction(
+      userId,
+      LOG_ACTIONS.CREATE_INVOICE,
+      invoice.id,
+      {
+        invoiceNumber: number_receipt,
+        vendor,
+        totalAmount: total_amount,
+        categoryId,
+        rubroId
+      }
+    );
+
     return res.status(201).json(invoice);
   } catch (error) {
     console.error('Error al crear factura:', error);

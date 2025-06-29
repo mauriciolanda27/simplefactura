@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import { PrismaClient } from '@prisma/client';
+import { logReportAction, LOG_ACTIONS } from '../../../utils/logging';
 
 const prisma = new PrismaClient();
 
@@ -47,7 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const minAmountNum = minAmount ? parseFloat(getString(minAmount)) : undefined;
     const maxAmountNum = maxAmount ? parseFloat(getString(maxAmount)) : undefined;
     const exportType = 'report';
-    const filters = { dateFrom: dateFromStr, dateTo: dateToStr, category: categoryStr, vendor: vendorStr, rubro: rubroStr, minAmount: minAmountNum, maxAmount: maxAmountNum, reportType: reportTypeStr };
     let status = 'completed';
     let error_message = null;
     let file_size = null;
@@ -170,6 +170,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
         file_size = Buffer.byteLength(csvBuffer);
         completed_at = new Date();
+
+        // Log the export action
+        await logReportAction(
+          user.id,
+          formatStr === 'csv' ? LOG_ACTIONS.EXPORT_CSV : LOG_ACTIONS.EXPORT_PDF,
+          {
+            reportType: reportTypeStr,
+            format: formatStr,
+            filename: exportFilename,
+            fileSize: file_size,
+            filters,
+            totalInvoices,
+            totalAmount
+          }
+        );
+
         // Log export history (success)
         exportId = (await prisma.exportHistory.create({
           data: {
@@ -185,6 +201,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             completed_at,
           }
         })).id;
+
         // Update analytics
         const analytics = await prisma.exportAnalytics.findUnique({
           where: {
@@ -198,10 +215,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
         let newCount = 1;
         let newTotal = file_size;
+        let newAvg = file_size;
+        let newSuccessRate = 100;
+
         if (analytics) {
           newCount = analytics.count + 1;
           newTotal = analytics.total_size + file_size;
+          newAvg = newTotal / newCount;
+          newSuccessRate = ((analytics.success_rate * analytics.count) + 100) / newCount;
         }
+
         await prisma.exportAnalytics.upsert({
           where: {
             userId_date_export_type_format: {
@@ -212,46 +235,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
           },
           update: {
-            count: { increment: 1 },
-            total_size: { increment: file_size },
-            avg_file_size: newTotal / newCount,
+            count: newCount,
+            total_size: newTotal,
+            avg_file_size: newAvg,
+            success_rate: newSuccessRate,
           },
           create: {
             userId: user.id,
             date: new Date(started_at.toISOString().slice(0, 10)),
             export_type: exportType,
             format: formatStr,
-            count: 1,
-            total_size: file_size,
-            avg_file_size: file_size,
-            success_rate: 100,
+            count: newCount,
+            total_size: newTotal,
+            avg_file_size: newAvg,
+            success_rate: newSuccessRate,
           }
         });
+
+        // Set response headers for CSV download
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-        res.setHeader('Content-Disposition', `attachment; filename=${exportFilename}`);
-        res.send(csvBuffer);
-        return;
+        res.setHeader('Content-Disposition', `attachment; filename="${exportFilename}"`);
+        res.setHeader('Content-Length', file_size.toString());
+        res.setHeader('Cache-Control', 'no-cache');
+        
+        return res.send(csvBuffer);
 
       } else if (formatStr === 'pdf') {
-        // For PDF, return the data and let the frontend handle PDF generation
+        // For PDF, return the data for frontend processing
         const pdfData = {
-          invoices: invoices.map(inv => ({
-            id: inv.id,
-            number_receipt: inv.number_receipt,
-            vendor: inv.vendor,
-            category: inv.category?.name || 'Sin categoría',
-            rubro: inv.rubro,
-            total_amount: inv.total_amount,
-            purchase_date: inv.purchase_date,
-            name: inv.name
-          })),
           summary: {
             totalInvoices,
-            totalAmount: totalAmount.toFixed(2),
-            averageAmount: averageAmount.toFixed(2),
-            totalTax: totalTax.toFixed(2),
-            periodStart: dateFromStr || '',
-            periodEnd: dateToStr || ''
+            totalAmount,
+            averageAmount,
+            totalTax,
+            periodStart: dateFromStr,
+            periodEnd: dateToStr
           },
           topPerformers: {
             categories: Object.entries(categoryStats)
@@ -263,87 +281,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               .sort((a, b) => b.amount - a.amount)
               .slice(0, 5)
           },
-          filters: {
-            dateFrom: dateFromStr,
-            dateTo: dateToStr,
-            category: categoryStr,
-            vendor: vendorStr,
-            rubro: rubroStr,
-            minAmount: minAmountNum,
-            maxAmount: maxAmountNum,
-            reportType: reportTypeStr
-          },
-          exportDate: new Date().toLocaleDateString('es-BO')
+          invoices: reportTypeStr === 'detailed' ? invoices.slice(0, 50).map(inv => ({
+            id: inv.id,
+            invoice_number: inv.number_receipt,
+            vendor: inv.vendor,
+            category: inv.category?.name || 'Sin categoría',
+            rubro: inv.rubro || 'Sin rubro',
+            total_amount: inv.total_amount,
+            purchase_date: inv.purchase_date.toISOString().split('T')[0],
+            description: inv.name || ''
+          })) : [],
+          exportDate: new Date().toISOString()
         };
 
-        completed_at = new Date();
-        // Log export history (success, no file size)
-        exportId = (await prisma.exportHistory.create({
-          data: {
-            userId: user.id,
-            export_type: exportType,
+        // Log the export action
+        await logReportAction(
+          user.id,
+          LOG_ACTIONS.EXPORT_PDF,
+          {
+            reportType: reportTypeStr,
             format: formatStr,
             filename: exportFilename,
-            file_size: null,
             filters,
-            status,
-            retry_count,
-            created_at: started_at,
-            completed_at,
-          }
-        })).id;
-        // Update analytics
-        const analytics = await prisma.exportAnalytics.findUnique({
-          where: {
-            userId_date_export_type_format: {
-              userId: user.id,
-              date: new Date(started_at.toISOString().slice(0, 10)),
-              export_type: exportType,
-              format: formatStr,
-            }
-          }
-        });
-        let newCount = 1;
-        let newTotal = 0;
-        if (analytics) {
-          newCount = analytics.count + 1;
-          newTotal = analytics.total_size;
-        }
-        await prisma.exportAnalytics.upsert({
-          where: {
-            userId_date_export_type_format: {
-              userId: user.id,
-              date: new Date(started_at.toISOString().slice(0, 10)),
-              export_type: exportType,
-              format: formatStr,
-            }
+            totalInvoices,
+            totalAmount
           },
-          update: {
-            count: { increment: 1 },
-            avg_file_size: newTotal / newCount,
-          },
-          create: {
-            userId: user.id,
-            date: new Date(started_at.toISOString().slice(0, 10)),
-            export_type: exportType,
-            format: formatStr,
-            count: 1,
-            total_size: 0,
-            avg_file_size: 0,
-            success_rate: 100,
-          }
-        });
-        res.status(200).json(pdfData);
-        return;
-      } else {
-        status = 'failed';
-        error_message = "Formato no soportado. Use 'csv' o 'pdf'";
-        throw new Error(error_message);
+          req.headers['user-agent']
+        );
+
+        return res.json(pdfData);
       }
+
     } catch (error) {
       status = 'failed';
       error_message = error instanceof Error ? error.message : 'Error desconocido';
-      await prisma.exportHistory.create({
+      completed_at = new Date();
+      
+      // Log export history (failure)
+      exportId = (await prisma.exportHistory.create({
         data: {
           userId: user.id,
           export_type: exportType,
@@ -355,13 +330,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           error_message,
           retry_count,
           created_at: started_at,
-          completed_at: new Date(),
+          completed_at,
         }
-      });
-      return res.status(400).json({ error: error_message });
+      })).id;
+
+      throw error;
     }
+
   } catch (error) {
-    console.error('Error exporting report:', error);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    console.error('Export error:', error);
+    return res.status(500).json({ 
+      error: "Error al exportar reporte",
+      details: error instanceof Error ? error.message : 'Error desconocido'
+    });
   }
 } 

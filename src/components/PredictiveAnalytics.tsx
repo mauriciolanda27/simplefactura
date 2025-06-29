@@ -171,6 +171,7 @@ export default function StatisticalAnalytics() {
           <Tab label="Patrones de Pagos" />
           <Tab label="Análisis Estacional" />
           <Tab label="Insights de Gastos" />
+          <Tab label="Análisis por Rubro" />
         </Tabs>
       </Box>
 
@@ -420,6 +421,68 @@ export default function StatisticalAnalytics() {
               </Card>
             </Box>
           ))}
+        </Box>
+      </TabPanel>
+
+      {/* Rubro Analysis */}
+      <TabPanel value={tabValue} index={4}>
+        <Typography variant="h6" gutterBottom>
+          Análisis de Gastos por Rubro
+        </Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          {data.rubroAnalysis?.map((rubro: any, index: number) => (
+            <Box sx={{ flex: '1 1 300px', minWidth: 0 }} key={index}>
+              <Card>
+                <CardContent>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h6" component="div">
+                      {rubro.name}
+                    </Typography>
+                    <Chip
+                      label={`${rubro.count} facturas`}
+                      color="primary"
+                      size="small"
+                    />
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', gap: 2 }} mb={2}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Monto Total
+                      </Typography>
+                      <Typography variant="h6">
+                        {formatCurrency(rubro.amount)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Porcentaje
+                      </Typography>
+                      <Typography variant="h6">
+                        {rubro.percentage.toFixed(1)}%
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                  <Divider sx={{ my: 1 }} />
+                  
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Promedio por factura: {formatCurrency(rubro.amount / rubro.count)}
+                  </Typography>
+                  
+                  <Alert severity={rubro.percentage > 30 ? 'warning' : 'info'} sx={{ mt: 1 }}>
+                    {rubro.percentage > 30 
+                      ? 'Este rubro representa una porción significativa de tus gastos. Considera revisar si es necesario.'
+                      : 'Gasto moderado en este rubro.'}
+                  </Alert>
+                </CardContent>
+              </Card>
+            </Box>
+          )) || (
+            <Alert severity="info">
+              No hay datos de rubros disponibles para análisis.
+            </Alert>
+          )}
         </Box>
       </TabPanel>
 

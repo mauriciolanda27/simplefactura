@@ -8,7 +8,6 @@ import {
   Box, 
   Paper,
   Stack,
-  useTheme,
   useMediaQuery,
   Card,
   CardContent,
@@ -33,8 +32,7 @@ import Link from 'next/link';
 export default function LandingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   // Redirect if already authenticated
   useEffect(() => {

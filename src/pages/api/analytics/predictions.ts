@@ -9,6 +9,7 @@ import {
   generateSpendingInsights,
   assessFinancialRisk
 } from '../../../utils/predictiveAnalytics';
+import { logAnalyticsAction, LOG_ACTIONS } from '../../../utils/logging';
 
 const prisma = new PrismaClient();
 
@@ -34,13 +35,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Get all invoices and categories for the user
-    const [invoices, categories] = await Promise.all([
+    const [invoices, categories, rubros] = await Promise.all([
       prisma.invoice.findMany({
         where: { userId: user.id },
-        include: { category: true },
+        include: { 
+          category: true,
+          rubro: true
+        },
         orderBy: { purchase_date: 'asc' }
       }),
       prisma.category.findMany({
+        where: { userId: user.id }
+      }),
+      prisma.rubro.findMany({
         where: { userId: user.id }
       })
     ]);
@@ -51,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         paymentPredictions: [],
         seasonalAnalysis: [],
         spendingInsights: [],
+        rubroAnalysis: [],
         riskAssessment: {
           riskLevel: 'low',
           riskFactors: ['Sin datos suficientes para análisis estadístico'],
@@ -75,6 +83,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       assessFinancialRisk(invoices)
     ]);
 
+    // Generate rubro analysis
+    const rubroAnalysis = invoices.reduce((acc: Record<string, { count: number; amount: number; rubroId?: string }>, invoice) => {
+      const rubroName = invoice.rubro?.name || 'Sin rubro';
+      const rubroId = invoice.rubro?.id;
+      if (!acc[rubroName]) {
+        acc[rubroName] = { count: 0, amount: 0, rubroId };
+      }
+      acc[rubroName].count += 1;
+      acc[rubroName].amount += parseFloat(String(invoice.total_amount || '0'));
+      return acc;
+    }, {});
+
+    const rubroAnalysisArray = Object.entries(rubroAnalysis).map(([name, data]) => ({
+      name,
+      count: data.count,
+      amount: data.amount,
+      rubroId: data.rubroId,
+      percentage: (data.amount / invoices.reduce((sum, inv) => sum + parseFloat(String(inv.total_amount || '0')), 0)) * 100
+    })).sort((a, b) => b.amount - a.amount);
+
+    // Log the action
+    await logAnalyticsAction(
+      user.id,
+      LOG_ACTIONS.GENERATE_PREDICTIONS,
+      {
+        dataPoints: invoices.length,
+        categoriesCount: categories.length,
+        rubrosCount: rubros.length,
+        predictionsGenerated: {
+          cashFlow: cashFlowPredictions.length,
+          payments: paymentPredictions.length,
+          seasonal: seasonalAnalysis.length,
+          insights: spendingInsights.length,
+          rubros: rubroAnalysisArray.length
+        }
+      }
+    );
+
     // Set cache headers for analytics data
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
 
@@ -83,6 +129,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       paymentPredictions,
       seasonalAnalysis,
       spendingInsights,
+      rubroAnalysis: rubroAnalysisArray,
       riskAssessment,
       dataPoints: invoices.length,
       lastUpdated: new Date().toISOString()

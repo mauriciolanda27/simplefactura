@@ -1,6 +1,6 @@
 # SimpleFactura - Sistema de Gestión de Facturas para Pymes
 
-Sistema multiplataforma de gestión de facturas desarrollado para Pequeñas y Medianas Empresas (Pymes) en Cochabamba, Bolivia. Permite la digitalización, organización y análisis de facturas con funcionalidades avanzadas de OCR, análisis estadístico y gestión de proveedores.
+Sistema multiplataforma de gestión de facturas desarrollado para Pequeñas y Medianas Empresas (Pymes) en Cochabamba, Bolivia. Permite la digitalización, organización y análisis de facturas con funcionalidades avanzadas de OCR, análisis estadístico, gestión de rubros y registro de actividad.
 
 ## Características Principales
 
@@ -21,15 +21,28 @@ Sistema multiplataforma de gestión de facturas desarrollado para Pequeñas y Me
 - **Información Detallada**: NIT, contacto, dirección y datos fiscales
 - **Integración con Facturas**: Selección automática en formularios de facturación
 
+### Gestión de Rubros
+- **Clasificación Contable**: Rubros específicos para análisis detallado
+- **Tipos de Rubros**: Empresariales y personales
+- **Organización Jerárquica**: Categoría → Rubro → Factura
+- **Análisis Granular**: Control presupuestario por área específica
+
+### Registro de Actividad (Logs)
+- **Trazabilidad Completa**: Registro automático de todas las acciones
+- **Auditoría**: Rastreo de cambios en datos y accesos al sistema
+- **Seguridad**: Monitoreo de actividades sospechosas
+- **Análisis de Uso**: Identificación de patrones de uso
+
 ### Análisis y Reportes
 - **Análisis Estadístico Avanzado**: Tendencias, patrones de gasto y predicciones
 - **Gráficos Interactivos**: Visualizaciones con Chart.js
-- **Exportación de Datos**: Formatos CSV, Excel y PDF
+- **Exportación de Datos**: Formatos CSV y PDF
 - **Dashboard Inteligente**: Métricas en tiempo real
 
 ### Organización
 - **Categorización**: Sistema de categorías personalizable
-- **Búsqueda Avanzada**: Filtros por fecha, proveedor, monto y categoría
+- **Rubros Específicos**: Clasificación contable detallada
+- **Búsqueda Avanzada**: Filtros por fecha, proveedor, categoría y rubro
 - **Ordenamiento**: Múltiples criterios de ordenamiento
 
 ## Tecnologías Utilizadas
@@ -120,6 +133,16 @@ El sistema estará disponible en `http://localhost:3000`
 - `PUT /api/categories/[id]` - Actualizar categoría
 - `DELETE /api/categories/[id]` - Eliminar categoría
 
+#### Rubros
+- `GET /api/rubros` - Listar rubros
+- `POST /api/rubros` - Crear rubro
+- `GET /api/rubros/[id]` - Obtener rubro específico
+- `PUT /api/rubros/[id]` - Actualizar rubro
+- `DELETE /api/rubros/[id]` - Eliminar rubro
+
+#### Registro de Actividad
+- `GET /api/logs` - Obtener registro de actividad
+
 #### Proveedores
 - `GET /api/vendors` - Listar proveedores
 - `POST /api/vendors` - Crear proveedor
@@ -127,13 +150,10 @@ El sistema estará disponible en `http://localhost:3000`
 - `PUT /api/vendors/[id]` - Actualizar proveedor
 - `DELETE /api/vendors/[id]` - Eliminar proveedor
 
-#### Configuración de Usuario
-- `GET /api/user-settings` - Obtener configuración
-- `PUT /api/user-settings` - Actualizar configuración
-
 #### Análisis Estadístico
 - `GET /api/analytics/predictions` - Predicciones y análisis
 - `GET /api/stats` - Estadísticas generales
+- `GET /api/reports` - Generar reportes
 
 ### Documentación Interactiva
 - **API Docs**: `http://localhost:3000/api-docs` - Documentación completa de la API
@@ -163,18 +183,23 @@ npm run test:watch
 ### Tablas Principales
 - **User**: Usuarios del sistema
 - **Category**: Categorías de facturas
+- **Rubro**: Rubros contables específicos
 - **Vendor**: Proveedores registrados
 - **Invoice**: Facturas principales
 - **InvoiceItem**: Líneas de factura
-- **UserSettings**: Configuración de usuario
-- **AuditLog**: Registro de auditoría
+- **UserLog**: Registro de actividad del sistema
+- **ExportHistory**: Historial de exportaciones
+- **ExportAnalytics**: Análisis de exportaciones
 
 ### Relaciones
 - Usuario → Categorías (1:N)
+- Usuario → Rubros (1:N)
 - Usuario → Proveedores (1:N)
 - Usuario → Facturas (1:N)
+- Usuario → Logs (1:N)
 - Factura → Items (1:N)
 - Factura → Categoría (N:1)
+- Factura → Rubro (N:1)
 - Factura → Proveedor (N:1)
 
 ## Características de la Interfaz
@@ -198,30 +223,31 @@ npm run test:watch
 ## Seguridad
 
 - Autenticación JWT con NextAuth.js
+- Encriptación de contraseñas con bcrypt
 - Validación de entrada en todos los endpoints
-- Sanitización de datos
-- Control de acceso basado en roles
-- Registro de auditoría de acciones
+- Protección CSRF
+- Headers de seguridad configurados
+- Registro completo de actividades para auditoría
 
 ## Funcionalidades Avanzadas
 
+### Gestión de Rubros
+- **Clasificación Contable**: Organización jerárquica de gastos
+- **Tipos Específicos**: Rubros empresariales y personales
+- **Análisis Detallado**: Control presupuestario por área
+- **Reportes Especializados**: Análisis por rubro específico
+
+### Sistema de Logs
+- **Trazabilidad**: Registro automático de todas las acciones
+- **Auditoría**: Rastreo de cambios y accesos
+- **Seguridad**: Detección de actividades sospechosas
+- **Análisis**: Identificación de patrones de uso
+
 ### Análisis Predictivo
-- Análisis de tendencias de gasto
-- Predicciones basadas en datos históricos
-- Identificación de patrones estacionales
-- Alertas de riesgo financiero
-
-### OCR Inteligente
-- Extracción automática de datos de facturas
-- Soporte para múltiples formatos (JPG, PNG, PDF)
-- Validación automática de datos extraídos
-- Corrección manual cuando sea necesario
-
-### Exportación Avanzada
-- Múltiples formatos (CSV, Excel, PDF)
-- Filtros personalizables
-- Reportes detallados
-- Gráficos incluidos en exportaciones
+- **Predicciones de Flujo de Caja**: Análisis de series temporales
+- **Patrones de Gasto**: Identificación de tendencias
+- **Evaluación de Riesgo**: Análisis estadístico de gastos
+- **Recomendaciones**: Insights automáticos
 
 ## Contribución
 
@@ -233,22 +259,15 @@ npm run test:watch
 
 ## Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
 
 ## Soporte
 
-Para soporte técnico o consultas:
-- Crear un issue en GitHub
-- Contactar al equipo de desarrollo
-- Revisar la documentación en `/api-docs`
-
-## Roadmap
-
-### Próximas Funcionalidades
-- [ ] Integración con sistemas contables
-- [ ] Notificaciones push
-- [ ] API móvil nativa
+Para soporte técnico, contactar:
+- Email: soporte@simplefactura.com
+- Documentación: [API Documentation](API_DOCUMENTATION.md)
+- Manual de Usuario: [Manual de Usuario](ANEXO_4_MANUAL_USUARIO_ACTUALIZADO.md)
 
 ---
 
-**Desarrollado para Pymes en Cochabamba, Bolivia** 🇧🇴
+**SimpleFactura v2.0** - Sistema completo de gestión de facturas para Pymes

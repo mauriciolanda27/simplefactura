@@ -32,7 +32,9 @@ import {
   Menu as MenuIcon,
   Person,
   Receipt,
-  Help
+  Help,
+  Business as BusinessIcon,
+  History
 } from '@mui/icons-material';
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
@@ -98,9 +100,11 @@ export default function Layout({ children, title = "SimpleFactura" }: LayoutProp
     { text: 'Dashboard', icon: <Dashboard />, href: '/' },
     { text: 'Nueva Factura', icon: <Add />, href: '/invoices/new' },
     { text: 'Categorías', icon: <Category />, href: '/categories' },
+    { text: 'Rubros', icon: <BusinessIcon />, href: '/rubros' },
     { text: 'Estadísticas', icon: <BarChart />, href: '/stats' },
     { text: 'Reportes', icon: <Assessment />, href: '/reports' },
     { text: 'Análisis Estadístico', icon: <Analytics />, href: '/analytics' },
+    { text: 'Registro de Actividad', icon: <History />, href: '/logs' },
     { text: 'Tutorial', icon: <Help />, href: '/tutorial' },
   ];
 

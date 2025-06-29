@@ -1,0 +1,114 @@
+@startuml Diagrama de Clases - SimpleFactura
+
+!theme plain
+skinparam class {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+class User {
+    -id: String
+    -name: String
+    -email: String
+    -password_hash: String
+    -created_at: DateTime
+    -updated_at: DateTime
+    
+    +registrar()
+    +iniciarSesion()
+    +cambiarPassword()
+    +obtenerPerfil()
+}
+
+class Invoice {
+    -id: String
+    -authorization_code: String
+    -name: String
+    -nit: String
+    -nit_ci_cex: String
+    -number_receipt: String
+    -purchase_date: DateTime
+    -total_amount: Float
+    -vendor: String
+    -rubro: String
+    -categoryId: String
+    -userId: String
+    -created_at: DateTime
+    -updated_at: DateTime
+    
+    +crear()
+    +editar()
+    +eliminar()
+    +obtenerDetalles()
+    +calcularTotal()
+    +validarDatos()
+}
+
+class Category {
+    -id: String
+    -name: String
+    -description: String?
+    -userId: String
+    -created_at: DateTime
+    -updated_at: DateTime
+    
+    +crear()
+    +editar()
+    +eliminar()
+    +obtenerCategorias()
+}
+
+class ExportHistory {
+    -id: String
+    -userId: String
+    -export_type: String
+    -format: String
+    -filename: String
+    -file_size: Int?
+    -filters: Json?
+    -status: String
+    -error_message: String?
+    -retry_count: Int
+    -download_count: Int
+    -created_at: DateTime
+    -completed_at: DateTime?
+    
+    +registrarExportacion()
+    +actualizarEstado()
+}
+
+class ExportAnalytics {
+    -id: String
+    -userId: String
+    -date: DateTime
+    -export_type: String
+    -format: String
+    -count: Int
+    -total_size: Int
+    -avg_file_size: Float
+    -success_rate: Float
+    
+    +registrarAnalitica()
+    +obtenerEstadisticas()
+}
+
+' Relaciones
+User ||--o{ Invoice : "posee"
+User ||--o{ Category : "crea"
+User ||--o{ ExportHistory : "realiza"
+User ||--o{ ExportAnalytics : "genera"
+Invoice }o--|| Category : "pertenece"
+
+' Notas
+note right of User
+  Un usuario puede tener
+  múltiples facturas y categorías
+end note
+
+note right of Invoice
+  El vendor es un String,
+  no una entidad separada
+end note
+
+@enduml 

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "./auth/[...nextauth]";
 import { PrismaClient } from '@prisma/client';
+import { logReportAction, LOG_ACTIONS } from '../../utils/logging';
 
 const prisma = new PrismaClient();
 
@@ -28,7 +29,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Obtener todas las facturas del usuario
     const invoices = await prisma.invoice.findMany({
       where: { userId: user.id },
-      include: { category: true },
+      include: { 
+        category: true,
+        rubro: true
+      },
       orderBy: { purchase_date: 'asc' }
     });
 
@@ -137,13 +141,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }));
 
     // Datos por rubro
-    const rubroMap = new Map<string, { count: number; amount: number }>();
+    const rubroMap = new Map<string, { count: number; amount: number; rubroId?: string }>();
     invoices.forEach(inv => {
-      const rubro = inv.rubro || 'Sin rubro';
-      if (!rubroMap.has(rubro)) {
-        rubroMap.set(rubro, { count: 0, amount: 0 });
+      const rubroName = inv.rubro?.name || 'Sin rubro';
+      const rubroId = inv.rubro?.id;
+      if (!rubroMap.has(rubroName)) {
+        rubroMap.set(rubroName, { count: 0, amount: 0, rubroId });
       }
-      const current = rubroMap.get(rubro)!;
+      const current = rubroMap.get(rubroName)!;
       current.count++;
       current.amount += parseFloat(String(inv.total_amount || '0'));
     });
@@ -151,7 +156,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const rubroData = Array.from(rubroMap.entries()).map(([name, data]) => ({
       rubro: name,
       count: data.count,
-      amount: data.amount
+      amount: data.amount,
+      rubroId: data.rubroId
     }));
 
     // Tendencias (comparación con período anterior)
@@ -191,8 +197,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .map(rubro => ({
         name: rubro.rubro,
         count: rubro.count,
-        amount: rubro.amount
+        amount: rubro.amount,
+        rubroId: rubro.rubroId
       }));
+
+    // Log the action
+    await logReportAction(
+      user.id,
+      LOG_ACTIONS.GENERATE_REPORT,
+      {
+        totalInvoices: invoices.length,
+        totalAmount,
+        categoriesCount: categoryData.length,
+        vendorsCount: vendorData.length,
+        rubrosCount: rubroData.length
+      }
+    );
 
     return res.json({
       summary: {

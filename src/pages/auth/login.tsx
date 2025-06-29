@@ -13,7 +13,6 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
-  useTheme,
   useMediaQuery
 } from '@mui/material';
 import { 
@@ -27,8 +26,7 @@ import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery('(max-width:600px)');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);

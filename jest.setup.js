@@ -81,11 +81,21 @@ global.console = {
 } 
 
 // --- GLOBAL TEARDOWN TO PREVENT LEAKS ---
-afterEach(() => {
+beforeEach(() => {
+  // Clear all timers and mocks before each test
+  jest.clearAllTimers();
+  jest.restoreAllMocks();
+  jest.clearAllMocks();
+});
+
+afterEach(async () => {
   // Clear all timers and mocks after each test
   jest.clearAllTimers();
   jest.restoreAllMocks();
   jest.clearAllMocks();
+  
+  // Wait for any pending promises to resolve
+  await new Promise(resolve => setTimeout(resolve, 0));
 });
 
 afterAll(async () => {
@@ -97,7 +107,9 @@ afterAll(async () => {
   // Clean up global instances from errorHandling
   try {
     const { cleanupGlobalInstances } = require('./src/utils/errorHandling');
-    cleanupGlobalInstances();
+    if (typeof cleanupGlobalInstances === 'function') {
+      cleanupGlobalInstances();
+    }
   } catch (error) {
     // Ignore if module not found
   }
@@ -112,16 +124,19 @@ afterAll(async () => {
     global.AdminAlertSystem.instance = null;
   }
   
-  // Force garbage collection if available
-  if (global.gc) {
-    global.gc();
-  }
-  
-  // Additional cleanup for any remaining timers
+  // Clear any remaining timers
   const activeHandles = process._getActiveHandles();
   activeHandles.forEach(handle => {
     if (handle && typeof handle.unref === 'function') {
       handle.unref();
     }
   });
+  
+  // Wait for any remaining async operations
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Force garbage collection if available
+  if (global.gc) {
+    global.gc();
+  }
 }); 

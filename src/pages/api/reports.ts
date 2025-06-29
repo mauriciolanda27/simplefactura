@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 import { PrismaClient } from '@prisma/client';
+import { logReportAction, LOG_ACTIONS } from '../../utils/logging';
 
 const prisma = new PrismaClient();
 
@@ -82,7 +83,8 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
         ...dateFilter
       },
       include: {
-        category: true
+        category: true,
+        rubro: true
       },
       orderBy: { purchase_date: 'desc' }
     });
@@ -112,6 +114,18 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
       }
       acc[vendorName].count += 1;
       acc[vendorName].amount += invoice.total_amount;
+      return acc;
+    }, {});
+
+    // Agrupar por rubro
+    const rubroStats = invoices.reduce((acc: Record<string, { count: number; amount: number; rubroId?: string }>, invoice) => {
+      const rubroName = invoice.rubro?.name || 'Sin rubro';
+      const rubroId = invoice.rubro?.id;
+      if (!acc[rubroName]) {
+        acc[rubroName] = { count: 0, amount: 0, rubroId };
+      }
+      acc[rubroName].count += 1;
+      acc[rubroName].amount += invoice.total_amount;
       return acc;
     }, {});
 
@@ -165,6 +179,10 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
             vendors: Object.entries(vendorStats)
               .map(([name, stats]) => ({ name, amount: stats.amount, count: stats.count }))
               .sort((a, b) => b.amount - a.amount)
+              .slice(0, 5),
+            rubros: Object.entries(rubroStats)
+              .map(([name, stats]) => ({ name, amount: stats.amount, count: stats.count, rubroId: stats.rubroId }))
+              .sort((a, b) => b.amount - a.amount)
               .slice(0, 5)
           },
           analysis: {
@@ -180,7 +198,8 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
             invoice_number: invoice.number_receipt,
             vendor: invoice.vendor,
             category: invoice.category?.name || 'Sin categoría',
-            rubro: invoice.rubro,
+            rubro: invoice.rubro?.name || 'Sin rubro',
+            rubroId: invoice.rubro?.id,
             total_amount: invoice.total_amount,
             purchase_date: invoice.purchase_date.toISOString().split('T')[0],
             description: invoice.name || ''
@@ -195,7 +214,8 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
             invoice_number: invoice.number_receipt,
             vendor: invoice.vendor,
             category: invoice.category?.name || 'Sin categoría',
-            rubro: invoice.rubro,
+            rubro: invoice.rubro?.name || 'Sin rubro',
+            rubroId: invoice.rubro?.id,
             total_amount: invoice.total_amount,
             purchase_date: invoice.purchase_date.toISOString().split('T')[0],
             description: invoice.name || ''
@@ -224,6 +244,12 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
             name,
             count: stats.count,
             amount: stats.amount
+          })),
+          rubroStats: Object.entries(rubroStats).map(([name, stats]) => ({
+            name,
+            count: stats.count,
+            amount: stats.amount,
+            rubroId: stats.rubroId
           }))
         };
         break;
@@ -240,6 +266,28 @@ async function getReports(req: NextApiRequest, res: NextApiResponse, userId: str
           }
         };
     }
+
+    // Log the action
+    await logReportAction(
+      userId,
+      LOG_ACTIONS.GENERATE_REPORT,
+      {
+        reportType: reportType as string,
+        filters: {
+          dateFrom,
+          dateTo,
+          category,
+          vendor,
+          rubro,
+          minAmount,
+          maxAmount
+        },
+        results: {
+          totalInvoices,
+          totalAmount
+        }
+      }
+    );
 
     return res.status(200).json(reportData);
   } catch (error) {

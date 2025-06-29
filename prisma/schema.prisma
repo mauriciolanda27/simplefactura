@@ -24,17 +24,29 @@ model User {
   
   // Relations
   categories   Category[]
+  rubros       Rubro[]
   invoices     Invoice[]
-  auditLogs    AuditLog[]
-  settings     UserSettings?
   exportHistory ExportHistory[]
   exportAnalytics ExportAnalytics[]
+  userLogs     UserLog[]
 }
 
 model Category {
   id          String   @id @default(cuid())
   name        String
   description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  invoices    Invoice[]
+}
+
+model Rubro {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        String   @default("business") // "personal" | "business"
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   userId      String
@@ -52,38 +64,31 @@ model Invoice {
   purchase_date      DateTime
   total_amount       Float
   vendor             String
-  rubro              String
   categoryId         String
   category           Category @relation(fields: [categoryId], references: [id])
+  rubroId            String
+  rubro              Rubro    @relation(fields: [rubroId], references: [id])
   created_at         DateTime @default(now())
   updated_at         DateTime @updatedAt
   user               User     @relation(fields: [userId], references: [id])
   userId             String
 }
 
-model AuditLog {
+model UserLog {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  action      String   // CREATE, UPDATE, DELETE
-  table_name  String
-  record_id   String
-  old_values  Json?
-  new_values  Json?
+  action      String   // "CREATE_INVOICE", "EXPORT_PDF", "GENERATE_REPORT", etc.
+  entity_type String?  // "Invoice", "Category", "Rubro"
+  entity_id   String?  // ID of the affected record
+  details     Json?    // Additional action details
   ip_address  String?
+  user_agent  String?
   created_at  DateTime @default(now())
-}
-
-model UserSettings {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  theme           String   @default("light")
-  language        String   @default("es")
-  notifications   Boolean  @default(true)
-  export_format   String   @default("csv")
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  
+  @@index([userId, created_at])
+  @@index([action])
+  @@index([entity_type])
 }
 
 // New models for export tracking and analytics

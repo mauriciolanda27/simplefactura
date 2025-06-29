@@ -51,7 +51,11 @@ import {
   Star,
   ArrowForward,
   ArrowBack,
-  Close
+  Close,
+  AccountTree,
+  History,
+  Security,
+  Assessment
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import Link from 'next/link';
@@ -273,6 +277,12 @@ export default function TutorialPage() {
                       <ListItemIcon>
                         <CheckCircle color="success" />
                       </ListItemIcon>
+                      <ListItemText primary="Asigna un rubro (opcional)" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CheckCircle color="success" />
+                      </ListItemIcon>
                       <ListItemText primary="Agrega items de la factura" />
                     </ListItem>
                     <ListItem>
@@ -357,6 +367,12 @@ export default function TutorialPage() {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
+                        <AccountTree color="warning" />
+                      </ListItemIcon>
+                      <ListItemText primary="Por rubro" />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
                         <TrendingUp color="warning" />
                       </ListItemIcon>
                       <ListItemText primary="Por monto" />
@@ -371,7 +387,7 @@ export default function TutorialPage() {
             <Typography variant="body2">
               <strong>🎯 Caso de Uso:</strong> Una PYME de Cochabamba puede registrar facturas de servicios públicos, 
               compras de suministros, y gastos de mantenimiento. El sistema calcula automáticamente totales y 
-              organiza todo por categorías para facilitar la contabilidad.
+              organiza todo por categorías y rubros para facilitar la contabilidad y el análisis detallado.
             </Typography>
           </Alert>
 
@@ -668,6 +684,290 @@ export default function TutorialPage() {
       )
     },
     {
+      title: 'Gestión de Rubros',
+      description: 'Organiza tus facturas por rubros para mejor control contable',
+      color: 'info',
+      icon: <AccountTree />,
+      content: (
+        <Box>
+          <Typography variant="h6" gutterBottom color="info.main">
+            🌳 Organización por Rubros
+          </Typography>
+
+          <Box container spacing={3} sx={{ mb: 3 }}>
+            <Box item xs={12} md={6}>
+              <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+                <CardContent>
+                  <Typography variant="h5" gutterBottom>
+                    ¿Qué son los Rubros?
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    Los rubros son categorías contables que te permiten clasificar tus gastos de manera más específica 
+                    que las categorías generales. Son especialmente útiles para la contabilidad empresarial.
+                  </Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <CheckCircle />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Clasificación Contable" 
+                        secondary="Organiza gastos por rubros específicos"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <CheckCircle />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Análisis Detallado" 
+                        secondary="Identifica patrones de gasto por rubro"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <CheckCircle />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Reportes Especializados" 
+                        secondary="Genera informes por rubro"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <CheckCircle />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Control Presupuestario" 
+                        secondary="Monitorea gastos por área específica"
+                      />
+                    </ListItem>
+                  </List>
+                </CardContent>
+              </Card>
+            </Box>
+
+            <Box item xs={12} md={6}>
+              <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
+                <CardContent>
+                  <Typography variant="h5" gutterBottom>
+                    Tipos de Rubros
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      🏢 Rubros Empresariales
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                      <Chip label="Gastos Operativos" color="primary" variant="outlined" sx={{ color: 'white', borderColor: 'white' }} />
+                      <Chip label="Gastos Administrativos" color="primary" variant="outlined" sx={{ color: 'white', borderColor: 'white' }} />
+                      <Chip label="Gastos de Ventas" color="primary" variant="outlined" sx={{ color: 'white', borderColor: 'white' }} />
+                      <Chip label="Gastos Financieros" color="primary" variant="outlined" sx={{ color: 'white', borderColor: 'white' }} />
+                    </Box>
+                  </Box>
+                  
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      👤 Rubros Personales
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      <Chip label="Gastos Personales" color="secondary" variant="outlined" sx={{ color: 'white', borderColor: 'white' }} />
+                      <Chip label="Gastos Familiares" color="secondary" variant="outlined" sx={{ color: 'white', borderColor: 'white' }} />
+                      <Chip label="Gastos de Ocio" color="secondary" variant="outlined" sx={{ color: 'white', borderColor: 'white' }} />
+                    </Box>
+                  </Box>
+                  
+                  <Typography variant="body2" sx={{ mt: 2 }}>
+                    <strong>💡 Consejo:</strong> Crea rubros específicos para tu negocio. 
+                    Por ejemplo, una empresa de construcción podría tener rubros como "Materiales", "Mano de Obra", "Equipos", etc.
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Box>
+          </Box>
+
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              <strong>📊 Caso de Uso:</strong> Una empresa de servicios en Cochabamba puede crear rubros como "Gastos de Personal", 
+              "Gastos de Equipos", "Gastos de Marketing", y "Gastos de Oficina". Esto le permite 
+              analizar qué áreas generan más gastos y optimizar su presupuesto.
+            </Typography>
+          </Alert>
+
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Button
+              component={Link}
+              href="/rubros"
+              variant="contained"
+              color="info"
+              startIcon={<AccountTree />}
+              sx={{ borderRadius: 2 }}
+            >
+              Gestionar Rubros
+            </Button>
+            <Button
+              component={Link}
+              href="/invoices/new"
+              variant="outlined"
+              startIcon={<Add />}
+              sx={{ borderRadius: 2 }}
+            >
+              Crear Factura con Rubro
+            </Button>
+          </Box>
+        </Box>
+      )
+    },
+    {
+      title: 'Registro de Actividad',
+      description: 'Monitorea todas las acciones realizadas en el sistema',
+      color: 'secondary',
+      icon: <History />,
+      content: (
+        <Box>
+          <Typography variant="h6" gutterBottom color="secondary.main">
+            📋 Registro de Actividad del Sistema
+          </Typography>
+
+          <Box container spacing={3} sx={{ mb: 3 }}>
+            <Box item xs={12} md={6}>
+              <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+                <CardContent>
+                  <Typography variant="h5" gutterBottom>
+                    ¿Qué registra el sistema?
+                  </Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <Add />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Creación de Registros" 
+                        secondary="Facturas, categorías, rubros creados"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <Edit />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Modificaciones" 
+                        secondary="Cambios en facturas y configuraciones"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <Delete />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Eliminaciones" 
+                        secondary="Registros eliminados del sistema"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <FileDownload />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Exportaciones" 
+                        secondary="Reportes y datos exportados"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <Security />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Acceso al Sistema" 
+                        secondary="Inicios y cierres de sesión"
+                      />
+                    </ListItem>
+                  </List>
+                </CardContent>
+              </Card>
+            </Box>
+
+            <Box item xs={12} md={6}>
+              <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
+                <CardContent>
+                  <Typography variant="h5" gutterBottom>
+                    Beneficios del Registro
+                  </Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <Security />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Seguridad" 
+                        secondary="Monitorea accesos al sistema"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <Assessment />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Auditoría" 
+                        secondary="Rastrea cambios en los datos"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <TrendingUp />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Análisis de Uso" 
+                        secondary="Identifica patrones de uso"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon sx={{ color: 'white' }}>
+                        <Warning />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Detección de Problemas" 
+                        secondary="Identifica errores o actividades sospechosas"
+                      />
+                    </ListItem>
+                  </List>
+                </CardContent>
+              </Card>
+            </Box>
+          </Box>
+
+          <Alert severity="success" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              <strong>🔍 Caso de Uso:</strong> Un administrador puede revisar los logs para ver quién creó una factura específica, 
+              cuándo se modificó una categoría, o qué reportes se han exportado. Esto es especialmente útil 
+              para auditorías y control de calidad.
+            </Typography>
+          </Alert>
+
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Button
+              component={Link}
+              href="/logs"
+              variant="contained"
+              color="secondary"
+              startIcon={<History />}
+              sx={{ borderRadius: 2 }}
+            >
+              Ver Registro de Actividad
+            </Button>
+            <Button
+              component={Link}
+              href="/reports"
+              variant="outlined"
+              startIcon={<Assessment />}
+              sx={{ borderRadius: 2 }}
+            >
+              Generar Reportes
+            </Button>
+          </Box>
+        </Box>
+      )
+    },
+    {
       title: 'Estadísticas y Reportes',
       description: 'Analiza tus datos con gráficos y estadísticas',
       color: 'warning',
@@ -701,7 +1001,7 @@ export default function TutorialPage() {
                       </ListItemIcon>
                       <ListItemText 
                         primary="Gráfico de Barras" 
-                        secondary="Comparación por categorías"
+                        secondary="Comparación por categorías y rubros"
                       />
                     </ListItem>
                     <ListItem>
@@ -754,6 +1054,15 @@ export default function TutorialPage() {
                     </ListItem>
                     <ListItem>
                       <ListItemIcon>
+                        <AccountTree color="info" />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Rubro Principal" 
+                        secondary="Rubro con más gastos"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
                         <Business color="warning" />
                       </ListItemIcon>
                       <ListItemText 
@@ -788,7 +1097,7 @@ export default function TutorialPage() {
                       </ListItemIcon>
                       <ListItemText 
                         primary="Reportes Personalizados" 
-                        secondary="Por fecha, categoría, proveedor"
+                        secondary="Por fecha, categoría, rubro, proveedor"
                       />
                     </ListItem>
                     <ListItem>
@@ -809,8 +1118,8 @@ export default function TutorialPage() {
           <Alert severity="warning" sx={{ mb: 2 }}>
             <Typography variant="body2">
               <strong>📈 Caso de Uso:</strong> Una empresa de construcción puede usar las estadísticas para identificar 
-              que el 40% de sus gastos son en materiales, 30% en equipos, y 30% en mano de obra. 
-              Esto le ayuda a optimizar costos y mejorar la rentabilidad.
+              que el 40% de sus gastos son en materiales (rubro: Gastos Operativos), 30% en equipos (rubro: Gastos de Equipos), 
+              y 30% en mano de obra (rubro: Gastos de Personal). Esto le ayuda a optimizar costos y mejorar la rentabilidad.
             </Typography>
           </Alert>
 

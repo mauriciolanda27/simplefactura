@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import { PrismaClient } from '@prisma/client';
+import { logCategoryAction, LOG_ACTIONS } from '../../../utils/logging';
+
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -72,6 +74,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             userId: user.id
           }
         });
+
+        // Log the action
+        await logCategoryAction(
+          user.id,
+          LOG_ACTIONS.CREATE_CATEGORY,
+          category.id,
+          {
+            name: category.name,
+            description: category.description
+          }
+        );
         
         return res.status(201).json(category);
       } catch (e) {

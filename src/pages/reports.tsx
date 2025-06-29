@@ -57,6 +57,7 @@ interface ReportData {
   topPerformers: {
     categories: Array<{ name: string; amount: number; count: number }>;
     vendors: Array<{ name: string; amount: number; count: number }>;
+    rubros: Array<{ name: string; amount: number; count: number; rubroId?: string }>;
   };
   analysis: {
     growthRate: number;
@@ -72,6 +73,7 @@ interface ReportData {
     vendor: string;
     category: string;
     rubro: string;
+    rubroId?: string;
     total_amount: number;
     purchase_date: string;
     description: string;
@@ -728,6 +730,30 @@ export default function Reports() {
                     size="small"
                     disabled={isExporting}
                   />
+                  <TextField
+                    label="Categoría"
+                    value={filters.category}
+                    onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                    sx={{ minWidth: { xs: '100%', sm: 150 } }}
+                    size="small"
+                    disabled={isExporting}
+                  />
+                  <TextField
+                    label="Proveedor"
+                    value={filters.vendor}
+                    onChange={(e) => setFilters({ ...filters, vendor: e.target.value })}
+                    sx={{ minWidth: { xs: '100%', sm: 150 } }}
+                    size="small"
+                    disabled={isExporting}
+                  />
+                  <TextField
+                    label="Rubro"
+                    value={filters.rubro}
+                    onChange={(e) => setFilters({ ...filters, rubro: e.target.value })}
+                    sx={{ minWidth: { xs: '100%', sm: 150 } }}
+                    size="small"
+                    disabled={isExporting}
+                  />
                   <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small">
                     <InputLabel>Tipo de Reporte</InputLabel>
                     <Select
@@ -747,6 +773,15 @@ export default function Reports() {
                     type="number"
                     value={filters.minAmount}
                     onChange={(e) => setFilters({ ...filters, minAmount: parseFloat(e.target.value) || 0 })}
+                    sx={{ minWidth: { xs: '100%', sm: 120 } }}
+                    size="small"
+                    disabled={isExporting}
+                  />
+                  <TextField
+                    label="Monto Máximo"
+                    type="number"
+                    value={filters.maxAmount}
+                    onChange={(e) => setFilters({ ...filters, maxAmount: parseFloat(e.target.value) || 0 })}
                     sx={{ minWidth: { xs: '100%', sm: 120 } }}
                     size="small"
                     disabled={isExporting}
@@ -946,7 +981,7 @@ export default function Reports() {
 
         {/* Top Performers */}
         <AnimatedContainer animation="fade-in" delay={700}>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} sx={{ mb: 4 }}>
+          <Stack direction={{ xs: 'column', lg: 'row' }} spacing={4} sx={{ mb: 4 }}>
             <Paper sx={{ p: 3, borderRadius: 0, flex: 1 }}>
               <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
                 Top Categorías
@@ -981,6 +1016,28 @@ export default function Reports() {
                     </Typography>
                   </Box>
                 ))}
+              </Stack>
+            </Paper>
+            <Paper sx={{ p: 3, borderRadius: 0, flex: 1 }}>
+              <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
+                Top Rubros
+              </Typography>
+              <Stack spacing={2}>
+                {topPerformers.rubros?.map((rubro, index) => (
+                  <Box key={rubro.name} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Chip label={`#${index + 1}`} size="small" color="success" />
+                      <Typography variant="body1">{rubro.name}</Typography>
+                    </Box>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      ${rubro.amount.toLocaleString()}
+                    </Typography>
+                  </Box>
+                )) || (
+                  <Typography variant="body2" color="text.secondary">
+                    No hay datos de rubros disponibles
+                  </Typography>
+                )}
               </Stack>
             </Paper>
           </Stack>

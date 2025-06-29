@@ -3,6 +3,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import { compare } from "bcrypt";  // usar compare para comparar hash
+import { logAuthAction, LOG_ACTIONS } from "../../../utils/logging";
 
 const prisma = new PrismaClient();
 
@@ -50,6 +51,35 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth/login",   // Página personalizada de login
     newUser: "/auth/register"  // (opcional) Podríamos dirigir al registro
+  },
+  callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      // Log successful login
+      if (user?.id) {
+        await logAuthAction(
+          user.id,
+          LOG_ACTIONS.LOGIN,
+          {
+            method: account?.provider || 'credentials',
+            email: user.email
+          }
+        );
+      }
+      return true;
+    },
+    async signOut({ token, session }) {
+      // Log logout
+      if (token?.sub) {
+        await logAuthAction(
+          token.sub,
+          LOG_ACTIONS.LOGOUT,
+          {
+            sessionDuration: Date.now() - (token.iat ? token.iat * 1000 : Date.now())
+          }
+        );
+      }
+      return true;
+    }
   },
   secret: process.env.NEXTAUTH_SECRET
 };

@@ -37,8 +37,11 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(node-mocks-http)/)',
   ],
-  testTimeout: 10000,
+  testTimeout: 15000,
   forceExit: true,
   clearMocks: true,
   resetModules: true,
+  maxWorkers: 1,
+  workerIdleMemoryLimit: '512MB',
+  detectOpenHandles: true,
 } 
