@@ -81,6 +81,16 @@ interface Category {
   description?: string;
 }
 
+interface Rubro {
+  id: string;
+  name: string;
+  description?: string;
+  type: string;
+  created_at: string;
+  updated_at: string;
+  userId: string;
+}
+
 interface Invoice {
   id: string;
   authorization_code: string;
@@ -91,7 +101,7 @@ interface Invoice {
   purchase_date: string;
   total_amount: string;
   vendor: string;
-  rubro: string;
+  rubro: Rubro;
   category: Category;
   categoryId: string;
 }
@@ -456,7 +466,7 @@ export default function InvoicesPage() {
                         <TableCell>{invoice.nit || '-'}</TableCell>
                         <TableCell>
                           <Chip 
-                            label={invoice.rubro || 'Sin rubro'} 
+                            label={invoice.rubro.name || 'Sin rubro'} 
                             variant="outlined" 
                             size="small"
                             color="secondary"
