@@ -6,6 +6,15 @@ import { compare } from "bcrypt";  // usar compare para comparar hash
 
 const prisma = new PrismaClient();
 
+// Validate required environment variables
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error('NEXTAUTH_SECRET environment variable is required');
+}
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is required');
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -42,7 +51,7 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/login",   // Página personalizada de login
     newUser: "/auth/register"  // (opcional) Podríamos dirigir al registro
   },
-  secret: process.env.NEXTAUTH_SECRET || "your-secret-key-here"
+  secret: process.env.NEXTAUTH_SECRET
 };
 
 export default NextAuth(authOptions);

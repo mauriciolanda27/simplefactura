@@ -15,7 +15,9 @@ import {
   Box,
   Typography,
   FormHelperText,
-  Chip
+  Chip,
+  LinearProgress,
+  Alert
 } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -87,6 +89,10 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
   const [newCategoryDescription, setNewCategoryDescription] = useState("");
   const [creatingCategory, setCreatingCategory] = useState(false);
 
+  // Estados para OCR progress
+  const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState(0);
+
   // Cargar categorías del usuario
   useEffect(() => {
     const loadData = async () => {
@@ -116,7 +122,21 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
     if (file) {
       // Cuando se selecciona un archivo, iniciar OCR
       (async () => {
+        setIsOcrProcessing(true);
+        setOcrProgress(0);
         showInfo('Extrayendo datos de la factura...');
+        
+        // Simulate progress for better UX
+        const progressInterval = setInterval(() => {
+          setOcrProgress(prev => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return 90;
+            }
+            return prev + 10;
+          });
+        }, 200);
+
         const base64 = await toBase64(file);
         try {
           const res = await fetch('/api/invoices/ocr', {
@@ -140,10 +160,15 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
             vendor: prev.vendor || data.vendor || ""
           }));
           
+          setOcrProgress(100);
           showSuccess('Datos extraídos del documento. Por favor, verifique antes de guardar.');
         } catch (e) {
           console.error(e);
           showError('No se pudo extraer automáticamente. Complete manualmente los datos.');
+        } finally {
+          clearInterval(progressInterval);
+          setIsOcrProcessing(false);
+          setOcrProgress(0);
         }
       })();
     }
@@ -430,6 +455,33 @@ function InvoiceForm({ initialData = {}, onSaved }: InvoiceFormProps) {
             )}
           </Box>
         </Box>
+
+        {/* OCR Progress */}
+        {isOcrProcessing && (
+          <Box sx={{ 
+            p: 2, 
+            bgcolor: 'primary.50', 
+            borderRadius: 1, 
+            border: '1px solid', 
+            borderColor: 'primary.200' 
+          }}>
+            <Typography variant="subtitle2" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+              <ImageIcon sx={{ mr: 1, fontSize: 20 }} />
+              Procesando Documento con IA
+            </Typography>
+            <LinearProgress 
+              variant="determinate" 
+              value={ocrProgress} 
+              sx={{ mb: 1, height: 8, borderRadius: 4 }}
+            />
+            <Typography variant="body2" color="text.secondary">
+              Extrayendo datos de la factura... {ocrProgress}%
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Esto puede tomar unos segundos dependiendo del tamaño del archivo
+            </Typography>
+          </Box>
+        )}
 
         {/* Información básica */}
         <Box>

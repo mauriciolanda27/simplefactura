@@ -21,7 +21,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField
+  TextField,
+  CircularProgress,
+  LinearProgress
 } from '@mui/material';
 import { 
   FileDownload,
@@ -30,13 +32,18 @@ import {
   Business,
   AttachMoney,
   Receipt,
-  Description as FileIcon
+  Description as FileIcon,
+  Storage as StorageIcon,
+  BarChart as BarChartIcon,
+  PieChart as PieChartIcon
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import SkeletonLoader from '../components/SkeletonLoader';
 import AnimatedContainer from '../components/AnimatedContainer';
+import { useAlert } from '../components/AlertSystem';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { generateChartImage, prepareChartDataForPDF } from '../utils/chartGenerator';
 
 interface ReportData {
   summary: {
@@ -85,10 +92,10 @@ interface ReportFilters {
 export default function Reports() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  
+  const { showSuccess, showError, showWarning } = useAlert();
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
   const [filters, setFilters] = useState<ReportFilters>({
     dateFrom: '',
     dateTo: '',
@@ -101,6 +108,11 @@ export default function Reports() {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [filename, setFilename] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportingFormat, setExportingFormat] = useState<'pdf' | 'csv' | null>(null);
+  const [estimatedFileSize, setEstimatedFileSize] = useState<string>('');
+  const [filenameError, setFilenameError] = useState<string>('');
 
   // Redirect to landing page if not authenticated
   useEffect(() => {
@@ -141,49 +153,193 @@ export default function Reports() {
     }
   }, [session, filters]);
 
+  // Calculate estimated file size based on report type and filters
+  useEffect(() => {
+    if (filters.dateFrom || filters.dateTo) {
+      // Rough estimation based on report type
+      let estimatedSize = 0;
+      
+      if (filters.reportType === 'summary') {
+        estimatedSize = 5000; // ~5KB for summary reports
+      } else if (filters.reportType === 'detailed') {
+        estimatedSize = 15000; // ~15KB for detailed reports
+      } else if (filters.reportType === 'trends') {
+        estimatedSize = 8000; // ~8KB for trend reports
+      } else {
+        estimatedSize = 10000; // ~10KB for breakdown reports
+      }
+      
+      // Adjust based on date range
+      if (filters.dateFrom && filters.dateTo) {
+        const start = new Date(filters.dateFrom);
+        const end = new Date(filters.dateTo);
+        const daysDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+        estimatedSize = Math.max(estimatedSize, daysDiff * 100); // At least 100 bytes per day
+      }
+      
+      if (estimatedSize < 1024) {
+        setEstimatedFileSize(`${estimatedSize} bytes`);
+      } else if (estimatedSize < 1024 * 1024) {
+        setEstimatedFileSize(`${(estimatedSize / 1024).toFixed(1)} KB`);
+      } else {
+        setEstimatedFileSize(`${(estimatedSize / (1024 * 1024)).toFixed(1)} MB`);
+      }
+    } else {
+      setEstimatedFileSize('');
+    }
+  }, [filters.dateFrom, filters.dateTo, filters.reportType]);
+
+  // Simulate export progress
+  useEffect(() => {
+    if (isExporting) {
+      const interval = setInterval(() => {
+        setExportProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+      
+      return () => clearInterval(interval);
+    } else {
+      setExportProgress(0);
+      setExportingFormat(null);
+    }
+  }, [isExporting]);
+
+  // Real-time filename validation
+  useEffect(() => {
+    if (!filename) {
+      setFilenameError('');
+      return;
+    }
+    if (filename.length < 3) {
+      setFilenameError('El nombre debe tener al menos 3 caracteres.');
+      return;
+    }
+    if (filename.length > 50) {
+      setFilenameError('El nombre no puede exceder 50 caracteres.');
+      return;
+    }
+    if (!/^[a-zA-Z0-9._-]+$/.test(filename)) {
+      setFilenameError('Solo se permiten letras, números, guiones, guiones bajos y puntos.');
+      return;
+    }
+    setFilenameError('');
+  }, [filename]);
+
+  // Helper for auto-retry with exponential backoff
+  async function retryExport(fn: () => Promise<any>, maxRetries = 3) {
+    let attempt = 0;
+    let lastError = null;
+    const delays = [500, 1000, 2000];
+    while (attempt < maxRetries) {
+      try {
+        return await fn();
+      } catch (err) {
+        lastError = err;
+        attempt++;
+        if (attempt < maxRetries) {
+          showWarning(
+            `Reintentando exportación... (Intento ${attempt + 1} de ${maxRetries})`,
+            'Reintentando'
+          );
+          await new Promise(res => setTimeout(res, delays[attempt - 1] || 2000));
+        }
+      }
+    }
+    throw lastError;
+  }
+
   const handleExport = async (format: 'pdf' | 'csv') => {
     try {
-      const params = new URLSearchParams();
-      if (filters.dateFrom) params.append('dateFrom', filters.dateFrom);
-      if (filters.dateTo) params.append('dateTo', filters.dateTo);
-      if (filters.category) params.append('category', filters.category);
-      if (filters.vendor) params.append('vendor', filters.vendor);
-      if (filters.rubro) params.append('rubro', filters.rubro);
-      if (filters.minAmount > 0) params.append('minAmount', filters.minAmount.toString());
-      if (filters.maxAmount > 0) params.append('maxAmount', filters.maxAmount.toString());
-      params.append('reportType', filters.reportType);
-      params.append('format', format);
+      setIsExporting(true);
+      setExportingFormat(format);
+      setExportProgress(0);
+      setError('');
 
-      const res = await fetch(`/api/reports/export?${params}`);
-      if (!res.ok) throw new Error('Error al exportar reporte');
-      
-      // Generate default filename if none provided
-      const defaultFilename = `reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}`;
-      const finalFilename = filename.trim() || defaultFilename;
-      const fileExtension = format === 'csv' ? '.csv' : '.pdf';
-      
-      if (format === 'csv') {
-        // Download CSV file
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${finalFilename}${fileExtension}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } else if (format === 'pdf') {
-        // Generate PDF on frontend
-        const pdfData = await res.json();
-        generatePDF(pdfData, filters.reportType, finalFilename);
-      }
+      await retryExport(async () => {
+        const params = new URLSearchParams();
+        if (filters.dateFrom) params.append('dateFrom', filters.dateFrom);
+        if (filters.dateTo) params.append('dateTo', filters.dateTo);
+        if (filters.category) params.append('category', filters.category);
+        if (filters.vendor) params.append('vendor', filters.vendor);
+        if (filters.rubro) params.append('rubro', filters.rubro);
+        if (filters.minAmount > 0) params.append('minAmount', filters.minAmount.toString());
+        if (filters.maxAmount > 0) params.append('maxAmount', filters.maxAmount.toString());
+        params.append('reportType', filters.reportType);
+        params.append('format', format);
+
+        const res = await fetch(`/api/reports/export?${params}`);
+        if (!res.ok) {
+          let errorMsg = 'Error al exportar reporte';
+          try {
+            const errorData = await res.json();
+            errorMsg = errorData.error || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
+        }
+        // Generate default filename if none provided
+        const defaultFilename = `reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}`;
+        const finalFilename = filename.trim() || defaultFilename;
+        const fileExtension = format === 'csv' ? '.csv' : '.pdf';
+        if (format === 'csv') {
+          // Download CSV file with real progress
+          const contentLength = res.headers.get('Content-Length');
+          const total = contentLength ? parseInt(contentLength, 10) : undefined;
+          const reader = res.body?.getReader();
+          const chunks = [];
+          let received = 0;
+          while (reader) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value) {
+              chunks.push(value);
+              received += value.length;
+              if (total) {
+                setExportProgress(Math.min(99, Math.round((received / total) * 100)));
+              }
+            }
+          }
+          const blob = new Blob(chunks, { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${finalFilename}${fileExtension}`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        } else if (format === 'pdf') {
+          // Generate PDF on frontend
+          const pdfData = await res.json();
+          await generatePDF(pdfData, filters.reportType, finalFilename);
+        }
+      });
+
+      setExportProgress(100);
+      showSuccess(
+        `Reporte exportado exitosamente como "${(filename.trim() || `reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}`)}.${format}"`,
+        'Exportación Completada'
+      );
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al exportar');
+      const msg = err instanceof Error ? err.message : 'Error al exportar';
+      setError(msg);
+      showError(
+        msg,
+        'Error de Exportación'
+      );
+    } finally {
+      setIsExporting(false);
+      setExportProgress(0);
+      setExportingFormat(null);
     }
   };
 
-  const generatePDF = (data: any, reportType: string, filename: string) => {
+  const generatePDF = async (data: any, reportType: string, filename: string) => {
     const doc = new jsPDF();
     
     // Title
@@ -226,9 +382,69 @@ export default function Reports() {
 
       yPosition = (doc as any).lastAutoTable.finalY + 20;
 
-      // Top categories
+      // Generate charts for summary report
+      try {
+        // Categories chart
+        if (data.topPerformers.categories.length > 0) {
+          const categoryChartData = prepareChartDataForPDF(data.topPerformers.categories, 'categories');
+          const categoryChartImage = await generateChartImage(categoryChartData, {
+            type: 'pie',
+            title: 'Distribución por Categorías',
+            width: 500,
+            height: 300
+          });
+
+          // Add chart to PDF
+          doc.addPage();
+          doc.setFontSize(16);
+          doc.text('Análisis Visual', 20, 20);
+          
+          doc.setFontSize(12);
+          doc.text('Distribución de Gastos por Categoría', 20, 35);
+          
+          doc.addImage(categoryChartImage, 'PNG', 20, 45, 170, 100);
+          
+          yPosition = 160;
+        }
+
+        // Vendors chart
+        if (data.topPerformers.vendors.length > 0) {
+          const vendorChartData = prepareChartDataForPDF(data.topPerformers.vendors, 'vendors');
+          const vendorChartImage = await generateChartImage(vendorChartData, {
+            type: 'bar',
+            title: 'Top Proveedores por Monto',
+            width: 500,
+            height: 300
+          });
+
+          // Add vendor chart to PDF
+          if (yPosition > 120) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          
+          doc.setFontSize(12);
+          doc.text('Top Proveedores por Monto', 20, yPosition);
+          yPosition += 15;
+          
+          doc.addImage(vendorChartImage, 'PNG', 20, yPosition, 170, 100);
+          yPosition += 120;
+        }
+
+      } catch (error) {
+        console.warn('Error generating charts:', error);
+        // Continue without charts if there's an error
+      }
+
+      // Add detailed tables on a new page
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.text('Detalles por Categoría y Proveedor', 20, 20);
+      yPosition = 35;
+
+      // Top categories table
       if (data.topPerformers.categories.length > 0) {
-        doc.setFontSize(16);
+        doc.setFontSize(14);
         doc.text('Top Categorías', 20, yPosition);
         yPosition += 15;
 
@@ -248,9 +464,9 @@ export default function Reports() {
         yPosition = (doc as any).lastAutoTable.finalY + 20;
       }
 
-      // Top vendors
+      // Top vendors table
       if (data.topPerformers.vendors.length > 0) {
-        doc.setFontSize(16);
+        doc.setFontSize(14);
         doc.text('Top Proveedores', 20, yPosition);
         yPosition += 15;
 
@@ -269,10 +485,62 @@ export default function Reports() {
       }
 
     } else if (reportType === 'detailed') {
-      // Detailed invoices table
+      // Generate trend chart for detailed report if we have invoice data
+      if (data.invoices && data.invoices.length > 0) {
+        try {
+          // Create monthly trend data
+          const monthlyStats = data.invoices.reduce((acc: any, inv: any) => {
+            const month = new Date(inv.purchase_date).toLocaleDateString('es-BO', { 
+              year: 'numeric', 
+              month: 'short' 
+            });
+            if (!acc[month]) {
+              acc[month] = { amount: 0, count: 0 };
+            }
+            acc[month].amount += inv.total_amount;
+            acc[month].count += 1;
+            return acc;
+          }, {});
+
+          const monthlyData = Object.entries(monthlyStats)
+            .map(([month, stats]: [string, any]) => ({
+              month,
+              amount: stats.amount,
+              count: stats.count
+            }))
+            .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+
+          if (monthlyData.length > 1) {
+            const monthlyChartData = prepareChartDataForPDF(monthlyData, 'monthly');
+            const monthlyChartImage = await generateChartImage(monthlyChartData, {
+              type: 'line',
+              title: 'Tendencia Mensual de Gastos',
+              width: 500,
+              height: 300
+            });
+
+            // Add chart to PDF
+            doc.addPage();
+            doc.setFontSize(16);
+            doc.text('Análisis de Tendencia', 20, 20);
+            
+            doc.setFontSize(12);
+            doc.text('Tendencia Mensual de Gastos', 20, 35);
+            
+            doc.addImage(monthlyChartImage, 'PNG', 20, 45, 170, 100);
+            
+            yPosition = 160;
+          }
+        } catch (error) {
+          console.warn('Error generating trend chart:', error);
+        }
+      }
+
+      // Add detailed invoices table on a new page
+      doc.addPage();
       doc.setFontSize(16);
-      doc.text('Detalle de Facturas', 20, yPosition);
-      yPosition += 15;
+      doc.text('Detalle de Facturas', 20, 20);
+      yPosition = 35;
 
       const tableData = data.invoices.map((inv: any) => [
         inv.number_receipt || '',
@@ -386,27 +654,50 @@ export default function Reports() {
                   variant="outlined"
                   startIcon={<FilterList />}
                   onClick={() => setShowFilters(!showFilters)}
+                  disabled={isExporting}
                 >
                   Filtros
                 </Button>
                 <Button
                   variant="contained"
-                  startIcon={<FileDownload />}
+                  startIcon={isExporting && exportingFormat === 'pdf' ? <CircularProgress size={20} /> : <FileDownload />}
                   onClick={() => handleExport('pdf')}
+                  disabled={isExporting || !!filenameError}
                 >
-                  Exportar PDF
+                  {isExporting && exportingFormat === 'pdf' ? 'Exportando PDF...' : 'Exportar PDF'}
                 </Button>
                 <Button
                   variant="contained"
-                  startIcon={<FileDownload />}
+                  startIcon={isExporting && exportingFormat === 'csv' ? <CircularProgress size={20} /> : <FileDownload />}
                   onClick={() => handleExport('csv')}
+                  disabled={isExporting || !!filenameError}
                 >
-                  Exportar CSV
+                  {isExporting && exportingFormat === 'csv' ? 'Exportando CSV...' : 'Exportar CSV'}
                 </Button>
               </Stack>
             </Stack>
           </Paper>
         </AnimatedContainer>
+
+        {/* Export Progress Indicator */}
+        {isExporting && (
+          <AnimatedContainer animation="fade-in" delay={100}>
+            <Paper sx={{ p: 3, mb: 4, borderRadius: 0 }}>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <FileDownload sx={{ mr: 1 }} />
+                Exportando Reporte {exportingFormat?.toUpperCase()}
+              </Typography>
+              <LinearProgress 
+                variant="determinate" 
+                value={exportProgress} 
+                sx={{ mb: 2 }}
+              />
+              <Typography variant="body2" color="text.secondary">
+                {exportProgress}% completado - Generando archivo...
+              </Typography>
+            </Paper>
+          </AnimatedContainer>
+        )}
 
         {/* Filters */}
         {showFilters && (
@@ -425,6 +716,7 @@ export default function Reports() {
                     InputLabelProps={{ shrink: true }}
                     sx={{ minWidth: { xs: '100%', sm: 150 } }}
                     size="small"
+                    disabled={isExporting}
                   />
                   <TextField
                     label="Fecha Hasta"
@@ -434,6 +726,7 @@ export default function Reports() {
                     InputLabelProps={{ shrink: true }}
                     sx={{ minWidth: { xs: '100%', sm: 150 } }}
                     size="small"
+                    disabled={isExporting}
                   />
                   <FormControl sx={{ minWidth: { xs: '100%', sm: 180 } }} size="small">
                     <InputLabel>Tipo de Reporte</InputLabel>
@@ -441,6 +734,7 @@ export default function Reports() {
                       value={filters.reportType}
                       onChange={(e) => setFilters({ ...filters, reportType: e.target.value as 'summary' | 'detailed' | 'trends' | 'breakdown' })}
                       label="Tipo de Reporte"
+                      disabled={isExporting}
                     >
                       <MenuItem value="summary">Resumen</MenuItem>
                       <MenuItem value="detailed">Detallado</MenuItem>
@@ -455,6 +749,7 @@ export default function Reports() {
                     onChange={(e) => setFilters({ ...filters, minAmount: parseFloat(e.target.value) || 0 })}
                     sx={{ minWidth: { xs: '100%', sm: 120 } }}
                     size="small"
+                    disabled={isExporting}
                   />
                 </Stack>
                 
@@ -471,11 +766,52 @@ export default function Reports() {
                       onChange={(e) => setFilename(e.target.value)}
                       fullWidth
                       placeholder={`reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}`}
-                      helperText={`Si no especificas un nombre, se usará: reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}.{formato}`}
+                      helperText={filenameError ? filenameError : `Si no especificas un nombre, se usará: reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}.{formato}`}
+                      error={!!filenameError}
                       size="small"
+                      disabled={isExporting}
                     />
                   </CardContent>
                 </Card>
+
+                {/* File Size Estimation */}
+                {estimatedFileSize && (
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                        <StorageIcon sx={{ mr: 1 }} />
+                        Estimación de Tamaño
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Tamaño estimado del archivo: <strong>{estimatedFileSize}</strong>
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Basado en el tipo de reporte y filtros seleccionados
+                      </Typography>
+                      {/* File size warning */}
+                      {(() => {
+                        // Parse estimated size in bytes
+                        let sizeBytes = 0;
+                        if (estimatedFileSize.endsWith('MB')) {
+                          sizeBytes = parseFloat(estimatedFileSize) * 1024 * 1024;
+                        } else if (estimatedFileSize.endsWith('KB')) {
+                          sizeBytes = parseFloat(estimatedFileSize) * 1024;
+                        } else if (estimatedFileSize.endsWith('bytes')) {
+                          sizeBytes = parseFloat(estimatedFileSize);
+                        }
+                        const threshold = exportingFormat === 'csv' ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+                        if (sizeBytes > threshold) {
+                          return (
+                            <Alert severity="warning" sx={{ mt: 2 }}>
+                              El archivo estimado es muy grande y puede demorar en generarse o descargarse. Considera acotar el rango de fechas o aplicar más filtros.
+                            </Alert>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </CardContent>
+                  </Card>
+                )}
               </Stack>
             </Paper>
           </AnimatedContainer>
@@ -686,6 +1022,26 @@ export default function Reports() {
             </Paper>
           </AnimatedContainer>
         )}
+
+        {/* PDF Features Info */}
+        <Box sx={{ mt: 3, p: 2, bgcolor: 'primary.50', borderRadius: 1, border: '1px solid', borderColor: 'primary.200' }}>
+          <Typography variant="subtitle2" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            <BarChartIcon sx={{ mr: 1, fontSize: 20 }} />
+            PDF Incluye Gráficos Automáticos
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            • Gráfico de distribución por categorías (circular)
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            • Gráfico de top proveedores (barras)
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            • Gráfico de tendencia mensual (líneas)
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            • Resumen ejecutivo con tablas detalladas
+          </Typography>
+        </Box>
 
       </Box>
     </Layout>

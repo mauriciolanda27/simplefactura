@@ -27,6 +27,8 @@ model User {
   invoices     Invoice[]
   auditLogs    AuditLog[]
   settings     UserSettings?
+  exportHistory ExportHistory[]
+  exportAnalytics ExportAnalytics[]
 }
 
 model Category {
@@ -82,4 +84,44 @@ model UserSettings {
   export_format   String   @default("csv")
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
+}
+
+// New models for export tracking and analytics
+
+model ExportHistory {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  export_type     String   // 'invoice' | 'report'
+  format          String   // 'csv' | 'pdf'
+  filename        String
+  file_size       Int?     // Size in bytes
+  filters         Json?    // Export filters used
+  status          String   @default("completed") // 'completed' | 'failed' | 'cancelled'
+  error_message   String?  // Error details if failed
+  retry_count     Int      @default(0)
+  download_count  Int      @default(1)
+  created_at      DateTime @default(now())
+  completed_at    DateTime?
+  
+  @@index([userId, created_at])
+  @@index([export_type, format])
+  @@index([status])
+}
+
+model ExportAnalytics {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  date            DateTime @default(now())
+  export_type     String   // 'invoice' | 'report'
+  format          String   // 'csv' | 'pdf'
+  count           Int      @default(1)
+  total_size      Int      @default(0) // Total size in bytes
+  avg_file_size   Float    @default(0)
+  success_rate    Float    @default(100) // Percentage of successful exports
+  
+  @@unique([userId, date, export_type, format])
+  @@index([userId, date])
+  @@index([export_type, format])
 }
