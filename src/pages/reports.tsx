@@ -29,7 +29,8 @@ import {
   TrendingUp,
   Business,
   AttachMoney,
-  Receipt
+  Receipt,
+  Description as FileIcon
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -99,6 +100,7 @@ export default function Reports() {
     reportType: 'summary'
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [filename, setFilename] = useState('');
 
   // Redirect to landing page if not authenticated
   useEffect(() => {
@@ -155,13 +157,18 @@ export default function Reports() {
       const res = await fetch(`/api/reports/export?${params}`);
       if (!res.ok) throw new Error('Error al exportar reporte');
       
+      // Generate default filename if none provided
+      const defaultFilename = `reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}`;
+      const finalFilename = filename.trim() || defaultFilename;
+      const fileExtension = format === 'csv' ? '.csv' : '.pdf';
+      
       if (format === 'csv') {
         // Download CSV file
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `${finalFilename}${fileExtension}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -169,14 +176,14 @@ export default function Reports() {
       } else if (format === 'pdf') {
         // Generate PDF on frontend
         const pdfData = await res.json();
-        generatePDF(pdfData, filters.reportType);
+        generatePDF(pdfData, filters.reportType, finalFilename);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al exportar');
     }
   };
 
-  const generatePDF = (data: any, reportType: string) => {
+  const generatePDF = (data: any, reportType: string, filename: string) => {
     const doc = new jsPDF();
     
     // Title
@@ -302,8 +309,8 @@ export default function Reports() {
       doc.text(`Página ${i} de ${pageCount}`, 20, doc.internal.pageSize.height - 10);
     }
 
-    // Save PDF
-    doc.save(`reporte_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`);
+    // Save PDF with custom filename
+    doc.save(`${filename}.pdf`);
   };
 
   // Show loading while checking authentication
@@ -450,6 +457,25 @@ export default function Reports() {
                     size="small"
                   />
                 </Stack>
+                
+                {/* Filename Input */}
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                      <FileIcon sx={{ mr: 1 }} />
+                      Nombre del Archivo de Exportación
+                    </Typography>
+                    <TextField
+                      label="Nombre del archivo (opcional)"
+                      value={filename}
+                      onChange={(e) => setFilename(e.target.value)}
+                      fullWidth
+                      placeholder={`reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}`}
+                      helperText={`Si no especificas un nombre, se usará: reporte_${filters.reportType}_${new Date().toISOString().split('T')[0]}.{formato}`}
+                      size="small"
+                    />
+                  </CardContent>
+                </Card>
               </Stack>
             </Paper>
           </AnimatedContainer>

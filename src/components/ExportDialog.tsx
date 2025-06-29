@@ -27,7 +27,8 @@ import {
   PictureAsPdf as PdfIcon,
   TableChart as CsvIcon,
   DateRange as DateRangeIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  Description as FileIcon
 } from '@mui/icons-material';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -74,6 +75,7 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
   const [vendor, setVendor] = useState('');
   const [nit, setNit] = useState('');
   const [includeIVA, setIncludeIVA] = useState(true);
+  const [filename, setFilename] = useState('');
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState('');
 
@@ -238,13 +240,18 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
         throw new Error(errorData.error || 'Error al exportar');
       }
 
+      // Generate default filename if none provided
+      const defaultFilename = `facturas_${startDate}_${endDate}`;
+      const finalFilename = filename.trim() || defaultFilename;
+      const fileExtension = format === 'csv' ? '.csv' : '.pdf';
+
       if (format === 'csv') {
         // Download CSV file
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `facturas_${startDate}_${endDate}.csv`;
+        a.download = `${finalFilename}${fileExtension}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -253,7 +260,7 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
         // Generate and download PDF
         const pdfData: PdfData = await response.json();
         const doc = generatePDF(pdfData);
-        doc.save(`facturas_${startDate}_${endDate}.pdf`);
+        doc.save(`${finalFilename}${fileExtension}`);
       }
 
       onClose();
@@ -404,6 +411,31 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
             </CardContent>
           </Card>
 
+          {/* Filename */}
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <FileIcon sx={{ mr: 1 }} />
+                Nombre del Archivo
+              </Typography>
+              <TextField
+                label="Nombre del archivo (opcional)"
+                value={filename}
+                onChange={(e) => setFilename(e.target.value)}
+                fullWidth
+                placeholder={`facturas_${startDate}_${endDate}`}
+                helperText={`Si no especificas un nombre, se usará: facturas_${startDate}_${endDate}.${format}`}
+                InputProps={{
+                  endAdornment: (
+                    <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+                      .{format}
+                    </Typography>
+                  ),
+                }}
+              />
+            </CardContent>
+          </Card>
+
           {/* Error Display */}
           {error && (
             <Alert severity="error">
@@ -430,13 +462,18 @@ export default function ExportDialog({ open, onClose }: ExportDialogProps) {
                     color={includeIVA ? 'success' : 'default'}
                   />
                 </Stack>
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>Archivo:</strong> {(filename.trim() || `facturas_${startDate}_${endDate}`) + '.' + format}
+                  </Typography>
+                </Box>
               </CardContent>
             </Card>
           )}
         </Stack>
       </DialogContent>
       
-      <DialogActions sx={{ p: 3 }}>
+      <DialogActions>
         <Button onClick={onClose} disabled={isExporting}>
           Cancelar
         </Button>
