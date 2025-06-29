@@ -106,7 +106,10 @@ export function isValidEmail(email: string): boolean {
 
 // Función para validar NIT
 export function isValidNIT(nit: string): boolean {
-  return nit.trim().length > 0;
+  const trimmedNit = nit.trim();
+  // NIT debe tener entre 7 y 11 dígitos y ser solo números
+  const nitRegex = /^\d{7,11}$/;
+  return nitRegex.test(trimmedNit);
 }
 
 // Función para validar monto

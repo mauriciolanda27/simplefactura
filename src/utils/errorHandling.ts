@@ -24,6 +24,7 @@ export class RetryQueue {
     lastError?: Error;
   }> = [];
   private processing = false;
+  private activeTimers: NodeJS.Timeout[] = [];
 
   async add(
     operation: () => Promise<any>,
@@ -103,8 +104,11 @@ export class RetryQueue {
           item.config.maxDelay
         );
 
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, delay));
+        // Wait before retrying with proper timer cleanup
+        await new Promise(resolve => {
+          const timer = setTimeout(resolve, delay);
+          this.activeTimers.push(timer);
+        });
       }
     }
   }
@@ -175,6 +179,15 @@ export class RetryQueue {
 
   clearQueue() {
     this.queue = [];
+    // Clear all active timers
+    this.activeTimers.forEach(timer => clearTimeout(timer));
+    this.activeTimers = [];
+  }
+
+  // Cleanup method for test teardown
+  cleanup() {
+    this.clearQueue();
+    this.processing = false;
   }
 }
 
@@ -208,29 +221,16 @@ export class AdminAlertSystem {
       context
     };
 
-    this.alerts.push(alert);
+    this.alerts.unshift(alert);
 
-    // Keep only last 100 alerts
+    // Keep only the last 100 alerts
     if (this.alerts.length > 100) {
-      this.alerts = this.alerts.slice(-100);
+      this.alerts = this.alerts.slice(0, 100);
     }
-
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.group(`🔔 Admin Alert: ${type.toUpperCase()}`);
-      console.log('Message:', message);
-      console.log('Timestamp:', alert.timestamp);
-      if (context) {
-        console.log('Context:', context);
-      }
-      console.groupEnd();
-    }
-
-    return alert.id;
   }
 
   getAlerts(limit = 50) {
-    return this.alerts.slice(-limit);
+    return this.alerts.slice(0, limit);
   }
 
   clearAlerts() {
@@ -238,26 +238,28 @@ export class AdminAlertSystem {
   }
 
   getAlertStats() {
-    const now = new Date();
-    const last24h = this.alerts.filter(alert => 
-      now.getTime() - alert.timestamp.getTime() < 24 * 60 * 60 * 1000
-    );
-
-    return {
+    const stats = {
       total: this.alerts.length,
-      last24h: last24h.length,
       byType: {
-        error: this.alerts.filter(a => a.type === 'error').length,
-        warning: this.alerts.filter(a => a.type === 'warning').length,
-        info: this.alerts.filter(a => a.type === 'info').length
+        error: 0,
+        warning: 0,
+        info: 0
       }
     };
+
+    this.alerts.forEach(alert => {
+      stats.byType[alert.type]++;
+    });
+
+    return stats;
+  }
+
+  // Cleanup method for test teardown
+  cleanup() {
+    this.clearAlerts();
   }
 }
 
-export const adminAlerts = AdminAlertSystem.getInstance();
-
-// Utility function for enhanced error handling
 export async function withEnhancedErrorHandling<T>(
   operation: () => Promise<T>,
   context?: Record<string, any>
@@ -265,20 +267,14 @@ export async function withEnhancedErrorHandling<T>(
   try {
     return await operation();
   } catch (error) {
-    const errorInfo = globalRetryQueue['categorizeError'](error as Error);
-    
-    // Add admin alert if needed
-    if (errorInfo.shouldAlertAdmin) {
-      adminAlerts.addAlert('error', errorInfo.message, {
-        ...context,
-        errorType: errorInfo.type,
-        timestamp: errorInfo.timestamp
-      });
-    }
-
-    // Re-throw the error with enhanced context
-    const enhancedError = new Error(errorInfo.message);
-    (enhancedError as any).errorInfo = errorInfo;
-    throw enhancedError;
+    // Log error with context
+    console.error('[ERROR]', context ? `${context.context || 'Operation'}:` : ':', error);
+    throw error;
   }
+}
+
+// Global cleanup function for tests
+export function cleanupGlobalInstances() {
+  globalRetryQueue.cleanup();
+  AdminAlertSystem.getInstance().cleanup();
 } 

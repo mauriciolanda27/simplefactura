@@ -79,3 +79,49 @@ global.console = {
   // warn: jest.fn(),
   // error: jest.fn(),
 } 
+
+// --- GLOBAL TEARDOWN TO PREVENT LEAKS ---
+afterEach(() => {
+  // Clear all timers and mocks after each test
+  jest.clearAllTimers();
+  jest.restoreAllMocks();
+  jest.clearAllMocks();
+});
+
+afterAll(async () => {
+  // Final cleanup after all tests
+  jest.clearAllTimers();
+  jest.restoreAllMocks();
+  jest.clearAllMocks();
+  
+  // Clean up global instances from errorHandling
+  try {
+    const { cleanupGlobalInstances } = require('./src/utils/errorHandling');
+    cleanupGlobalInstances();
+  } catch (error) {
+    // Ignore if module not found
+  }
+  
+  // Attempt to disconnect Prisma if present
+  if (global.prisma && typeof global.prisma.$disconnect === 'function') {
+    await global.prisma.$disconnect();
+  }
+  
+  // Clear any global instances that might hold references
+  if (global.AdminAlertSystem && global.AdminAlertSystem.instance) {
+    global.AdminAlertSystem.instance = null;
+  }
+  
+  // Force garbage collection if available
+  if (global.gc) {
+    global.gc();
+  }
+  
+  // Additional cleanup for any remaining timers
+  const activeHandles = process._getActiveHandles();
+  activeHandles.forEach(handle => {
+    if (handle && typeof handle.unref === 'function') {
+      handle.unref();
+    }
+  });
+}); 
