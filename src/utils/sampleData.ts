@@ -1,15 +1,10 @@
-import { Invoice, Category } from '@prisma/client';
+import { Invoice, Category, Rubro } from '@prisma/client';
 
 // Generate sample invoice data for testing predictive analytics
-export function generateSampleInvoices(categories: Category[], userId: string): Omit<Invoice, 'id' | 'created_at' | 'updated_at'>[] {
+export function generateSampleInvoices(categories: Category[], rubros: Rubro[], userId: string): Omit<Invoice, 'id' | 'created_at' | 'updated_at'>[] {
   const vendors = [
     'Proveedor A', 'Proveedor B', 'Proveedor C', 'Proveedor D', 'Proveedor E',
     'Servicios XYZ', 'Materiales ABC', 'Tecnología 123', 'Logística Plus', 'Consultoría Pro'
-  ];
-
-  const rubros = [
-    'Servicios', 'Materiales', 'Tecnología', 'Logística', 'Consultoría',
-    'Mantenimiento', 'Suministros', 'Equipos', 'Transporte', 'Capacitación'
   ];
 
   const sampleInvoices: Omit<Invoice, 'id' | 'created_at' | 'updated_at'>[] = [];
@@ -54,7 +49,7 @@ export function generateSampleInvoices(categories: Category[], userId: string): 
         purchase_date: purchaseDate,
         total_amount: Math.max(100, amount),
         vendor,
-        rubro,
+        rubroId: rubro.id,
         categoryId: category.id,
         userId
       });

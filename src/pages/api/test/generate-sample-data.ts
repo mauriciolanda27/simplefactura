@@ -43,8 +43,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       sampleCategories.map(category => prisma.category.create({ data: category }))
     );
 
+    // Generate sample rubros
+    const sampleRubros = generateSampleRubros(user.id);
+    const createdRubros = await Promise.all(
+      sampleRubros.map(rubro => prisma.rubro.create({ data: rubro }))
+    );
+
     // Generate sample invoices
-    const sampleInvoices = generateSampleInvoices(createdCategories, user.id);
+    const sampleInvoices = generateSampleInvoices(createdCategories, createdRubros, user.id);
     const createdInvoices = await Promise.all(
       sampleInvoices.map(invoice => prisma.invoice.create({ data: invoice }))
     );
@@ -52,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       message: "Datos de muestra generados exitosamente",
       categoriesCreated: createdCategories.length,
+      rubrosCreated: createdRubros.length,
       invoicesCreated: createdInvoices.length,
       totalAmount: createdInvoices.reduce((sum, inv) => sum + parseFloat(String(inv.total_amount)), 0)
     });
@@ -60,4 +67,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error('Error generating sample data:', error);
     return res.status(500).json({ error: "Error al generar datos de muestra" });
   }
+}
+
+function generateSampleRubros(userId: string) {
+  return [
+    { name: 'Servicios', description: 'Servicios generales', type: 'business', userId },
+    { name: 'Materiales', description: 'Materiales y suministros', type: 'business', userId },
+    { name: 'Tecnología', description: 'Equipos y software', type: 'business', userId },
+    { name: 'Logística', description: 'Gastos de logística', type: 'business', userId },
+    { name: 'Consultoría', description: 'Servicios de consultoría', type: 'business', userId },
+    { name: 'Mantenimiento', description: 'Mantenimiento y reparación', type: 'business', userId },
+    { name: 'Suministros', description: 'Suministros varios', type: 'business', userId },
+    { name: 'Equipos', description: 'Equipos y maquinaria', type: 'business', userId },
+    { name: 'Transporte', description: 'Gastos de transporte', type: 'business', userId },
+    { name: 'Capacitación', description: 'Capacitación y formación', type: 'personal', userId },
+  ];
 } 

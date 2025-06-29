@@ -57,6 +57,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let completed_at = null;
     const started_at = new Date();
 
+    const filters = {
+      dateFrom: dateFromStr,
+      dateTo: dateToStr,
+      category: categoryStr,
+      vendor: vendorStr,
+      rubro: rubroStr,
+      minAmount: minAmountNum,
+      maxAmount: maxAmountNum,
+      reportType: reportTypeStr,
+      format: formatStr
+    };
+
     try {
       // Build where clause
       const whereClause: any = { userId: user.id };
@@ -82,7 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Get filtered invoices
       const invoices = await prisma.invoice.findMany({
         where: whereClause,
-        include: { category: true },
+        include: { category: true, rubro: true },
         orderBy: { purchase_date: 'desc' }
       });
 
@@ -161,7 +173,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           csvContent += `Número,Proveedor,Categoría,Rubro,Monto,Fecha,Descripción\n`;
           invoices.forEach(inv => {
-            csvContent += `"${inv.number_receipt || ''}","${(inv.vendor || 'Sin proveedor').replace(/"/g, '""')}","${(inv.category?.name || 'Sin categoría').replace(/"/g, '""')}","${(inv.rubro || 'Sin rubro').replace(/"/g, '""')}",${inv.total_amount.toFixed(2)},"${new Date(inv.purchase_date).toLocaleDateString()}","${(inv.name || '').replace(/"/g, '""')}"\n`;
+            csvContent += `"${inv.number_receipt || ''}","${(inv.vendor || 'Sin proveedor').replace(/"/g, '""')}","${(inv.category?.name || 'Sin categoría').replace(/"/g, '""')}","${(inv.rubro?.name || 'Sin rubro').replace(/"/g, '""')}",${inv.total_amount.toFixed(2)},"${new Date(inv.purchase_date).toLocaleDateString()}","${(inv.name || '').replace(/"/g, '""')}"\n`;
           });
         }
 
@@ -286,7 +298,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             invoice_number: inv.number_receipt,
             vendor: inv.vendor,
             category: inv.category?.name || 'Sin categoría',
-            rubro: inv.rubro || 'Sin rubro',
+            rubro: inv.rubro?.name || 'Sin rubro',
             total_amount: inv.total_amount,
             purchase_date: inv.purchase_date.toISOString().split('T')[0],
             description: inv.name || ''
@@ -305,8 +317,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             filters,
             totalInvoices,
             totalAmount
-          },
-          req.headers['user-agent']
+          }
         );
 
         return res.json(pdfData);

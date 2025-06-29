@@ -66,19 +66,6 @@ export const authOptions: NextAuthOptions = {
         );
       }
       return true;
-    },
-    async signOut({ token, session }) {
-      // Log logout
-      if (token?.sub) {
-        await logAuthAction(
-          token.sub,
-          LOG_ACTIONS.LOGOUT,
-          {
-            sessionDuration: Date.now() - (token.iat ? token.iat * 1000 : Date.now())
-          }
-        );
-      }
-      return true;
     }
   },
   secret: process.env.NEXTAUTH_SECRET

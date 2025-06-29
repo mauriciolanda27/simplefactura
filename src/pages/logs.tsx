@@ -24,7 +24,6 @@ import {
   TextField,
   CircularProgress,
   Pagination,
-  Grid,
   IconButton,
   Tooltip
 } from '@mui/material';
@@ -47,6 +46,7 @@ import Layout from '../components/Layout';
 import SkeletonLoader from '../components/SkeletonLoader';
 import AnimatedContainer from '../components/AnimatedContainer';
 import { useAlert } from '../components/AlertSystem';
+import Grid from '@mui/material/Grid';
 
 interface LogEntry {
   id: string;
@@ -288,76 +288,73 @@ export default function Logs() {
         {/* Activity Summary */}
         {summary && (
           <AnimatedContainer animation="fade-in" delay={300}>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderRadius: 0 }}>
-                  <CardContent>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <History color="primary" />
-                      <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                          {summary.totalActions}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Acciones (30 días)
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderRadius: 0 }}>
-                  <CardContent>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <Assessment color="success" />
-                      <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                          {Object.keys(summary.actionsByType).length}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Tipos de Acciones
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderRadius: 0 }}>
-                  <CardContent>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <Analytics color="warning" />
-                      <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                          {summary.mostCommonAction ? summary.actionsByType[summary.mostCommonAction] : 0}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Acción Más Común
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ borderRadius: 0 }}>
-                  <CardContent>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                      <Visibility color="info" />
-                      <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                          {summary.mostActiveDay ? new Date(summary.mostActiveDay).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit' }) : 'N/A'}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Día Más Activo
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
+            <Box sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 3,
+              mb: 4,
+            }}>
+              <Card sx={{ borderRadius: 0, flex: '1 1 220px', minWidth: 220 }}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" spacing={2}>
+                    <History color="primary" />
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                        {summary.totalActions}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Acciones (30 días)
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+              <Card sx={{ borderRadius: 0, flex: '1 1 220px', minWidth: 220 }}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" spacing={2}>
+                    <Assessment color="success" />
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                        {Object.keys(summary.actionsByType).length}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Tipos de Acciones
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+              <Card sx={{ borderRadius: 0, flex: '1 1 220px', minWidth: 220 }}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" spacing={2}>
+                    <Analytics color="warning" />
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                        {summary.mostCommonAction ? summary.actionsByType[summary.mostCommonAction] : 0}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Acción Más Común
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+              <Card sx={{ borderRadius: 0, flex: '1 1 220px', minWidth: 220 }}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" spacing={2}>
+                    <Visibility color="info" />
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                        {summary.mostActiveDay ? new Date(summary.mostActiveDay).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit' }) : 'N/A'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Día Más Activo
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Box>
           </AnimatedContainer>
         )}
 

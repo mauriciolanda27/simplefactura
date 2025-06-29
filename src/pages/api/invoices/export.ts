@@ -82,6 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where,
         include: {
           category: true, // Incluir datos de la categoría
+          rubro: true,    // Incluir datos del rubro
         },
         orderBy: {
           purchase_date: 'desc',
@@ -143,7 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               inv.authorization_code || '',
               `"${(inv.name || '').replace(/"/g, '""')}"`, // Escape quotes in name
               inv.category?.name || '',
-              `"${(inv.rubro || '').replace(/"/g, '""')}"`, // Escape quotes in rubro
+              `"${(inv.rubro?.name || '').replace(/"/g, '""')}"`, // Escape quotes in rubro
               inv.total_amount.toFixed(2),
               (inv.total_amount / 1.13).toFixed(2),
               (inv.total_amount - inv.total_amount / 1.13).toFixed(2)
@@ -158,7 +159,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               inv.authorization_code || '',
               `"${(inv.name || '').replace(/"/g, '""')}"`, // Escape quotes in name
               inv.category?.name || '',
-              `"${(inv.rubro || '').replace(/"/g, '""')}"`, // Escape quotes in rubro
+              `"${(inv.rubro?.name || '').replace(/"/g, '""')}"`, // Escape quotes in rubro
               inv.total_amount.toFixed(2)
             ];
           }
