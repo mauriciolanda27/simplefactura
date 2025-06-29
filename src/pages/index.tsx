@@ -442,6 +442,7 @@ export default function InvoicesPage() {
                       <TableCell sx={{ fontWeight: 'bold' }}>Fecha</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Vendedor</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>NIT</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Rubro</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Monto</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Categoría</TableCell>
                       <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
@@ -453,6 +454,15 @@ export default function InvoicesPage() {
                         <TableCell>{new Date(invoice.purchase_date).toLocaleDateString()}</TableCell>
                         <TableCell>{invoice.vendor}</TableCell>
                         <TableCell>{invoice.nit || '-'}</TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={invoice.rubro || 'Sin rubro'} 
+                            variant="outlined" 
+                            size="small"
+                            color="secondary"
+                            sx={{ borderRadius: 0 }}
+                          />
+                        </TableCell>
                         <TableCell>
                           <Chip 
                             label={formatCurrency(parseFloat(invoice.total_amount))} 
