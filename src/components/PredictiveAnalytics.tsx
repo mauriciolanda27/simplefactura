@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -29,6 +29,9 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import useSWR from 'swr';
 
+// Fetcher function for SWR
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -53,7 +56,22 @@ function TabPanel(props: TabPanelProps) {
 
 export default function StatisticalAnalytics() {
   const [tabValue, setTabValue] = useState(0);
-  const { data, error, isLoading } = useSWR('/api/analytics/predictions');
+  const { data, error, isLoading } = useSWR('/api/analytics/predictions', fetcher);
+
+  // Debug logs
+  useEffect(() => {
+    console.log('🔍 PredictiveAnalytics - Status:', { isLoading, error, hasData: !!data });
+    if (data) {
+      console.log('📊 PredictiveAnalytics - Data received:', {
+        cashFlow: data.cashFlowPredictions?.length || 0,
+        payments: data.paymentPredictions?.length || 0,
+        seasonal: data.seasonalAnalysis?.length || 0,
+        insights: data.spendingInsights?.length || 0,
+        rubros: data.rubroAnalysis?.length || 0,
+        mockData: data.mockData
+      });
+    }
+  }, [data, error, isLoading]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -75,13 +93,19 @@ export default function StatisticalAnalytics() {
     );
   }
 
-  if (!data || data.cashFlowPredictions.length === 0) {
+  if (!data) {
     return (
       <Alert severity="info" sx={{ m: 2 }}>
-        {data?.message || 'No hay suficientes datos para generar análisis estadístico. Agrega más facturas para obtener insights.'}
+        No hay datos disponibles. Agrega más facturas para obtener análisis estadístico.
       </Alert>
     );
   }
+
+  // Show partial data if some analyses are available
+  const hasAnyData = data.cashFlowPredictions?.length > 0 || 
+                     data.spendingInsights?.length > 0 || 
+                     data.rubroAnalysis?.length > 0 ||
+                     data.paymentPredictions?.length > 0;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-BO', {
@@ -118,11 +142,20 @@ export default function StatisticalAnalytics() {
         Análisis Estadístico Avanzado
       </Typography>
 
+      {!hasAnyData && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          Se requieren más facturas distribuidas en diferentes fechas para generar análisis completo. 
+          Actualmente: {data.dataPoints || 0} facturas. 
+          Ve a <strong>/test-predictive-data</strong> para generar datos de prueba.
+        </Alert>
+      )}
+
       {/* Risk Assessment Card */}
-      <Card sx={{ mb: 3, border: `2px solid ${
-        data.riskAssessment.riskLevel === 'high' ? '#f44336' :
-        data.riskAssessment.riskLevel === 'medium' ? '#ff9800' : '#4caf50'
-      }` }}>
+      {data.riskAssessment && (
+        <Card sx={{ mb: 3, border: `2px solid ${
+          data.riskAssessment.riskLevel === 'high' ? '#f44336' :
+          data.riskAssessment.riskLevel === 'medium' ? '#ff9800' : '#4caf50'
+        }` }}>
         <CardContent>
           <Box display="flex" alignItems="center" mb={2}>
             <Warning color={getRiskColor(data.riskAssessment.riskLevel)} sx={{ mr: 1 }} />
@@ -163,6 +196,7 @@ export default function StatisticalAnalytics() {
           </Box>
         </CardContent>
       </Card>
+      )}
 
       {/* Tabs for different analytics */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -177,6 +211,7 @@ export default function StatisticalAnalytics() {
 
       {/* Cash Flow Predictions */}
       <TabPanel value={tabValue} index={0}>
+        {data.cashFlowPredictions?.length > 0 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <Box>
             <Typography variant="h6" gutterBottom>
@@ -255,6 +290,12 @@ export default function StatisticalAnalytics() {
             </TableContainer>
           </Box>
         </Box>
+        ) : (
+          <Alert severity="info">
+            No hay suficientes datos para proyección de flujo de caja. 
+            Se requieren facturas en al menos 3 fechas diferentes.
+          </Alert>
+        )}
       </TabPanel>
 
       {/* Payment Predictions */}
@@ -262,6 +303,7 @@ export default function StatisticalAnalytics() {
         <Typography variant="h6" gutterBottom>
           Análisis de Patrones de Pagos por Proveedor
         </Typography>
+        {data.paymentPredictions?.length > 0 ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -315,10 +357,17 @@ export default function StatisticalAnalytics() {
             </TableBody>
           </Table>
         </TableContainer>
+        ) : (
+          <Alert severity="info">
+            No hay suficientes datos para análisis de patrones de pago. 
+            Se requieren al menos 3 facturas del mismo proveedor.
+          </Alert>
+        )}
       </TabPanel>
 
       {/* Seasonal Analysis */}
       <TabPanel value={tabValue} index={2}>
+        {data.seasonalAnalysis?.length > 0 ? (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
           <Box sx={{ flex: '1 1 400px', minWidth: 0 }}>
             <Typography variant="h6" gutterBottom>
@@ -365,6 +414,11 @@ export default function StatisticalAnalytics() {
             </Box>
           </Box>
         </Box>
+        ) : (
+          <Alert severity="info">
+            No hay suficientes datos para análisis estacional.
+          </Alert>
+        )}
       </TabPanel>
 
       {/* Spending Insights */}
@@ -372,6 +426,7 @@ export default function StatisticalAnalytics() {
         <Typography variant="h6" gutterBottom>
           Insights de Gastos por Categoría
         </Typography>
+        {data.spendingInsights?.length > 0 ? (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           {data.spendingInsights.map((insight: any, index: number) => (
             <Box sx={{ flex: '1 1 300px', minWidth: 0 }} key={index}>
@@ -422,6 +477,11 @@ export default function StatisticalAnalytics() {
             </Box>
           ))}
         </Box>
+        ) : (
+          <Alert severity="info">
+            No hay suficientes datos para insights de gastos por categoría.
+          </Alert>
+        )}
       </TabPanel>
 
       {/* Rubro Analysis */}
@@ -492,6 +552,11 @@ export default function StatisticalAnalytics() {
           <Info sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
           Análisis basado en {data.dataPoints} facturas. Última actualización: {new Date(data.lastUpdated).toLocaleString('es-BO')}
         </Typography>
+        {data.mockData && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, fontStyle: 'italic' }}>
+            Datos de demostración generados automáticamente para visualización
+          </Typography>
+        )}
       </Box>
     </Box>
   );

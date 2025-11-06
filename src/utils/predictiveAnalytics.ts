@@ -98,19 +98,21 @@ export function predictCashFlow(invoices: Invoice[], daysAhead: number = 30): Ca
   const dates = Array.from(groupedInvoices.keys()).sort();
   const amounts = dates.map(date => groupedInvoices.get(date) || 0);
   
-  if (amounts.length < 7) {
+  if (amounts.length < 3) {
     // Not enough data for statistical analysis
     return [];
   }
   
-  // Calculate moving averages for trend analysis
-  const shortMA = calculateMovingAverage(amounts, 7);
+  // Calculate moving averages for trend analysis (adaptive window)
+  const windowSize = Math.min(7, Math.max(3, amounts.length));
+  const shortMA = calculateMovingAverage(amounts, windowSize);
   
-  // Detect trend using statistical methods
-  const recentTrend = shortMA.slice(-7).reduce((sum, val, i) => {
-    if (i > 0) return sum + (val - shortMA[shortMA.length - 8 + i]);
+  // Detect trend using statistical methods (adaptive)
+  const trendWindow = Math.min(windowSize, shortMA.length);
+  const recentTrend = shortMA.slice(-trendWindow).reduce((sum, val, i) => {
+    if (i > 0) return sum + (val - shortMA[shortMA.length - trendWindow - 1 + i]);
     return sum;
-  }, 0) / 6;
+  }, 0) / Math.max(1, trendWindow - 1);
   
   // Detect seasonality using autocorrelation
   const { seasonality, strength } = detectSeasonality(amounts);

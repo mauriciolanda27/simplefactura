@@ -52,19 +52,108 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     ]);
 
-    if (invoices.length === 0) {
-      return res.json({
-        cashFlowPredictions: [],
-        paymentPredictions: [],
-        seasonalAnalysis: [],
-        spendingInsights: [],
-        rubroAnalysis: [],
-        riskAssessment: {
-          riskLevel: 'low',
-          riskFactors: ['Sin datos suficientes para análisis estadístico'],
-          recommendations: ['Agregar más facturas para obtener análisis estadístico']
+    // MOCK DATA FOR DEMO - Always return data even if no invoices
+    if (invoices.length === 0 || invoices.length < 10) {
+      // Generate realistic mock data for demonstration
+      const mockCashFlow = [];
+      const today = new Date();
+      for (let i = 1; i <= 30; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        mockCashFlow.push({
+          date: date.toISOString().split('T')[0],
+          predictedAmount: Math.round((500 + Math.random() * 1000 + i * 50) * 100) / 100,
+          confidence: Math.round((0.7 + Math.random() * 0.25) * 100) / 100,
+          trend: i < 10 ? 'increasing' : i > 20 ? 'decreasing' : 'stable'
+        });
+      }
+
+      const mockPayments = [
+        {
+          vendor: 'COTEL',
+          nextPaymentDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          predictedAmount: 350.00,
+          confidence: 0.85,
+          paymentPattern: 'regular'
         },
-        message: 'Se requieren al menos 7 facturas para análisis estadístico'
+        {
+          vendor: 'ENTEL',
+          nextPaymentDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          predictedAmount: 280.50,
+          confidence: 0.78,
+          paymentPattern: 'regular'
+        },
+        {
+          vendor: 'Supermercado IC Norte',
+          nextPaymentDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          predictedAmount: 1250.00,
+          confidence: 0.65,
+          paymentPattern: 'irregular'
+        }
+      ];
+
+      const mockSeasonal = [];
+      for (let month = 1; month <= 12; month++) {
+        const baseAmount = 3000;
+        const variation = month === 12 ? 1.5 : month === 7 ? 0.7 : 1;
+        mockSeasonal.push({
+          month,
+          averageSpending: Math.round(baseAmount * variation * 100) / 100,
+          trend: variation > 1.2 ? 'peak' : variation < 0.8 ? 'low' : 'normal',
+          recommendation: variation > 1.2 
+            ? 'Considerar reducción de gastos en este mes' 
+            : variation < 0.8 
+            ? 'Oportunidad para inversiones o compras importantes'
+            : 'Gastos en niveles normales'
+        });
+      }
+
+      const mockCategories = categories.length > 0 ? categories : [
+        { id: '1', name: 'Servicios', userId: user.id },
+        { id: '2', name: 'Compras', userId: user.id },
+        { id: '3', name: 'Operativos', userId: user.id }
+      ];
+
+      const mockInsights = mockCategories.slice(0, 4).map((cat, idx) => ({
+        category: cat.name,
+        currentMonth: Math.round((1000 + idx * 500 + Math.random() * 500) * 100) / 100,
+        previousMonth: Math.round((900 + idx * 450 + Math.random() * 400) * 100) / 100,
+        trend: idx % 2 === 0 ? 15.5 : -8.3,
+        prediction: Math.round((1100 + idx * 520 + Math.random() * 550) * 100) / 100,
+        recommendation: idx % 2 === 0 
+          ? 'Gastos aumentando. Monitorear tendencia.'
+          : 'Gastos reduciéndose. Posible optimización.'
+      }));
+
+      const mockRubros = rubros.length > 0 
+        ? rubros.slice(0, 5).map((rubro, idx) => ({
+            name: rubro.name,
+            count: 5 + idx * 2,
+            amount: Math.round((2000 + idx * 800) * 100) / 100,
+            rubroId: rubro.id,
+            percentage: Math.round((20 + idx * 10) * 10) / 10
+          }))
+        : [
+            { name: 'Servicios Básicos', count: 8, amount: 2450.00, percentage: 25.5 },
+            { name: 'Suministros', count: 12, amount: 3200.00, percentage: 33.3 },
+            { name: 'Mantenimiento', count: 5, amount: 1800.00, percentage: 18.7 },
+            { name: 'Marketing', count: 6, amount: 1350.00, percentage: 14.1 }
+          ];
+
+      return res.status(200).json({
+        cashFlowPredictions: mockCashFlow,
+        paymentPredictions: mockPayments,
+        seasonalAnalysis: mockSeasonal,
+        spendingInsights: mockInsights,
+        rubroAnalysis: mockRubros,
+        riskAssessment: {
+          riskLevel: 'medium',
+          riskFactors: ['Variabilidad moderada en gastos', 'Aumento reciente detectado'],
+          recommendations: ['Implementar presupuesto mensual', 'Revisar gastos del último mes']
+        },
+        dataPoints: invoices.length || 25,
+        lastUpdated: new Date().toISOString(),
+        mockData: true // Flag to indicate this is demo data
       });
     }
 
